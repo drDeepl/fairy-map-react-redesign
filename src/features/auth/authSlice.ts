@@ -1,4 +1,8 @@
-import { AuthControllerService, SignInRequestDto } from "@/api";
+import {
+  AuthControllerService,
+  SignInRequestDto,
+  SignUpRequestDto,
+} from "@/api";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
 
@@ -28,6 +32,13 @@ export const signIn = createAsyncThunk(
   }
 );
 
+export const signUp = createAsyncThunk(
+  "user/signup",
+  async (signUp: SignUpRequestDto, thunkAPI) => {
+    return await AuthControllerService.authControllerSignUp(signUp);
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -49,6 +60,25 @@ const authSlice = createSlice({
         state.success = true;
       })
       .addCase(signIn.rejected, (state, action) => {
+        state.loading = false;
+        console.log(action);
+        state.error = action.error.message as string;
+      })
+      .addCase(signUp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(signUp.fulfilled, (state, action) => {
+        const accessToken: string = action.payload.accessToken;
+        const arrayToken = accessToken.split(".");
+        const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
+        console.log(`token payload ${tokenPayload}`);
+        state.user = tokenPayload;
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

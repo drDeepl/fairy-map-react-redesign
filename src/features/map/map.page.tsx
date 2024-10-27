@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MapComponent from "./map.component";
 import { fetchMapData } from "./mapSlice";
-import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { AuthState } from "../auth/authSlice";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+
+import AuthForm from "../auth/auth.form.component";
 
 const MapPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,14 +18,6 @@ const MapPage: React.FC = () => {
   const { dataMap, loading, error } = useSelector(
     (state: RootState) => state.map
   );
-
-  const handleClickSignIn = () => {
-    console.log("click sign in");
-  };
-
-  const handleClickLogIn = () => {
-    console.log("click log in");
-  };
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
@@ -34,6 +28,10 @@ const MapPage: React.FC = () => {
     setEthnicGroupInputValue(event.target.value);
     console.log(event.target.value); // Логирование значения в консоль
   };
+
+  const [authFormVisible, setAuthFormVisible] = useState<boolean>(false);
+
+  const handleClickAvatar = () => {};
 
   useEffect(() => {
     dispatch(fetchMapData());
@@ -48,31 +46,35 @@ const MapPage: React.FC = () => {
   }
 
   return (
-    // <ResizablePanel>
-
-    <div className="map-pag__content">
-      <div className="fixed flex items-center justify-between p-4 w-full">
-        <Input
-          className="min-h-11 max-w-fit bg-slate-50"
-          type="text"
-          placeholder="введите название этнической группы"
-          value={ethnicGroupInputValue}
-          onChange={handleInputChange}
-        />
-        <Avatar className="">
-          <Button
-            className="h-11 w-11 rounded-full bg-slate-50"
-            variant="ghost"
-            size="icon"
-          >
-            <span className="text-black">
-              {authState.user ? authState.user.email.split("@") : "?"}
-            </span>
-          </Button>
-        </Avatar>
+    <Dialog>
+      <div className="map-pag__content">
+        <div className="fixed flex items-center justify-between p-4 w-full">
+          <Input
+            className="min-h-11 max-w-fit bg-slate-50"
+            type="text"
+            placeholder="введите название этнической группы"
+            value={ethnicGroupInputValue}
+            onChange={handleInputChange}
+          />
+          <DialogTrigger asChild>
+            <Avatar className="">
+              <Button
+                className="h-11 w-11 rounded-full bg-slate-50"
+                variant="ghost"
+                size="icon"
+              >
+                <span className="text-black">
+                  {authState.user ? authState.user.email.split("@") : "?"}
+                </span>
+              </Button>
+            </Avatar>
+          </DialogTrigger>
+          <AuthForm />
+        </div>
+        {dataMap ? <MapComponent features={dataMap} /> : ""}{" "}
       </div>
-      {dataMap ? <MapComponent features={dataMap} /> : ""}{" "}
-    </div>
+    </Dialog>
+
     // </div>
     // {/* </ResizablePanel> */}
     // <ResizablePanelGroup

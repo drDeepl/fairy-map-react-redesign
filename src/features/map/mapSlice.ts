@@ -20,7 +20,7 @@ const initialState: MapState = {
 
 export const fetchMapData = createAsyncThunk("map/fetchMapData", async () => {
   const response = await MapControllerService.mapControllerGetMapTopojson();
-  console.log(response);
+
   return response;
 });
 
