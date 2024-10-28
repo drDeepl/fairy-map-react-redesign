@@ -7,7 +7,7 @@ import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
-import { AuthState } from "../auth/authSlice";
+import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
 import AuthForm from "../auth/auth.form.component";
@@ -34,6 +34,11 @@ const MapPage: React.FC = () => {
 
   const handleClickAvatar = () => {};
 
+  const handleCloseAuthForm = () => {
+    setAuthFormVisible(false);
+    dispatch(setVerifyedCaptcha(false));
+  };
+
   useEffect(() => {
     dispatch(fetchMapData());
   }, [dispatch]);
@@ -47,34 +52,36 @@ const MapPage: React.FC = () => {
   }
 
   return (
-    <Dialog>
-      <div className="map-pag__content">
-        <div className="fixed flex items-center justify-between p-4 w-full">
-          <Input
-            className="min-h-11 max-w-fit bg-slate-50"
-            type="text"
-            placeholder="введите название этнической группы"
-            value={ethnicGroupInputValue}
-            onChange={handleInputChange}
-          />
-          <DialogTrigger asChild>
-            <Avatar className="">
-              <Button
-                className="h-11 w-11 rounded-full bg-slate-50"
-                variant="ghost"
-                size="icon"
-              >
-                <span className="text-black">
-                  {authState.user ? authState.user.email.split("@") : "?"}
-                </span>
-              </Button>
-            </Avatar>
-          </DialogTrigger>
-          <AuthForm />
-        </div>
-        {dataMap ? <MapComponent features={dataMap} /> : ""}{" "}
+    <div className="map-pag__content">
+      <div className="fixed flex items-center justify-between p-4 w-full">
+        <Input
+          className="min-h-11 max-w-fit bg-slate-50"
+          type="text"
+          placeholder="введите название этнической группы"
+          value={ethnicGroupInputValue}
+          onChange={handleInputChange}
+        />
+
+        <Avatar className="">
+          <Button
+            className="h-11 w-11 rounded-full bg-slate-50"
+            variant="ghost"
+            size="icon"
+            onClick={() => setAuthFormVisible(true)}
+          >
+            <span className="text-black">
+              {authState.user ? authState.user.email.split("@") : "?"}
+            </span>
+          </Button>
+        </Avatar>
+
+        <AuthForm
+          visible={authFormVisible}
+          onClose={() => handleCloseAuthForm()}
+        />
       </div>
-    </Dialog>
+      {dataMap ? <MapComponent features={dataMap} /> : ""}
+    </div>
 
     // </div>
     // {/* </ResizablePanel> */}

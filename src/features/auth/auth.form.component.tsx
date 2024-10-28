@@ -6,7 +6,7 @@ import { signInFormSchema } from "./schemas/sign-in.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpFormSchema } from "./schemas/sign-up.schema";
 import { RootState } from "@/store";
-import { setVerifyedCaptcha, signIn } from "./authSlice";
+import { setVerifyedCaptcha, signIn, signUp } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,7 +28,12 @@ import CaptchaComponent from "@/components/captcha.component";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { DialogClose, DialogTitle } from "@radix-ui/react-dialog";
 
-const AuthForm = () => {
+interface AuthFormProps {
+  visible: boolean;
+  onClose: () => void;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const authState = useSelector((state: RootState) => state.auth);
@@ -50,6 +55,7 @@ const AuthForm = () => {
   });
 
   const hundleSuccessCaptcha = () => {
+    console.log("success captcha");
     dispatch(setVerifyedCaptcha(true));
   };
 
@@ -68,119 +74,130 @@ const AuthForm = () => {
     signUpForm.reset();
   }
 
-  useEffect(() => {
-    dispatch(setVerifyedCaptcha(false));
-  });
+  const resetForms = async () => {
+    signUpForm.reset();
+    signInForm.reset();
+  };
 
   return (
-    <DialogContent className="max-w-fit p-9">
-      <Tabs defaultValue="sign-in" className="">
-        <DialogTitle>
-          <TabsList className="grid w-full grid-cols-2 mb-2">
-            <TabsTrigger value="sign-in">Вход</TabsTrigger>
-            <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
-          </TabsList>
-        </DialogTitle>
-        <TabsContent value="sign-in" className="">
-          <Form {...signInForm}>
-            <form
-              onSubmit={signInForm.handleSubmit(onSubmitSignIn)}
-              className="space-y-8"
-            >
-              <FormField
-                control={signInForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Электронная почта</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={signInForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>пароль</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                disabled={authState.loading || !authState.verifyedCaptcha}
-                className="w-full"
-                type="submit"
+    <Dialog
+      open={visible}
+      onOpenChange={(open: boolean) => {
+        if (!open) {
+          onClose();
+          resetForms();
+        }
+      }}
+    >
+      <DialogContent className="max-w-fit p-9">
+        <Tabs defaultValue="sign-in" className="">
+          <DialogTitle>
+            <TabsList className="grid w-full grid-cols-2 mb-2">
+              <TabsTrigger value="sign-in">Вход</TabsTrigger>
+              <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
+            </TabsList>
+          </DialogTitle>
+          <TabsContent value="sign-in" className="">
+            <Form {...signInForm}>
+              <form
+                onSubmit={signInForm.handleSubmit(onSubmitSignIn)}
+                className="space-y-8"
               >
-                {authState.loading ? (
-                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  ""
-                )}
-                войти
-              </Button>
-            </form>
-          </Form>
-        </TabsContent>
-        <TabsContent value="sign-up">
-          <Form {...signUpForm}>
-            <form
-              onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
-              className="space-y-8"
-            >
-              <FormField
-                control={signUpForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Электронная почта</FormLabel>
-                    <FormControl>
-                      <Input placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={signUpForm.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>пароль</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                disabled={authState.loading || !authState.verifyedCaptcha}
-                className="w-full"
-                type="submit"
+                <FormField
+                  control={signInForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Электронная почта</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={signInForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>пароль</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  disabled={authState.loading || !authState.verifyedCaptcha}
+                  className="w-full"
+                  type="submit"
+                >
+                  {authState.loading ? (
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    ""
+                  )}
+                  войти
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+          <TabsContent value="sign-up">
+            <Form {...signUpForm}>
+              <form
+                onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
+                className="space-y-8"
               >
-                {authState.loading ? (
-                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  ""
-                )}
-                зарегистрироваться
-              </Button>
-            </form>
-          </Form>
-        </TabsContent>
-        <CaptchaComponent
-          onSuccessVerify={hundleSuccessCaptcha}
-          onErrorVerify={hundleErrorCaptcha}
-        />
-      </Tabs>
-    </DialogContent>
+                <FormField
+                  control={signUpForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Электронная почта</FormLabel>
+                      <FormControl>
+                        <Input placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={signUpForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>пароль</FormLabel>
+                      <FormControl>
+                        <Input type="password" placeholder="" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  disabled={authState.loading || !authState.verifyedCaptcha}
+                  className="w-full"
+                  type="submit"
+                >
+                  {authState.loading ? (
+                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    ""
+                  )}
+                  зарегистрироваться
+                </Button>
+              </form>
+            </Form>
+          </TabsContent>
+          <CaptchaComponent
+            onSuccessVerify={hundleSuccessCaptcha}
+            onErrorVerify={hundleErrorCaptcha}
+          />
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 };
 

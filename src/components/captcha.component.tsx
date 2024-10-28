@@ -12,7 +12,7 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   onErrorVerify,
 }) => {
   const [token, setToken] = useState(null); // TODO: RESPONSE FROM SERVER
-  const [loading, setLoading] = useState<boolean>(true);
+
   const siteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY;
 
   const handleVerificationSuccess = (token: any) => {
@@ -24,16 +24,12 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
     onErrorVerify(error);
   };
 
-  const captchaContainerRef = useRef<HTMLDivElement | null>(null);
-
   return (
-    <div className="mt-3" ref={captchaContainerRef}>
-      <HCaptcha
-        sitekey={siteKey}
-        onVerify={handleVerificationSuccess}
-        onError={handleVerificationError}
-      />
-    </div>
+    <HCaptcha
+      sitekey={siteKey}
+      onVerify={handleVerificationSuccess}
+      onError={handleVerificationError}
+    />
   );
 };
 export default CaptchaComponent;
