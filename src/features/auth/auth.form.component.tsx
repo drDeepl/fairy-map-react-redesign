@@ -71,6 +71,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   async function onSubmitSignUp(values: z.infer<typeof signInFormSchema>) {
     console.log(values);
+    dispatch(signUp(values));
     signUpForm.reset();
   }
 
