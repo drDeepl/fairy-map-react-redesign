@@ -3,8 +3,7 @@ import {
   SignInRequestDto,
   SignUpRequestDto,
 } from "@/api";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface JwtPayload {
   sub: string;
@@ -16,6 +15,7 @@ export interface AuthState {
   error: string | null;
   success: boolean;
   user: null | JwtPayload;
+  verifyedCaptcha: boolean;
 }
 
 const initialState: AuthState = {
@@ -23,6 +23,7 @@ const initialState: AuthState = {
   error: null,
   success: false,
   user: null,
+  verifyedCaptcha: false,
 };
 
 export const signIn = createAsyncThunk(
@@ -42,7 +43,11 @@ export const signUp = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setVerifyedCaptcha(state: AuthState, action) {
+      state.verifyedCaptcha = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(signIn.pending, (state) => {
@@ -84,5 +89,7 @@ const authSlice = createSlice({
       });
   },
 });
+
+export const { setVerifyedCaptcha } = authSlice.actions;
 
 export default authSlice.reducer;

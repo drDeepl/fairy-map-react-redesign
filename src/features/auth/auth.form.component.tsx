@@ -4,6 +4,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signInFormSchema } from "./schemas/sign-in.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { logInFormSchema } from "./schemas/log-in.schema";
+import { RootState } from "@/store";
+import { setVerifyedCaptcha, signIn } from "./authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   Form,
@@ -16,15 +20,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DialogContent } from "@/components/ui/dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { logInFormSchema } from "./schemas/log-in.schema";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { signIn } from "./authSlice";
+import CaptchaComponent from "@/components/captcha.component";
 import { ReloadIcon } from "@radix-ui/react-icons";
 
 const AuthForm = () => {
@@ -47,6 +47,14 @@ const AuthForm = () => {
       password: "",
     },
   });
+
+  const hundleSuccessCaptcha = () => {
+    dispatch(setVerifyedCaptcha(true));
+  };
+
+  const hundleErrorCaptcha = (error: any) => {
+    console.log(error);
+  };
 
   async function onSubmitSignIn(values: z.infer<typeof signInFormSchema>) {
     console.log(values);
@@ -99,7 +107,7 @@ const AuthForm = () => {
                 )}
               />
               <Button
-                disabled={authState.loading}
+                disabled={authState.loading || !authState.verifyedCaptcha}
                 className="w-full"
                 type="submit"
               >
@@ -146,7 +154,7 @@ const AuthForm = () => {
                 )}
               />
               <Button
-                disabled={authState.loading}
+                disabled={authState.loading || !authState.verifyedCaptcha}
                 className="w-full"
                 type="submit"
               >
@@ -160,6 +168,10 @@ const AuthForm = () => {
             </form>
           </Form>
         </TabsContent>
+        <CaptchaComponent
+          onSuccessVerify={hundleSuccessCaptcha}
+          onErrorVerify={hundleErrorCaptcha}
+        />
       </Tabs>
     </DialogContent>
   );
