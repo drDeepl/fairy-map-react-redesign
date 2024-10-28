@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signInFormSchema } from "./schemas/sign-in.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { logInFormSchema } from "./schemas/log-in.schema";
+import { signUpFormSchema } from "./schemas/sign-up.schema";
 import { RootState } from "@/store";
 import { setVerifyedCaptcha, signIn } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,11 +21,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
 import { ReloadIcon } from "@radix-ui/react-icons";
+import { DialogClose, DialogTitle } from "@radix-ui/react-dialog";
 
 const AuthForm = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,8 +41,8 @@ const AuthForm = () => {
     },
   });
 
-  const logInForm = useForm<z.infer<typeof logInFormSchema>>({
-    resolver: zodResolver(logInFormSchema),
+  const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -64,24 +65,30 @@ const AuthForm = () => {
 
   async function onSubmitSignUp(values: z.infer<typeof signInFormSchema>) {
     console.log(values);
-    signInForm.reset();
+    signUpForm.reset();
   }
+
+  useEffect(() => {
+    dispatch(setVerifyedCaptcha(false));
+  });
 
   return (
     <DialogContent className="max-w-fit p-9">
       <Tabs defaultValue="sign-in" className="">
-        <TabsList className="grid w-full grid-cols-2 mb-2">
-          <TabsTrigger value="sign-in">Вход</TabsTrigger>
-          <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
-        </TabsList>
+        <DialogTitle>
+          <TabsList className="grid w-full grid-cols-2 mb-2">
+            <TabsTrigger value="sign-in">Вход</TabsTrigger>
+            <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
+          </TabsList>
+        </DialogTitle>
         <TabsContent value="sign-in" className="">
           <Form {...signInForm}>
             <form
-              onSubmit={logInForm.handleSubmit(onSubmitSignIn)}
+              onSubmit={signInForm.handleSubmit(onSubmitSignIn)}
               className="space-y-8"
             >
               <FormField
-                control={logInForm.control}
+                control={signInForm.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -94,7 +101,7 @@ const AuthForm = () => {
                 )}
               />
               <FormField
-                control={logInForm.control}
+                control={signInForm.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
@@ -122,13 +129,13 @@ const AuthForm = () => {
           </Form>
         </TabsContent>
         <TabsContent value="sign-up">
-          <Form {...signInForm}>
+          <Form {...signUpForm}>
             <form
-              onSubmit={signInForm.handleSubmit(onSubmitSignUp)}
+              onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
               className="space-y-8"
             >
               <FormField
-                control={signInForm.control}
+                control={signUpForm.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -141,7 +148,7 @@ const AuthForm = () => {
                 )}
               />
               <FormField
-                control={signInForm.control}
+                control={signUpForm.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
