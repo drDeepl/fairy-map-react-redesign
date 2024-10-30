@@ -1,14 +1,13 @@
-import { AppDispatch, RootState } from "@/store";
+import { AppDispatch, RootState } from "@/app/store";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MapComponent from "./map.component";
-import { fetchMapData } from "./mapSlice";
+import { fetchMapData } from "./map.actions";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/avatar";
 import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
 import AuthForm from "../auth/auth.form.component";
 

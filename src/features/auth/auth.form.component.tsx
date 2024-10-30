@@ -5,7 +5,7 @@ import { z } from "zod";
 import { signInFormSchema } from "./schemas/sign-in.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpFormSchema } from "./schemas/sign-up.schema";
-import { RootState } from "@/store";
+import { RootState } from "@/app/store";
 import { setVerifyedCaptcha, signIn, signUp } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 

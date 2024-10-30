@@ -1,8 +1,3 @@
-import {
-  AuthControllerService,
-  SignInRequestDto,
-  SignUpRequestDto,
-} from "@/api";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface JwtPayload {
@@ -28,15 +23,15 @@ const initialState: AuthState = {
 
 export const signIn = createAsyncThunk(
   "user/signin",
-  async (signInDto: SignInRequestDto, thunkAPI) => {
-    return await AuthControllerService.authControllerSignIn(signInDto);
+  async (signInDto: any, thunkAPI) => {
+    console.log(signInDto);
   }
 );
 
 export const signUp = createAsyncThunk(
   "user/signup",
-  async (signUp: SignUpRequestDto, thunkAPI) => {
-    return await AuthControllerService.authControllerSignUp(signUp);
+  async (signUp: any, thunkAPI) => {
+    console.log(signUp);
   }
 );
 
@@ -84,6 +79,7 @@ const authSlice = createSlice({
         state.success = true;
       })
       .addCase(signUp.rejected, (state, action) => {
+        console.log(action);
         state.loading = false;
         state.error = action.payload as string;
       });

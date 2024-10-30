@@ -1,28 +1,22 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import * as turf from "@turf/turf";
 import { feature } from "topojson-client";
 import { FeatureCollection } from "geojson";
-import { MapControllerService } from "../../api/services/MapControllerService";
+import { fetchMapData } from "./map.actions";
 
-export interface MapState {
+export interface MapSlice {
   loading: boolean;
   error: string | null;
   success: boolean;
   dataMap: FeatureCollection | null;
 }
 
-const initialState: MapState = {
+const initialState: MapSlice = {
   loading: false,
   error: null,
   success: false,
   dataMap: null,
 };
-
-export const fetchMapData = createAsyncThunk("map/fetchMapData", async () => {
-  const response = await MapControllerService.mapControllerGetMapTopojson();
-
-  return response;
-});
 
 const mapSlice = createSlice({
   name: "map",
@@ -35,7 +29,8 @@ const mapSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMapData.fulfilled, (state, action) => {
-        const geoJson = feature(action.payload, action.payload.objects.map);
+        const data = action.payload.data;
+        const geoJson = feature(data, data.objects.map);
 
         const simplifyOptions = { tolerance: 0.008, highQuality: false };
 
@@ -44,6 +39,7 @@ const mapSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchMapData.rejected, (state, action) => {
+        console.log(action);
         state.loading = false;
         state.error = action.error.message ? action.error.message : null;
       });
