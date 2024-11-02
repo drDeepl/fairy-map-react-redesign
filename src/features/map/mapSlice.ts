@@ -3,6 +3,10 @@ import * as turf from "@turf/turf";
 import { feature } from "topojson-client";
 import { FeatureCollection } from "geojson";
 import { fetchMapData } from "./map.actions";
+import {
+  ApiErrorResponse,
+  handleApiErrorResponse,
+} from "@/api/helpers/handler-response";
 
 export interface MapSlice {
   loading: boolean;
@@ -39,7 +43,10 @@ const mapSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchMapData.rejected, (state, action) => {
-        console.log(action);
+        const errorResponse: ApiErrorResponse = handleApiErrorResponse(
+          action.error
+        );
+        console.log(errorResponse.message);
         state.loading = false;
         state.error = action.error.message ? action.error.message : null;
       });
