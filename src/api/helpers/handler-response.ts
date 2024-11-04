@@ -2,20 +2,30 @@ import { isAxiosError } from "axios";
 
 export interface ApiErrorResponse {
   message: string;
+  validationErrors?: Record<string, string[]>;
 }
 
 export const handleApiErrorResponse = (error: any): ApiErrorResponse => {
-  const errorResponse = { message: "что-то пошло не так" };
+  console.log("handleApiErrorResponse");
 
-  console.log(error);
+  const errorResponse = {
+    message: "что-то пошло не так",
+    validationErrors: undefined,
+  };
 
   if (isAxiosError(error)) {
-    if (typeof error.code === "number") {
-      errorResponse.message = error.message;
+    if (typeof error.status === "number") {
+      errorResponse.message = error.response?.data.message;
+
+      if (error.response?.data.statusCode === 400) {
+        errorResponse.validationErrors = error.response?.data.validationErrors;
+      }
+
       return errorResponse;
     }
-    errorResponse.message = "возникли проблемы с подключением к сети";
+    errorResponse.message = "ошибка в интернет соедиении";
     return errorResponse;
   }
+
   return errorResponse;
 };

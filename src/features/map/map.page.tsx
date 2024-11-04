@@ -10,19 +10,17 @@ import { Avatar } from "@/components/ui/avatar";
 import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
 
 import AuthForm from "../auth/auth.form.component";
+import ErrorMessageScreen from "@/components/error-message.screen";
 
 const MapPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { dataMap, loading, error } = useSelector(
-    (state: RootState) => state.map
-  );
+  const mapState = useSelector((state: RootState) => state.map);
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
+    useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -30,8 +28,6 @@ const MapPage: React.FC = () => {
   };
 
   const [authFormVisible, setAuthFormVisible] = useState<boolean>(false);
-
-  const handleClickAvatar = () => {};
 
   const handleCloseAuthForm = () => {
     setAuthFormVisible(false);
@@ -42,12 +38,14 @@ const MapPage: React.FC = () => {
     dispatch(fetchMapData());
   }, [dispatch]);
 
-  if (loading) {
+  if (mapState.loading) {
     return <LoadSpinner />;
   }
 
-  if (error) {
-    return <div>{error}</div>;
+  if (mapState.error) {
+    console.log("error state");
+    console.log(mapState.error);
+    return <ErrorMessageScreen message={mapState.error.message} />;
   }
 
   return (
@@ -79,7 +77,7 @@ const MapPage: React.FC = () => {
           onClose={() => handleCloseAuthForm()}
         />
       </div>
-      {dataMap ? <MapComponent features={dataMap} /> : ""}
+      {mapState.dataMap ? <MapComponent features={mapState.dataMap} /> : ""}
     </div>
 
     // </div>

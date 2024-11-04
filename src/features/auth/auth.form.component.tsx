@@ -5,8 +5,8 @@ import { z } from "zod";
 import { signInFormSchema } from "./schemas/sign-in.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpFormSchema } from "./schemas/sign-up.schema";
-import { RootState } from "@/app/store";
-import { setVerifyedCaptcha, signIn, signUp } from "./authSlice";
+import { AppDispatch, RootState } from "@/app/store";
+import { setVerifyedCaptcha } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -27,6 +27,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { DialogClose, DialogTitle } from "@radix-ui/react-dialog";
+import { signIn, signUp } from "./auth.actions";
 
 interface AuthFormProps {
   visible: boolean;

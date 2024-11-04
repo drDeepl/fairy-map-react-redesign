@@ -10,7 +10,7 @@ import {
 
 export interface MapSlice {
   loading: boolean;
-  error: string | null;
+  error: ApiErrorResponse | null;
   success: boolean;
   dataMap: FeatureCollection | null;
 }
@@ -43,12 +43,8 @@ const mapSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchMapData.rejected, (state, action) => {
-        const errorResponse: ApiErrorResponse = handleApiErrorResponse(
-          action.error
-        );
-        console.log(errorResponse.message);
+        state.error = action.paylaod as ApiErrorResponse;
         state.loading = false;
-        state.error = action.error.message ? action.error.message : null;
       });
   },
 });

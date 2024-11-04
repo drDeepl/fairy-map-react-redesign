@@ -1,4 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { signIn, signUp } from "./auth.actions";
+import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 export interface JwtPayload {
   sub: string;
@@ -7,7 +9,7 @@ export interface JwtPayload {
 
 export interface AuthState {
   loading: boolean;
-  error: string | null;
+  error: ApiErrorResponse | null;
   success: boolean;
   user: null | JwtPayload;
   verifyedCaptcha: boolean;
@@ -20,20 +22,6 @@ const initialState: AuthState = {
   user: null,
   verifyedCaptcha: false,
 };
-
-export const signIn = createAsyncThunk(
-  "user/signin",
-  async (signInDto: any, thunkAPI) => {
-    console.log(signInDto);
-  }
-);
-
-export const signUp = createAsyncThunk(
-  "user/signup",
-  async (signUp: any, thunkAPI) => {
-    console.log(signUp);
-  }
-);
 
 const authSlice = createSlice({
   name: "auth",
@@ -62,7 +50,7 @@ const authSlice = createSlice({
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         console.log(action);
-        state.error = action.error.message as string;
+        state.error = action.payload as ApiErrorResponse;
       })
       .addCase(signUp.pending, (state) => {
         state.loading = true;
@@ -81,7 +69,7 @@ const authSlice = createSlice({
       .addCase(signUp.rejected, (state, action) => {
         console.log(action);
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload as ApiErrorResponse;
       });
   },
 });
