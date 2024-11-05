@@ -19,8 +19,9 @@ const MapPage: React.FC = () => {
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -43,8 +44,6 @@ const MapPage: React.FC = () => {
   }
 
   if (mapState.error) {
-    console.log("error state");
-    console.log(mapState.error);
     return <ErrorMessageScreen message={mapState.error.message} />;
   }
 
@@ -79,28 +78,6 @@ const MapPage: React.FC = () => {
       </div>
       {mapState.dataMap ? <MapComponent features={mapState.dataMap} /> : ""}
     </div>
-
-    // </div>
-    // {/* </ResizablePanel> */}
-    // <ResizablePanelGroup
-    //   direction="vertical"
-    //   className="min-h-screen min-w-screen"
-    // >
-    /* <ResizablePanel defaultSize={10}>
-        <div className="flex h-3 items-center justify-center p-6">
-          <span className="font-semibold">Header</span>
-        </div>
-      </ResizablePanel> */
-
-    // </ResizablePanelGroup>
-    // <div className="map-page__container flex justify-content-center">
-    //   <Topbar
-    //     user={authState.user}
-    //     onClickSignIn={handleClickSignIn}
-    //     onClickLogIn={handleClickLogIn}
-    //   />
-
-    // </div>
   );
 };
 

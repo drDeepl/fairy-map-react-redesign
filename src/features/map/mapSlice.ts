@@ -43,7 +43,8 @@ const mapSlice = createSlice({
         state.loading = false;
       })
       .addCase(fetchMapData.rejected, (state, action) => {
-        state.error = action.paylaod as ApiErrorResponse;
+        state.error = action.payload as ApiErrorResponse;
+
         state.loading = false;
       });
   },

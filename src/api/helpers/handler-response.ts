@@ -23,7 +23,7 @@ export const handleApiErrorResponse = (error: any): ApiErrorResponse => {
 
       return errorResponse;
     }
-    errorResponse.message = "ошибка в интернет соедиении";
+    errorResponse.message = "ошибка в интернет соединении";
     return errorResponse;
   }
 
