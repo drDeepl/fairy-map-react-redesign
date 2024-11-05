@@ -19,7 +19,7 @@ const ErrorMessageScreen: React.FC<ErrorMessageProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="absolute bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 filter blur-3xl h-2/6 w-1/6 left-2 top-1"></div>
       <div className="absolute bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 filter blur-3xl h-2/6 w-1/6 right-2 bottom-1"></div>
       <div className="relative z-30 flex flex-col items-center text-center ">
