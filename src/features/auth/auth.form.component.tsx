@@ -1,10 +1,12 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
+import { signIn, signUp } from "./auth.actions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { signInFormSchema } from "./schemas/sign-in.schema";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signUpFormSchema } from "./schemas/sign-up.schema";
+import { signUpFormSchema } from "./forms/schemas/sign-up.schema";
 import { AppDispatch, RootState } from "@/app/store";
 import { setVerifyedCaptcha } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,14 +21,16 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import { DialogClose, DialogTitle } from "@radix-ui/react-dialog";
-import { signIn, signUp } from "./auth.actions";
+import SignInFormComponent from "./forms/sign-in.form.component";
+
+import { components } from "@/api/schema/schema";
 
 interface AuthFormProps {
   visible: boolean;
@@ -39,13 +42,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   const authState = useSelector((state: RootState) => state.auth);
 
-  const signInForm = useForm<z.infer<typeof signInFormSchema>>({
-    resolver: zodResolver(signInFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  const [showCaptcha, setShowCaptcha] = useState<boolean>(false);
 
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -58,27 +55,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   const hundleSuccessCaptcha = () => {
     console.log("success captcha");
     dispatch(setVerifyedCaptcha(true));
+    setShowCaptcha(false);
   };
 
   const hundleErrorCaptcha = (error: any) => {
     console.log(error);
   };
 
-  async function onSubmitSignIn(values: z.infer<typeof signInFormSchema>) {
-    console.log(values);
-    dispatch(signIn(values));
-    signInForm.reset();
-  }
-
-  async function onSubmitSignUp(values: z.infer<typeof signInFormSchema>) {
+  async function onSubmitSignUp(values: z.infer<typeof signUpFormSchema>) {
     console.log(values);
     dispatch(signUp(values));
     signUpForm.reset();
   }
 
+  async function onSubmitSignIn(
+    values: components["schemas"]["SignInRequestDto"]
+  ) {
+    console.log(values);
+    setShowCaptcha(true);
+    dispatch(signIn(values));
+  }
+
   const resetForms = async () => {
     signUpForm.reset();
-    signInForm.reset();
   };
 
   return (
@@ -99,52 +98,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
               <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
             </TabsList>
           </DialogTitle>
+          <DialogDescription className="flex justify-center">
+            {authState.error?.message || authState.error?.validationErrors
+              ? "todo show errors"
+              : ""}
+          </DialogDescription>
           <TabsContent value="sign-in" className="">
-            <Form {...signInForm}>
-              <form
-                onSubmit={signInForm.handleSubmit(onSubmitSignIn)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={signInForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Электронная почта</FormLabel>
-                      <FormControl>
-                        <Input placeholder="" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={signInForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>пароль</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  disabled={authState.loading || !authState.verifyedCaptcha}
-                  className="w-full"
-                  type="submit"
-                >
-                  {authState.loading ? (
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    ""
-                  )}
-                  войти
-                </Button>
-              </form>
-            </Form>
+            <SignInFormComponent
+              state={authState}
+              onSubmit={async (values) => {
+                onSubmitSignIn(values);
+              }}
+            />
           </TabsContent>
           <TabsContent value="sign-up">
             <Form {...signUpForm}>
@@ -179,7 +144,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
                   )}
                 />
                 <Button
-                  disabled={authState.loading || !authState.verifyedCaptcha}
+                  disabled={authState.loading}
                   className="w-full"
                   type="submit"
                 >
@@ -193,10 +158,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
               </form>
             </Form>
           </TabsContent>
-          <CaptchaComponent
-            onSuccessVerify={hundleSuccessCaptcha}
-            onErrorVerify={hundleErrorCaptcha}
-          />
+          <div className="pt-4">
+            <CaptchaComponent
+              onSuccessVerify={hundleSuccessCaptcha}
+              onErrorVerify={hundleErrorCaptcha}
+            />
+          </div>
         </Tabs>
       </DialogContent>
     </Dialog>

@@ -25,11 +25,13 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   };
 
   return (
-    <HCaptcha
-      sitekey={siteKey}
-      onVerify={handleVerificationSuccess}
-      onError={handleVerificationError}
-    />
+    <div>
+      <HCaptcha
+        sitekey={siteKey}
+        onVerify={handleVerificationSuccess}
+        onError={handleVerificationError}
+      />
+    </div>
   );
 };
 export default CaptchaComponent;
