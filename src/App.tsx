@@ -12,8 +12,12 @@ function App() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location}>
-        <Route path={RouteApp.Home} element={<WelcomePage />} />
-        <Route path={RouteApp.Map} element={<MapPage />} />
+        <Route
+          key={RouteApp.Home}
+          path={RouteApp.Home}
+          element={<WelcomePage />}
+        />
+        <Route key={RouteApp.Map} path={RouteApp.Map} element={<MapPage />} />
       </Routes>
     </AnimatePresence>
   );
