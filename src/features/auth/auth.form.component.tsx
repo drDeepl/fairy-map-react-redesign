@@ -8,7 +8,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpFormSchema } from "./forms/schemas/sign-up.schema";
 import { AppDispatch, RootState } from "@/app/store";
-import { setValidDataForm, setVerifyedCaptcha } from "./authSlice";
+import {
+  setError,
+  setLoad,
+  setValidDataForm,
+  setVerifyedCaptcha,
+} from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -81,6 +86,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     []
   );
 
+  const handleOnClose = () => {
+    onClose();
+    resetForms();
+    dispatch(setLoad(false));
+    dispatch(setError(null));
+  };
+
   // async function onSubmitSignIn(
   //   values: components["schemas"]["SignInRequestDto"]
   // ) {
@@ -98,8 +110,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
       open={visible}
       onOpenChange={(open: boolean) => {
         if (!open) {
-          onClose();
-          resetForms();
+          handleOnClose();
         }
       }}
     >

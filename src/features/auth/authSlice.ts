@@ -35,6 +35,12 @@ const authSlice = createSlice({
     setValidDataForm(state: AuthState, action) {
       state.dataFormValid = action.payload;
     },
+    setLoad(state: AuthState, action) {
+      state.loading = action.payload;
+    },
+    setError(state: AuthState, action) {
+      state.error = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -79,6 +85,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setVerifyedCaptcha, setValidDataForm } = authSlice.actions;
+export const { setVerifyedCaptcha, setValidDataForm, setLoad, setError } =
+  authSlice.actions;
 
 export default authSlice.reducer;
