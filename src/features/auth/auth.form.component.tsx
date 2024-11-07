@@ -36,7 +36,7 @@ import CaptchaComponent from "@/components/captcha.component";
 import SignInFormComponent from "./forms/sign-in.form.component";
 
 import { components } from "@/api/schema/schema";
-import ErrorsAlertComponent from "@/components/error-alert.component";
+import ErrorsAlertComponent from "@/components/errors-alert.component";
 
 enum Tab {
   SignIn = "signin",
@@ -127,7 +127,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           </DialogTitle>
           <DialogDescription className="flex justify-center">
             {authState.error?.message || authState.error?.validationErrors ? (
-              <ErrorsAlertComponent title="произошла ошибка" />
+              <ErrorsAlertComponent
+                title="ошибка"
+                errors={{ cdjqcndjq: [authState.error?.message] }}
+              />
             ) : null}
           </DialogDescription>
           <TabsContent value={Tab.SignIn} className="">
