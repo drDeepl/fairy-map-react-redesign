@@ -1,8 +1,7 @@
 import { RouteApp } from "@/pages/constants/route.enum";
-import FeatherIcon from "feather-icons-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { CrossCircledIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, CrossCircledIcon } from "@radix-ui/react-icons";
 
 interface ErrorMessageProps {
   message: string;
@@ -30,7 +29,7 @@ const ErrorMessageScreen: React.FC<ErrorMessageProps> = ({
         </div>
         <h1 className="mt-2 text-slate-500 text-2xl">{message}...</h1>
         <Button className="m-2" onClick={handleOnBack} variant="outline">
-          <FeatherIcon icon="arrow-left" />
+          <ArrowLeftIcon />
           назад
         </Button>
       </div>

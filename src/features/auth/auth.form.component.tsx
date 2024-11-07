@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,7 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpFormSchema } from "./forms/schemas/sign-up.schema";
 import { AppDispatch, RootState } from "@/app/store";
-import { setVerifyedCaptcha } from "./authSlice";
+import { setValidDataForm, setVerifyedCaptcha } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -31,6 +31,12 @@ import CaptchaComponent from "@/components/captcha.component";
 import SignInFormComponent from "./forms/sign-in.form.component";
 
 import { components } from "@/api/schema/schema";
+import ErrorsAlertComponent from "@/components/error-alert.component";
+
+enum Tab {
+  SignIn = "signin",
+  SignUp = "signup",
+}
 
 interface AuthFormProps {
   visible: boolean;
@@ -42,7 +48,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   const authState = useSelector((state: RootState) => state.auth);
 
-  const [showCaptcha, setShowCaptcha] = useState<boolean>(false);
+  const [verifyedCaptcha, setVerifyedCaptcha] = useState<boolean>(false);
+  const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
 
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -54,8 +61,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   const hundleSuccessCaptcha = () => {
     console.log("success captcha");
-    dispatch(setVerifyedCaptcha(true));
-    setShowCaptcha(false);
+    setVerifyedCaptcha(true);
   };
 
   const hundleErrorCaptcha = (error: any) => {
@@ -68,13 +74,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     signUpForm.reset();
   }
 
-  async function onSubmitSignIn(
-    values: components["schemas"]["SignInRequestDto"]
-  ) {
-    console.log(values);
-    setShowCaptcha(true);
-    dispatch(signIn(values));
-  }
+  const handleSignIn = useCallback(
+    async (values: components["schemas"]["SignInRequestDto"]) => {
+      dispatch(signIn(values));
+    },
+    []
+  );
+
+  // async function onSubmitSignIn(
+  //   values: components["schemas"]["SignInRequestDto"]
+  // ) {
+  //   console.log(values);
+
+  //   dispatch(signIn(values));
+  // }
 
   const resetForms = async () => {
     signUpForm.reset();
@@ -91,27 +104,29 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
       }}
     >
       <DialogContent className="max-w-fit p-9">
-        <Tabs defaultValue="sign-in" className="">
+        <Tabs
+          defaultValue={Tab.SignIn}
+          onValueChange={(value: string) => setCurrentTab(value)}
+        >
           <DialogTitle>
             <TabsList className="grid w-full grid-cols-2 mb-2">
-              <TabsTrigger value="sign-in">Вход</TabsTrigger>
-              <TabsTrigger value="sign-up">Регистрация</TabsTrigger>
+              <TabsTrigger value={Tab.SignIn}>Вход</TabsTrigger>
+              <TabsTrigger value={Tab.SignUp}>Регистрация</TabsTrigger>
             </TabsList>
           </DialogTitle>
           <DialogDescription className="flex justify-center">
-            {authState.error?.message || authState.error?.validationErrors
-              ? "todo show errors"
-              : ""}
+            {authState.error?.message || authState.error?.validationErrors ? (
+              <ErrorsAlertComponent title="произошла ошибка" />
+            ) : null}
           </DialogDescription>
-          <TabsContent value="sign-in" className="">
+          <TabsContent value={Tab.SignIn} className="">
             <SignInFormComponent
-              state={authState}
-              onSubmit={async (values) => {
-                onSubmitSignIn(values);
-              }}
-            />
+              loading={authState.loading}
+              verifyedCaptcha={verifyedCaptcha}
+              onSubmit={handleSignIn}
+            ></SignInFormComponent>
           </TabsContent>
-          <TabsContent value="sign-up">
+          <TabsContent value={Tab.SignUp}>
             <Form {...signUpForm}>
               <form
                 onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
@@ -150,15 +165,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
                 >
                   {authState.loading ? (
                     <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    ""
-                  )}
+                  ) : null}
                   зарегистрироваться
                 </Button>
               </form>
             </Form>
           </TabsContent>
-          <div className="pt-4">
+          <div className="flex flex-col space-y-4 pt-4">
             <CaptchaComponent
               onSuccessVerify={hundleSuccessCaptcha}
               onErrorVerify={hundleErrorCaptcha}

@@ -13,6 +13,7 @@ export interface AuthState {
   success: boolean;
   user: null | JwtPayload;
   verifyedCaptcha: boolean;
+  dataFormValid: boolean;
 }
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   success: false,
   user: null,
   verifyedCaptcha: false,
+  dataFormValid: false,
 };
 
 const authSlice = createSlice({
@@ -29,6 +31,9 @@ const authSlice = createSlice({
   reducers: {
     setVerifyedCaptcha(state: AuthState, action) {
       state.verifyedCaptcha = action.payload;
+    },
+    setValidDataForm(state: AuthState, action) {
+      state.dataFormValid = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -74,6 +79,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setVerifyedCaptcha } = authSlice.actions;
+export const { setVerifyedCaptcha, setValidDataForm } = authSlice.actions;
 
 export default authSlice.reducer;

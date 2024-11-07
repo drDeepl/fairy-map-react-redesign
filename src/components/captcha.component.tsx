@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import LoadSpinner from "./ui/load-spinner";
+import { motion } from "framer-motion";
 
 interface CaptchaComponentProps {
   onSuccessVerify: () => void;
@@ -25,13 +25,19 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   };
 
   return (
-    <div>
-      <HCaptcha
-        sitekey={siteKey}
-        onVerify={handleVerificationSuccess}
-        onError={handleVerificationError}
-      />
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.9, ease: "easeOut" }}
+    >
+      <div>
+        <HCaptcha
+          sitekey={siteKey}
+          onVerify={handleVerificationSuccess}
+          onError={handleVerificationError}
+        />
+      </div>
+    </motion.div>
   );
 };
 export default CaptchaComponent;
