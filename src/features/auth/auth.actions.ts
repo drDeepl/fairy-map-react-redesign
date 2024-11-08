@@ -10,9 +10,9 @@ export const signIn = createAsyncThunk(
   async (signInDto: any, { rejectWithValue }) => {
     try {
       const response = await apiClient.post("/api/auth/signin", signInDto);
-      console.log(response);
-      return response;
-    } catch (err: any) {
+
+      return response.data;
+    } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
 
       return rejectWithValue(errorResposne);
@@ -22,7 +22,15 @@ export const signIn = createAsyncThunk(
 
 export const signUp = createAsyncThunk(
   "user/signup",
-  async (signUp: any, thunkAPI) => {
-    console.log(signUp);
+  async (signUpDto: any, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post("/api/auth/signup", signUpDto);
+      console.log(response);
+      return response.data;
+    } catch (err) {
+      const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
+
+      return rejectWithValue(errorResposne);
+    }
   }
 );

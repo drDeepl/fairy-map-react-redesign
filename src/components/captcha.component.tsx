@@ -30,13 +30,12 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, ease: "easeOut" }}
     >
-      <div>
-        <HCaptcha
-          sitekey={siteKey}
-          onVerify={handleVerificationSuccess}
-          onError={handleVerificationError}
-        />
-      </div>
+      <HCaptcha
+        size="normal"
+        sitekey={siteKey}
+        onVerify={handleVerificationSuccess}
+        onError={handleVerificationError}
+      />
     </motion.div>
   );
 };

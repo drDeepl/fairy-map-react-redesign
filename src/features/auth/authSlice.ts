@@ -50,6 +50,7 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signIn.fulfilled, (state, action) => {
+        console.log(action);
         const accessToken: string = action.payload.accessToken;
         const arrayToken = accessToken.split(".");
         const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
@@ -69,6 +70,7 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signUp.fulfilled, (state, action) => {
+        console.log(action);
         const accessToken: string = action.payload.accessToken;
         const arrayToken = accessToken.split(".");
         const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
@@ -85,7 +87,11 @@ const authSlice = createSlice({
   },
 });
 
-export const { setVerifyedCaptcha, setValidDataForm, setLoad, setError } =
-  authSlice.actions;
+export const {
+  setVerifyedCaptcha,
+  setValidDataForm,
+  setLoad,
+  setError,
+} = authSlice.actions;
 
 export default authSlice.reducer;

@@ -37,6 +37,8 @@ import SignInFormComponent from "./forms/sign-in.form.component";
 
 import { components } from "@/api/schema/schema";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
+import SignUpFormComponent from "./forms/sign-up.form.component";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 enum Tab {
   SignIn = "signin",
@@ -79,6 +81,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     signUpForm.reset();
   }
 
+  const handleSignUp = useCallback(
+    async (values: components["schemas"]["SignUpRequestDto"]) => {
+      dispatch(signUp(values));
+    },
+    []
+  );
+
   const handleSignIn = useCallback(
     async (values: components["schemas"]["SignInRequestDto"]) => {
       dispatch(signIn(values));
@@ -88,21 +97,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   const handleOnClose = () => {
     onClose();
-    resetForms();
-    dispatch(setLoad(false));
-    dispatch(setError(null));
+    clearForm();
   };
 
-  // async function onSubmitSignIn(
-  //   values: components["schemas"]["SignInRequestDto"]
-  // ) {
-  //   console.log(values);
-
-  //   dispatch(signIn(values));
-  // }
-
-  const resetForms = async () => {
-    signUpForm.reset();
+  const clearForm = async () => {
+    dispatch(setLoad(false));
+    dispatch(setError(null));
   };
 
   return (
@@ -114,10 +114,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
         }
       }}
     >
-      <DialogContent className="max-w-fit p-9">
+      <DialogContent className="max-w-sm p-9">
         <Tabs
           defaultValue={Tab.SignIn}
-          onValueChange={(value: string) => setCurrentTab(value)}
+          onValueChange={(value: string) => {
+            clearForm();
+            setCurrentTab(value);
+          }}
         >
           <DialogTitle>
             <TabsList className="grid w-full grid-cols-2 mb-2">
@@ -141,7 +144,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
             ></SignInFormComponent>
           </TabsContent>
           <TabsContent value={Tab.SignUp}>
-            <Form {...signUpForm}>
+            <SignUpFormComponent
+              loading={authState.loading}
+              verifyedCaptcha={verifyedCaptcha}
+              onSubmit={handleSignUp}
+            />
+            {/* TODO: REMOVE AFTER REFACTOR */}
+            {/* <Form {...signUpForm}>
               <form
                 onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
                 className="space-y-8"
@@ -183,13 +192,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
                   зарегистрироваться
                 </Button>
               </form>
-            </Form>
+            </Form> */}
           </TabsContent>
-          <div className="flex flex-col space-y-4 pt-4">
-            <CaptchaComponent
-              onSuccessVerify={hundleSuccessCaptcha}
-              onErrorVerify={hundleErrorCaptcha}
-            />
+          <div className="flex flex-col justify-center space-y-4 pt-4">
+            {!verifyedCaptcha ? (
+              <CaptchaComponent
+                onSuccessVerify={hundleSuccessCaptcha}
+                onErrorVerify={hundleErrorCaptcha}
+              />
+            ) : null}
           </div>
         </Tabs>
       </DialogContent>

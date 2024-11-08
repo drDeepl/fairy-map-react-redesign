@@ -21,7 +21,7 @@ const ErrorsAlertComponent: React.FC<ErrorsAlertProps> = ({
       {errors ? (
         <AlertDescription className="">
           {Object.keys(errors).map((error) => (
-            <p>{errors[error].join("\n")}</p>
+            <p key={error}>{errors[error].join("\n")}</p>
           ))}
         </AlertDescription>
       ) : null}

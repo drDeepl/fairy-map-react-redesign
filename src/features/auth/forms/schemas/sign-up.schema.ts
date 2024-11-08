@@ -10,5 +10,11 @@ export const signUpFormSchema = z
     password: z.string().min(5, {
       message: "длина пароля должна быть больше или равна 5 символам",
     }),
+    firstName: z
+      .string()
+      .min(1, { message: 'поле "имя"  не может быть пустым' }),
+    lastName: z
+      .string()
+      .min(1, { message: 'поле "фамилия"  не может быть пустым' }),
   })
   .required();

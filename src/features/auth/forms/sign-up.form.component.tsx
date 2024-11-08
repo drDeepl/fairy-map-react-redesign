@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+import { signUpFormSchema } from "../forms/schemas/sign-up.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
@@ -19,30 +20,58 @@ import { components } from "@/api/schema/schema";
 import { Button } from "@/components/ui/button";
 
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { signInFormSchema } from "./schemas/sign-in.schema";
 
-interface SignInFormProps extends AuthFormProps {
+interface SignUpFormProps extends AuthFormProps {
   onSubmit: (
-    values: components["schemas"]["SignInRequestDto"]
+    values: components["schemas"]["SignUpRequestDto"]
   ) => Promise<void>;
 }
 
-const SignInFormComponent: React.FC<SignInFormProps> = ({
+const SignUpFormComponent: React.FC<SignUpFormProps> = ({
   loading,
   verifyedCaptcha,
   onSubmit,
 }) => {
-  const signUpForm = useForm<z.infer<typeof signInFormSchema>>({
-    resolver: zodResolver(signInFormSchema),
+  const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
+    resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
+      firstName: "",
+      lastName: "",
     },
   });
 
   return (
     <Form {...signUpForm}>
       <form onSubmit={signUpForm.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={signUpForm.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Имя</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={signUpForm.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Фамилия</FormLabel>
+              <FormControl>
+                <Input placeholder="" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={signUpForm.control}
           name="email"
@@ -61,7 +90,7 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Пароль</FormLabel>
+              <FormLabel>пароль</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="" {...field} />
               </FormControl>
@@ -69,7 +98,6 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
             </FormItem>
           )}
         />
-
         <Button
           disabled={!verifyedCaptcha || loading}
           className="w-full"
@@ -85,4 +113,4 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
   );
 };
 
-export default SignInFormComponent;
+export default SignUpFormComponent;
