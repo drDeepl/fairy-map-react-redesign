@@ -38,7 +38,6 @@ import SignInFormComponent from "./forms/sign-in.form.component";
 import { components } from "@/api/schema/schema";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 enum Tab {
   SignIn = "signin",
@@ -141,6 +140,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
               loading={authState.loading}
               verifyedCaptcha={verifyedCaptcha}
               onSubmit={handleSignIn}
+              onValidFormData={(isValid) => {
+                console.log(isValid);
+                dispatch(setValidDataForm(isValid));
+              }}
             ></SignInFormComponent>
           </TabsContent>
           <TabsContent value={Tab.SignUp}>
@@ -149,59 +152,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
               verifyedCaptcha={verifyedCaptcha}
               onSubmit={handleSignUp}
             />
-            {/* TODO: REMOVE AFTER REFACTOR */}
-            {/* <Form {...signUpForm}>
-              <form
-                onSubmit={signUpForm.handleSubmit(onSubmitSignUp)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={signUpForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Электронная почта</FormLabel>
-                      <FormControl>
-                        <Input placeholder="" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={signUpForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>пароль</FormLabel>
-                      <FormControl>
-                        <Input type="password" placeholder="" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  disabled={authState.loading}
-                  className="w-full"
-                  type="submit"
-                >
-                  {authState.loading ? (
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
-                  зарегистрироваться
-                </Button>
-              </form>
-            </Form> */}
           </TabsContent>
-          <div className="flex flex-col justify-center space-y-4 pt-4">
-            {!verifyedCaptcha ? (
-              <CaptchaComponent
-                onSuccessVerify={hundleSuccessCaptcha}
-                onErrorVerify={hundleErrorCaptcha}
-              />
-            ) : null}
-          </div>
+          {authState.dataFormValid ? (
+            <CaptchaComponent
+              onSuccessVerify={hundleSuccessCaptcha}
+              onErrorVerify={hundleErrorCaptcha}
+            />
+          ) : null}
         </Tabs>
       </DialogContent>
     </Dialog>

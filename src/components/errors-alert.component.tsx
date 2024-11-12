@@ -14,14 +14,14 @@ const ErrorsAlertComponent: React.FC<ErrorsAlertProps> = ({
   console.log(errors);
   return (
     <Alert variant="destructive">
-      <div className="flex align-center space-x-2">
-        <AlertCircle className="size-5" />
-        <AlertTitle className="self-center">{title}</AlertTitle>
-      </div>
+      <AlertTitle className="flex place-items-center space-x-1">
+        <AlertCircle className="size-5 self-center align-center" />
+        <span>{title}</span>
+      </AlertTitle>
       {errors ? (
-        <AlertDescription className="">
+        <AlertDescription className="pl-6">
           {Object.keys(errors).map((error) => (
-            <p key={error}>{errors[error].join("\n")}</p>
+            <span key={error}>{errors[error].join("\n")}</span>
           ))}
         </AlertDescription>
       ) : null}

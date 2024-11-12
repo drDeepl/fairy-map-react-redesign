@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -20,19 +20,22 @@ import { Button } from "@/components/ui/button";
 
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { signInFormSchema } from "./schemas/sign-in.schema";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SignInFormProps extends AuthFormProps {
   onSubmit: (
     values: components["schemas"]["SignInRequestDto"]
   ) => Promise<void>;
+  onValidFormData: (isValid: boolean) => void;
 }
 
 const SignInFormComponent: React.FC<SignInFormProps> = ({
   loading,
   verifyedCaptcha,
   onSubmit,
+  onValidFormData,
 }) => {
-  const signUpForm = useForm<z.infer<typeof signInFormSchema>>({
+  const signInForm = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
@@ -40,11 +43,18 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
     },
   });
 
+  useEffect(() => {
+    // console.log(signInForm.formState.isValid);
+    if (signInForm.formState.isValid) {
+      onValidFormData(true);
+    }
+  }, [signInForm.formState.isValid]);
+
   return (
-    <Form {...signUpForm}>
-      <form onSubmit={signUpForm.handleSubmit(onSubmit)} className="space-y-8">
+    <Form {...signInForm}>
+      <form onSubmit={signInForm.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
-          control={signUpForm.control}
+          control={signInForm.control}
           name="email"
           render={({ field }) => (
             <FormItem>
@@ -57,7 +67,7 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
           )}
         />
         <FormField
-          control={signUpForm.control}
+          control={signInForm.control}
           name="password"
           render={({ field }) => (
             <FormItem>

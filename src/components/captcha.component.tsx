@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
-import { motion } from "framer-motion";
 
 interface CaptchaComponentProps {
   onSuccessVerify: () => void;
@@ -11,12 +10,15 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   onSuccessVerify,
   onErrorVerify,
 }) => {
+  const captchaRef = useRef<HCaptcha>(null);
+
   const [token, setToken] = useState(null); // TODO: RESPONSE FROM SERVER
 
   const siteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY;
 
   const handleVerificationSuccess = (token: any) => {
     setToken(token);
+    captchaRef.current?.removeCaptcha();
     onSuccessVerify();
   };
 
@@ -25,18 +27,13 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 100 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: "easeOut" }}
-    >
-      <HCaptcha
-        size="normal"
-        sitekey={siteKey}
-        onVerify={handleVerificationSuccess}
-        onError={handleVerificationError}
-      />
-    </motion.div>
+    <HCaptcha
+      ref={captchaRef}
+      size="normal"
+      sitekey={siteKey}
+      onVerify={handleVerificationSuccess}
+      onError={handleVerificationError}
+    />
   );
 };
 export default CaptchaComponent;
