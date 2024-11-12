@@ -1,6 +1,6 @@
 export enum RouteApp {
-  Home = "/",
-  Map = "/map",
-  Me = "/me",
-  Admin = "/admin",
+  HomePage = "/",
+  MapPage = "/map",
+  PersonalPage = "/me",
+  AdminPage = "/admin",
 }

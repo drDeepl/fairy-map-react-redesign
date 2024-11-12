@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -18,23 +18,20 @@ import { AuthFormProps } from "@/types/forms/auth.form.interface";
 import { components } from "@/api/schema/schema";
 import { Button } from "@/components/ui/button";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { ReloadIcon, EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
 import { signInFormSchema } from "./schemas/sign-in.schema";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface SignInFormProps extends AuthFormProps {
   onSubmit: (
     values: components["schemas"]["SignInRequestDto"]
   ) => Promise<void>;
-  onValidFormData: (isValid: boolean) => void;
 }
 
 const SignInFormComponent: React.FC<SignInFormProps> = ({
   loading,
-  verifyedCaptcha,
   onSubmit,
-  onValidFormData,
 }) => {
+  const [visiblePassword, setVisiblePassword] = useState<boolean>(false);
   const signInForm = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -42,13 +39,6 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
       password: "",
     },
   });
-
-  useEffect(() => {
-    // console.log(signInForm.formState.isValid);
-    if (signInForm.formState.isValid) {
-      onValidFormData(true);
-    }
-  }, [signInForm.formState.isValid]);
 
   return (
     <Form {...signInForm}>
@@ -73,18 +63,19 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
             <FormItem>
               <FormLabel>Пароль</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="" {...field} />
+                <Input
+                  type={visiblePassword ? "text" : "password"}
+                  placeholder=""
+                  {...field}
+                />
               </FormControl>
+
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button
-          disabled={!verifyedCaptcha || loading}
-          className="w-full"
-          type="submit"
-        >
+        <Button disabled={loading} className="w-full" type="submit">
           {loading ? (
             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
           ) : null}

@@ -11,7 +11,7 @@ const WelcomePage: React.FC = () => {
     "Проект представляет собой интерактивный веб-сайт, на котором размещена карта России. Пользователь может выбрать регион, а затем этническую группу и язык, чтобы прослушать сказку, соответствующую этой группе";
   const navigate = useNavigate();
   const handleOnMap = () => {
-    navigate(RouteApp.Map);
+    navigate(RouteApp.MapPage);
   };
 
   return (

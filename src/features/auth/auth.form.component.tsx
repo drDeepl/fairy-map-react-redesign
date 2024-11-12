@@ -2,31 +2,11 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signUpFormSchema } from "./forms/schemas/sign-up.schema";
 import { AppDispatch, RootState } from "@/app/store";
-import {
-  setError,
-  setLoad,
-  setValidDataForm,
-  setVerifyedCaptcha,
-} from "./authSlice";
+import { setError, setLoad, setVerifyedCaptcha } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -38,6 +18,8 @@ import SignInFormComponent from "./forms/sign-in.form.component";
 import { components } from "@/api/schema/schema";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
+import { useNavigate } from "react-router-dom";
+import { RouteApp } from "../../pages/constants/route.enum";
 
 enum Tab {
   SignIn = "signin",
@@ -51,48 +33,59 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const authState = useSelector((state: RootState) => state.auth);
 
-  const [verifyedCaptcha, setVerifyedCaptcha] = useState<boolean>(false);
   const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
 
-  const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
-    resolver: zodResolver(signUpFormSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
+  const [visibleCaptcha, setVisibleCaptcha] = useState<boolean>(false);
 
   const hundleSuccessCaptcha = () => {
     console.log("success captcha");
-    setVerifyedCaptcha(true);
+    dispatch(setVerifyedCaptcha(true));
+    setVisibleCaptcha(false);
   };
 
   const hundleErrorCaptcha = (error: any) => {
     console.log(error);
+    dispatch(setError({ message: "ошибка подтверждения капчи" }));
   };
-
-  async function onSubmitSignUp(values: z.infer<typeof signUpFormSchema>) {
-    console.log(values);
-    dispatch(signUp(values));
-    signUpForm.reset();
-  }
 
   const handleSignUp = useCallback(
     async (values: components["schemas"]["SignUpRequestDto"]) => {
-      dispatch(signUp(values));
+      console.log(authState.verifyedCaptcha);
+      authState.verifyedCaptcha
+        ? dispatch(signUp(values))
+        : setVisibleCaptcha(true);
     },
-    []
+    [authState.verifyedCaptcha]
   );
 
   const handleSignIn = useCallback(
     async (values: components["schemas"]["SignInRequestDto"]) => {
-      dispatch(signIn(values));
+      authState.verifyedCaptcha
+        ? dispatch(signIn(values))
+        : setVisibleCaptcha(true);
     },
-    []
+    [authState.verifyedCaptcha]
   );
+
+  useEffect(() => {
+    console.log(authState.user);
+    if (authState.user) {
+      switch (authState.user.role) {
+        case "USER":
+          navigate(RouteApp.PersonalPage);
+          break;
+        case "ADMIN":
+          navigate(RouteApp.AdminPage);
+          break;
+        default:
+          break;
+      }
+    }
+  }, [authState.user]);
 
   const handleOnClose = () => {
     onClose();
@@ -138,22 +131,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           <TabsContent value={Tab.SignIn} className="">
             <SignInFormComponent
               loading={authState.loading}
-              verifyedCaptcha={verifyedCaptcha}
               onSubmit={handleSignIn}
-              onValidFormData={(isValid) => {
-                console.log(isValid);
-                dispatch(setValidDataForm(isValid));
-              }}
             ></SignInFormComponent>
           </TabsContent>
           <TabsContent value={Tab.SignUp}>
             <SignUpFormComponent
               loading={authState.loading}
-              verifyedCaptcha={verifyedCaptcha}
               onSubmit={handleSignUp}
             />
           </TabsContent>
-          {authState.dataFormValid ? (
+          {visibleCaptcha ? (
             <CaptchaComponent
               onSuccessVerify={hundleSuccessCaptcha}
               onErrorVerify={hundleErrorCaptcha}

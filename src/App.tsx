@@ -13,11 +13,15 @@ function App() {
     <AnimatePresence mode="wait">
       <Routes location={location}>
         <Route
-          key={RouteApp.Home}
-          path={RouteApp.Home}
+          key={RouteApp.HomePage}
+          path={RouteApp.HomePage}
           element={<WelcomePage />}
         />
-        <Route key={RouteApp.Map} path={RouteApp.Map} element={<MapPage />} />
+        <Route
+          key={RouteApp.MapPage}
+          path={RouteApp.MapPage}
+          element={<MapPage />}
+        />
       </Routes>
     </AnimatePresence>
   );

@@ -29,7 +29,6 @@ interface SignUpFormProps extends AuthFormProps {
 
 const SignUpFormComponent: React.FC<SignUpFormProps> = ({
   loading,
-  verifyedCaptcha,
   onSubmit,
 }) => {
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
@@ -98,11 +97,7 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
             </FormItem>
           )}
         />
-        <Button
-          disabled={!verifyedCaptcha || loading}
-          className="w-full"
-          type="submit"
-        >
+        <Button disabled={loading} className="w-full" type="submit">
           {loading ? (
             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
           ) : null}

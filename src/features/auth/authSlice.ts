@@ -5,6 +5,8 @@ import { ApiErrorResponse } from "@/api/helpers/handler-response";
 export interface JwtPayload {
   sub: string;
   email: string;
+  role: string;
+  iat: number;
 }
 
 export interface AuthState {

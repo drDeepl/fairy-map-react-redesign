@@ -10,7 +10,7 @@ interface ErrorMessageProps {
 
 const ErrorMessageScreen: React.FC<ErrorMessageProps> = ({
   message,
-  routeBack = RouteApp.Home,
+  routeBack = RouteApp.HomePage,
 }) => {
   const navigate = useNavigate();
 
