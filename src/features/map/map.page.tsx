@@ -10,7 +10,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
 
 import AuthForm from "../auth/auth.form.component";
-import ErrorMessageScreen from "@/components/error-message.screen";
+import ErrorMessageScreen from "@/pages/error-message.page";
 
 const MapPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,8 +19,9 @@ const MapPage: React.FC = () => {
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);

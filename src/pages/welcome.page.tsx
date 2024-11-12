@@ -28,7 +28,10 @@ const WelcomePage: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-around space-x-2">
-          <Button className="mt-4 bg-orange-600" onClick={handleOnMap}>
+          <Button
+            className="mt-4 bg-orange-600  hover:bg-slate-100 hover:text-slate-700 animate-jump-heart"
+            onClick={handleOnMap}
+          >
             карта
           </Button>
         </div>

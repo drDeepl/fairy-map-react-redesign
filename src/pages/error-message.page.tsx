@@ -1,21 +1,16 @@
-import { RouteApp } from "@/pages/constants/route.enum";
 import { useNavigate } from "react-router-dom";
-import { Button } from "./ui/button";
+import { Button } from "../components/ui/button";
 import { ArrowLeftIcon, CrossCircledIcon } from "@radix-ui/react-icons";
 
 interface ErrorMessageProps {
   message: string;
-  routeBack: RouteApp;
 }
 
-const ErrorMessageScreen: React.FC<ErrorMessageProps> = ({
-  message,
-  routeBack = RouteApp.HomePage,
-}) => {
+const ErrorMessageScreen: React.FC<ErrorMessageProps> = ({ message }) => {
   const navigate = useNavigate();
 
   const handleOnBack = () => {
-    navigate(routeBack);
+    navigate(-1);
   };
 
   return (

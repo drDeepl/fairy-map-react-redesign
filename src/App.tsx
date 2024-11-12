@@ -5,6 +5,7 @@ import MapPage from "./features/map/map.page.tsx";
 import { RouteApp } from "./pages/constants/route.enum.ts";
 import { AnimatePresence } from "framer-motion";
 import WelcomePage from "./pages/welcome.page.tsx";
+import ErrorMessageScreen from "./pages/error-message.page.tsx";
 
 function App() {
   const location = useLocation();
@@ -21,6 +22,10 @@ function App() {
           key={RouteApp.MapPage}
           path={RouteApp.MapPage}
           element={<MapPage />}
+        />
+        <Route
+          path="*"
+          element={<ErrorMessageScreen message="Страница не найдена" />}
         />
       </Routes>
     </AnimatePresence>

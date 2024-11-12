@@ -4,8 +4,43 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      keyframes: {
+        "jump-heart": {
+          "0%, 100%": {
+            transform: "translateY(-10px)",
+          },
+          "50%": {
+            transform: "translateY(0px)",
+          },
+        },
+        "swapping-middle": {
+          "0%": {
+            transform: "translateY(-40px)",
+          },
+          "100%": {
+            transform: "translate(40px, 40px)",
+          },
+        },
+        "swapping-left": {
+          "0%": {
+            transform: "translate(40px, 40px)",
+          },
+          "100%": {
+            transform: "translate(-40px, 40px)",
+          },
+        },
+        "swapping-right": {
+          "0%": {
+            transform: "translate(-40px, 40px)",
+          },
+          "100%": {
+            transform: "translateY(-40px)",
+          },
+        },
+      },
       animation: {
-        fadeIn: "fadeIn 0.5s ease-out",
+        fadeIn: "fadeIn 0.7s ease-out",
+        "jump-heart": "jump-heart 1.5s ease-out infinite",
       },
       borderRadius: {
         lg: "var(--radius)",
