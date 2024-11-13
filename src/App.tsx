@@ -9,7 +9,7 @@ import ErrorMessageScreen from "./pages/error-message.page.tsx";
 import AdminPage from "./features/admin/admin.page.tsx";
 import { useEffect } from "react";
 import { JwtPayload, setUser } from "./features/auth/authSlice.ts";
-import { getUserLocalStorage } from "./common/helpers/token.helper.ts";
+import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./app/store.ts";
 
@@ -18,7 +18,7 @@ function App() {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    const user: JwtPayload | null = getUserLocalStorage();
+    const user: JwtPayload | null = checkValidAccessTokenInLocalStorage();
 
     if (user) {
       dispatch(setUser(user));

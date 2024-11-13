@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { signIn, signUp } from "./auth.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import {
-  parseUserFromAccessToken,
+  parsePayloadFromAccessToken,
   setTokenLocalStorage,
 } from "@/common/helpers/token.helper";
 
@@ -11,6 +11,7 @@ export interface JwtPayload {
   email: string;
   role: string;
   iat: number;
+  exp: number;
 }
 
 export interface AuthState {
@@ -61,7 +62,7 @@ const authSlice = createSlice({
       .addCase(signIn.fulfilled, (state, action) => {
         const accessToken: string = action.payload.accessToken;
         setTokenLocalStorage(accessToken);
-        const user: JwtPayload = parseUserFromAccessToken(accessToken);
+        const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
         console.log(`token payload ${user}`);
         state.user = user;
         state.loading = false;
@@ -80,7 +81,7 @@ const authSlice = createSlice({
       .addCase(signUp.fulfilled, (state, action) => {
         const accessToken: string = action.payload.accessToken;
         setTokenLocalStorage(accessToken);
-        const user: JwtPayload = parseUserFromAccessToken(accessToken);
+        const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
         console.log(`token payload ${user}`);
         state.user = user;
         state.loading = false;
