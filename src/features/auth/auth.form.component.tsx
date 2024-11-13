@@ -71,22 +71,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     [authState.verifyedCaptcha]
   );
 
-  useEffect(() => {
-    console.log(authState.user);
-    if (authState.user) {
-      switch (authState.user.role) {
-        case "USER":
-          navigate(RouteApp.PersonalPage);
-          break;
-        case "ADMIN":
-          navigate(RouteApp.AdminPage);
-          break;
-        default:
-          break;
-      }
-    }
-  }, [authState.user]);
-
   const handleOnClose = () => {
     onClose();
     clearForm();

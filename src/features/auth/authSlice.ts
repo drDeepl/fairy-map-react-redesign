@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { signIn, signUp } from "./auth.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
+import {
+  parseUserFromAccessToken,
+  setTokenLocalStorage,
+} from "@/common/helpers/token.helper";
 
 export interface JwtPayload {
   sub: string;
@@ -31,6 +35,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    setUser(state: AuthState, action) {
+      state.user = action.payload;
+    },
     setVerifyedCaptcha(state: AuthState, action) {
       state.verifyedCaptcha = action.payload;
     },
@@ -52,18 +59,17 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signIn.fulfilled, (state, action) => {
-        console.log(action);
         const accessToken: string = action.payload.accessToken;
-        const arrayToken = accessToken.split(".");
-        const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
-        console.log(`token payload ${tokenPayload}`);
-        state.user = tokenPayload;
+        setTokenLocalStorage(accessToken);
+        const user: JwtPayload = parseUserFromAccessToken(accessToken);
+        console.log(`token payload ${user}`);
+        state.user = user;
         state.loading = false;
         state.success = true;
       })
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
-        console.log(action);
+
         state.error = action.payload as ApiErrorResponse;
       })
       .addCase(signUp.pending, (state) => {
@@ -72,17 +78,15 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signUp.fulfilled, (state, action) => {
-        console.log(action);
         const accessToken: string = action.payload.accessToken;
-        const arrayToken = accessToken.split(".");
-        const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
-        console.log(`token payload ${tokenPayload}`);
-        state.user = tokenPayload;
+        setTokenLocalStorage(accessToken);
+        const user: JwtPayload = parseUserFromAccessToken(accessToken);
+        console.log(`token payload ${user}`);
+        state.user = user;
         state.loading = false;
         state.success = true;
       })
       .addCase(signUp.rejected, (state, action) => {
-        console.log(action);
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       });
@@ -90,6 +94,7 @@ const authSlice = createSlice({
 });
 
 export const {
+  setUser,
   setVerifyedCaptcha,
   setValidDataForm,
   setLoad,

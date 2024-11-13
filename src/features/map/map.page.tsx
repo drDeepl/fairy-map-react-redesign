@@ -11,13 +11,16 @@ import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
 
 import AuthForm from "../auth/auth.form.component";
 import ErrorMessageScreen from "@/pages/error-message.page";
+import { useNavigate } from "react-router-dom";
+
+import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 
 const MapPage: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-
   const mapState = useSelector((state: RootState) => state.map);
-
   const authState: AuthState = useSelector((state: RootState) => state.auth);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
     ""
@@ -35,7 +38,18 @@ const MapPage: React.FC = () => {
     dispatch(setVerifyedCaptcha(false));
   };
 
-  console.log(authState.user);
+  const handleOnClickAvatar = () => {
+    if (authState.user) {
+      console.log("user exists");
+      const routeUserPersonalPage: string = getRoutePageByUserRole(
+        authState.user.role
+      );
+      console.log("navigate");
+      navigate(routeUserPersonalPage);
+    } else {
+      setAuthFormVisible(true);
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchMapData());
@@ -65,10 +79,12 @@ const MapPage: React.FC = () => {
             className="h-11 w-11 rounded-full bg-slate-50"
             variant="ghost"
             size="icon"
-            onClick={() => setAuthFormVisible(true)}
+            onClick={() => handleOnClickAvatar()}
           >
             <span className="text-black">
-              {authState.user ? authState.user.email.split("@") : "?"}
+              {authState.user
+                ? authState.user.email.split("@")[0][0].toUpperCase()
+                : "?"}
             </span>
           </Button>
         </Avatar>

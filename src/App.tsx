@@ -6,9 +6,24 @@ import { RouteApp } from "./pages/constants/route.enum.ts";
 import { AnimatePresence } from "framer-motion";
 import WelcomePage from "./pages/welcome.page.tsx";
 import ErrorMessageScreen from "./pages/error-message.page.tsx";
+import AdminPage from "./features/admin/admin.page.tsx";
+import { useEffect } from "react";
+import { JwtPayload, setUser } from "./features/auth/authSlice.ts";
+import { getUserLocalStorage } from "./common/helpers/token.helper.ts";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "./app/store.ts";
 
 function App() {
   const location = useLocation();
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    const user: JwtPayload | null = getUserLocalStorage();
+
+    if (user) {
+      dispatch(setUser(user));
+    }
+  }, []);
 
   return (
     <AnimatePresence mode="wait">
@@ -22,6 +37,11 @@ function App() {
           key={RouteApp.MapPage}
           path={RouteApp.MapPage}
           element={<MapPage />}
+        />
+        <Route
+          key={RouteApp.AdminPage}
+          path={RouteApp.AdminPage}
+          element={<AdminPage />}
         />
         <Route
           path="*"

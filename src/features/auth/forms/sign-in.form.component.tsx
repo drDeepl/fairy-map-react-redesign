@@ -18,7 +18,7 @@ import { AuthFormProps } from "@/types/forms/auth.form.interface";
 import { components } from "@/api/schema/schema";
 import { Button } from "@/components/ui/button";
 
-import { ReloadIcon, EyeOpenIcon, EyeClosedIcon } from "@radix-ui/react-icons";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { signInFormSchema } from "./schemas/sign-in.schema";
 
 interface SignInFormProps extends AuthFormProps {
@@ -31,7 +31,6 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
   loading,
   onSubmit,
 }) => {
-  const [visiblePassword, setVisiblePassword] = useState<boolean>(false);
   const signInForm = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -63,11 +62,7 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
             <FormItem>
               <FormLabel>Пароль</FormLabel>
               <FormControl>
-                <Input
-                  type={visiblePassword ? "text" : "password"}
-                  placeholder=""
-                  {...field}
-                />
+                <Input type="password" placeholder="" {...field} />
               </FormControl>
 
               <FormMessage />
