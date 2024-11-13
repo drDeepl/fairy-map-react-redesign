@@ -1,0 +1,7 @@
+@layer utilities {
+  .welcome-page-bg-img {
+    background-image: url("./welcome-page-bg.png");
+    background-size: fit;
+    background-position: top;
+  }
+}

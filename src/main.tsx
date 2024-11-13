@@ -1,20 +1,17 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Provider } from "react-redux";
+
 import "./index.css";
 import App from "./App.tsx";
-import store from "./store/index.ts";
-import MapPage from "./features/map/map.page.tsx";
+import store from "./app/store.ts";
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/map" element={<MapPage />} />
-        </Routes>
+        <App />
       </BrowserRouter>
     </Provider>
   </React.StrictMode>

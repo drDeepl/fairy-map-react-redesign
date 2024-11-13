@@ -1,21 +1,21 @@
-import {
-  AuthControllerService,
-  SignInRequestDto,
-  SignUpRequestDto,
-} from "@/api";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import { createSlice } from "@reduxjs/toolkit";
+import { signIn, signUp } from "./auth.actions";
+import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 export interface JwtPayload {
   sub: string;
   email: string;
+  role: string;
+  iat: number;
 }
 
 export interface AuthState {
   loading: boolean;
-  error: string | null;
+  error: ApiErrorResponse | null;
   success: boolean;
   user: null | JwtPayload;
+  verifyedCaptcha: boolean;
+  dataFormValid: boolean;
 }
 
 const initialState: AuthState = {
@@ -23,26 +23,27 @@ const initialState: AuthState = {
   error: null,
   success: false,
   user: null,
+  verifyedCaptcha: false,
+  dataFormValid: false,
 };
-
-export const signIn = createAsyncThunk(
-  "user/signin",
-  async (signInDto: SignInRequestDto, thunkAPI) => {
-    return await AuthControllerService.authControllerSignIn(signInDto);
-  }
-);
-
-export const signUp = createAsyncThunk(
-  "user/signup",
-  async (signUp: SignUpRequestDto, thunkAPI) => {
-    return await AuthControllerService.authControllerSignUp(signUp);
-  }
-);
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setVerifyedCaptcha(state: AuthState, action) {
+      state.verifyedCaptcha = action.payload;
+    },
+    setValidDataForm(state: AuthState, action) {
+      state.dataFormValid = action.payload;
+    },
+    setLoad(state: AuthState, action) {
+      state.loading = action.payload;
+    },
+    setError(state: AuthState, action) {
+      state.error = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(signIn.pending, (state) => {
@@ -51,6 +52,7 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signIn.fulfilled, (state, action) => {
+        console.log(action);
         const accessToken: string = action.payload.accessToken;
         const arrayToken = accessToken.split(".");
         const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
@@ -62,7 +64,7 @@ const authSlice = createSlice({
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         console.log(action);
-        state.error = action.error.message as string;
+        state.error = action.payload as ApiErrorResponse;
       })
       .addCase(signUp.pending, (state) => {
         state.loading = true;
@@ -70,6 +72,7 @@ const authSlice = createSlice({
         state.success = false;
       })
       .addCase(signUp.fulfilled, (state, action) => {
+        console.log(action);
         const accessToken: string = action.payload.accessToken;
         const arrayToken = accessToken.split(".");
         const tokenPayload = JSON.parse(atob(arrayToken[1])) as JwtPayload;
@@ -79,10 +82,18 @@ const authSlice = createSlice({
         state.success = true;
       })
       .addCase(signUp.rejected, (state, action) => {
+        console.log(action);
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = action.payload as ApiErrorResponse;
       });
   },
 });
+
+export const {
+  setVerifyedCaptcha,
+  setValidDataForm,
+  setLoad,
+  setError,
+} = authSlice.actions;
 
 export default authSlice.reducer;
