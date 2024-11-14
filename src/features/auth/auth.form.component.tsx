@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
-import { setError, setLoad, setVerifyedCaptcha } from "./authSlice";
+import { setError, setLoad, setSuccess, setVerifyedCaptcha } from "./authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
@@ -19,7 +19,8 @@ import { components } from "@/api/schema/schema";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
 import { useNavigate } from "react-router-dom";
-import { RouteApp } from "../../pages/constants/route.enum";
+
+import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 
 enum Tab {
   SignIn = "signin",
@@ -37,18 +38,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
 
   const authState = useSelector((state: RootState) => state.auth);
 
-  const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
-
   const [visibleCaptcha, setVisibleCaptcha] = useState<boolean>(false);
 
   const hundleSuccessCaptcha = () => {
-    console.log("success captcha");
     dispatch(setVerifyedCaptcha(true));
     setVisibleCaptcha(false);
   };
 
   const hundleErrorCaptcha = (error: any) => {
-    console.log(error);
     dispatch(setError({ message: "ошибка подтверждения капчи" }));
   };
 
@@ -81,6 +78,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     dispatch(setError(null));
   };
 
+  useEffect(() => {
+    if (authState.success) {
+      navigate(getRoutePageByUserRole(authState.user!.role));
+    }
+
+    return () => {
+      dispatch(setSuccess(false));
+    };
+  }, [authState.success]);
+
   return (
     <Dialog
       open={visible}
@@ -95,7 +102,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           defaultValue={Tab.SignIn}
           onValueChange={(value: string) => {
             clearForm();
-            setCurrentTab(value);
+            // setCurrentTab(value);
           }}
         >
           <DialogTitle>

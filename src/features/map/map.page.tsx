@@ -40,11 +40,10 @@ const MapPage: React.FC = () => {
 
   const handleOnClickAvatar = () => {
     if (authState.user) {
-      console.log("user exists");
       const routeUserPersonalPage: string = getRoutePageByUserRole(
         authState.user.role
       );
-      console.log("navigate");
+
       navigate(routeUserPersonalPage);
     } else {
       setAuthFormVisible(true);

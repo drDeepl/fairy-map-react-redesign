@@ -51,6 +51,9 @@ const authSlice = createSlice({
     setError(state: AuthState, action) {
       state.error = action.payload;
     },
+    setSuccess(state: AuthState, action) {
+      state.success = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -100,6 +103,7 @@ export const {
   setValidDataForm,
   setLoad,
   setError,
+  setSuccess,
 } = authSlice.actions;
 
 export default authSlice.reducer;
