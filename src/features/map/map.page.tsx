@@ -6,7 +6,7 @@ import { fetchMapData } from "./map.actions";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar } from "@/components/ui/avatar";
+
 import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
 
 import AuthForm from "../auth/auth.form.component";
@@ -66,27 +66,25 @@ const MapPage: React.FC = () => {
     <div className="map-pag__content">
       <div className="fixed flex items-center justify-between p-4 w-full">
         <Input
-          className="min-h-11 max-w-fit bg-slate-50"
+          className="min-h-11 max-w-fit bg-slate-50 self-center"
           type="text"
           placeholder="введите название этнической группы"
           value={ethnicGroupInputValue}
           onChange={handleInputChange}
         />
 
-        <Avatar className="">
-          <Button
-            className="h-11 w-11 rounded-full bg-slate-50"
-            variant="ghost"
-            size="icon"
-            onClick={() => handleOnClickAvatar()}
-          >
-            <span className="text-black">
-              {authState.user
-                ? authState.user.email.split("@")[0][0].toUpperCase()
-                : "?"}
-            </span>
-          </Button>
-        </Avatar>
+        <Button
+          className="rounded-full bg-slate-50 self-center size-11"
+          variant="ghost"
+          size="icon"
+          onClick={() => handleOnClickAvatar()}
+        >
+          <span className="text-black">
+            {authState.user
+              ? authState.user.email.split("@")[0][0].toUpperCase()
+              : "?"}
+          </span>
+        </Button>
 
         <AuthForm
           visible={authFormVisible}

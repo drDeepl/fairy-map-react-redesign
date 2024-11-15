@@ -65,7 +65,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     svg.call(
       d3
         .zoom()
-        .scaleExtent([1 / 2, 5])
+        .scaleExtent([1 / 2, 2])
         .on("zoom", (event) => {
           g.attr("transform", event.transform);
         })
