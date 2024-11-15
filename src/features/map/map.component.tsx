@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { FeatureCollection } from "geojson";
+import {
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuShortcut,
+  ContextMenuTrigger,
+  ContextMenu,
+} from "@/components/ui/context-menu";
 
 interface ScreenSize {
   mapWidth: number;
@@ -9,6 +16,11 @@ interface ScreenSize {
 
 interface MapComponentProps {
   features: FeatureCollection;
+}
+
+interface CoordinatesMap {
+  long: number;
+  lat: number;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
@@ -26,7 +38,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
 
   const tooltipDiv = useRef<HTMLDivElement | null>(null);
 
-  function drawMap(features: FeatureCollection) {
+  const [clickCoords, setClickCoords] = useState<CoordinatesMap | null>(null);
+
+  const drawMap = (features: FeatureCollection) => {
     console.log(features);
     const mapProjection = d3
       .geoAlbers()
@@ -76,9 +90,21 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
       .enter()
       .append("path")
       .attr("d", mapPath)
+
       .style("stroke", "#82A9FD")
       .style("stroke-width", "0.5")
-      .style("fill", "rgb(255,255,225)");
+      .style("fill", "rgb(255,255,225)")
+      .on("contextmenu", (event: MouseEvent, d) => {
+        console.log(event);
+        const clickX = event.pageX;
+        const clickY = event.pageY;
+        const [long, lat] = mapProjection?.invert([clickX, clickY]);
+        console.log(
+          `Page X: ${clickX}\tPage Y: ${clickY}\nlongitude: ${long}\tlatitude: ${lat}`
+        );
+        setClickCoords({ long, lat });
+        // event.preventDefault();
+      });
 
     // TODO: REFACTOR
 
@@ -128,13 +154,32 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     //   // Add your calculation logic here
     //   return 5; // Placeholder value
     // };
-  }
+  };
 
   useEffect(() => {
     drawMap(features);
   }, [features]);
 
-  return <div ref={mapContainerRef}></div>;
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger className="">
+        <div ref={mapContainerRef}></div>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem>
+          Coords: {`${JSON.stringify(clickCoords)}`}
+        </ContextMenuItem>
+        <ContextMenuItem inset>
+          Back
+          <ContextMenuShortcut>⌘[</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem inset disabled>
+          Forward
+          <ContextMenuShortcut>⌘]</ContextMenuShortcut>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
+  );
 };
 
 export default MapComponent;
