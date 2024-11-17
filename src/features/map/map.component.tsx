@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/context-menu";
 
 interface ScreenSize {
-  mapWidth: number;
-  mapHeight: number;
+  width: number;
+  height: number;
 }
 
 interface MapComponentProps {
@@ -23,6 +23,11 @@ interface CoordinatesMap {
   lat: number;
 }
 
+interface Point {
+  x: number;
+  y: number;
+}
+
 const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   // TODO: REFACTOR
   // const [heroSelect, setHeroSelect] = useState("batman");
@@ -30,8 +35,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   // const [maxHero, setMaxHero] = useState(null);
 
   const [screenSize, setScreenSize] = useState<ScreenSize>({
-    mapWidth: document.documentElement.clientWidth,
-    mapHeight: document.documentElement.clientHeight,
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
   });
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -39,16 +44,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   const tooltipDiv = useRef<HTMLDivElement | null>(null);
 
   const [clickCoords, setClickCoords] = useState<CoordinatesMap | null>(null);
+  const [points, setPoints] = useState<Point[]>([]);
+
+  const [selectedRegion, setSelectedRegion] = useState<{
+    feature: any;
+    centroid: [number, number];
+  } | null>(null);
+
+  const [selectedPath, setPath] = useState<string>("");
 
   const drawMap = (features: FeatureCollection) => {
-    console.log(features);
     const mapProjection = d3
       .geoAlbers()
       .rotate([-105, 0]) //  .rotate([-105,0])
       .center([-10, 65])
       .parallels([50, 70]) //.parallels([52, 64])
       .scale(700)
-      .translate([screenSize.mapWidth / 2, screenSize.mapHeight / 2])
+      .translate([screenSize.width / 2, screenSize.height / 2])
       .precision(0.1);
 
     // Path
@@ -59,8 +71,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     const svg = d3
       .select(mapContainerRef.current)
       .append("svg")
-      .attr("width", screenSize.mapWidth)
-      .attr("height", screenSize.mapHeight)
+      .attr("width", screenSize.width)
+      .attr("height", screenSize.height)
       .style("background-color", "#82A9FD");
 
     svg.selectAll("*").remove();
@@ -76,24 +88,24 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     // Tooltip
 
     // Zoom
-    svg.call(
-      d3
-        .zoom()
-        .scaleExtent([1 / 2, 2])
-        .on("zoom", (event) => {
-          g.attr("transform", event.transform);
-        })
-    );
+    const zoomBehavior = d3
+      .zoom()
+      .scaleExtent([1 / 2, 2])
+      .on("zoom", (event) => {
+        g.attr("transform", event.transform);
+      });
+
+    svg.call(zoomBehavior);
 
     g.selectAll("path")
       .data(features as any)
       .enter()
       .append("path")
       .attr("d", mapPath)
-
       .style("stroke", "#82A9FD")
       .style("stroke-width", "0.5")
       .style("fill", "rgb(255,255,225)")
+      .attr("class", "region")
       .on("contextmenu", (event: MouseEvent, d) => {
         console.log(event);
         const clickX = event.pageX;
@@ -103,7 +115,34 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
           `Page X: ${clickX}\tPage Y: ${clickY}\nlongitude: ${long}\tlatitude: ${lat}`
         );
         setClickCoords({ long, lat });
+        const [x, y] = d3.pointer(event);
+        setPoints((prevPoints) => [...prevPoints, { x, y }]);
         // event.preventDefault();
+      })
+      .on("click", function (event, d) {
+        d3.selectAll(".region").style("fill", "rgb(255,255,255)");
+        d3.select(this).style("fill", "red");
+        const [[x0, y0], [x1, y1]] = mapPath.bounds(d);
+        event.stopPropagation();
+        svg
+          .transition()
+          .duration(750)
+          .call(
+            zoomBehavior.transform,
+            d3.zoomIdentity
+              .translate(screenSize.width / 2, screenSize.height / 2)
+              .scale(
+                Math.min(
+                  8,
+                  0.9 /
+                    Math.max(
+                      (x1 - x0) / screenSize.width,
+                      (y1 - y0) / screenSize.height
+                    )
+                )
+              )
+              .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+          );
       });
 
     // TODO: REFACTOR
@@ -158,7 +197,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
 
   useEffect(() => {
     drawMap(features);
-  }, [features]);
+  }, [features, setSelectedRegion]);
+
+  useEffect(() => {
+    if (mapContainerRef.current) {
+      const svg = d3.select(mapContainerRef.current).select("svg");
+      // Обновление точек на карте
+
+      svg
+        .selectAll("circle")
+        .data(points)
+        .join("circle")
+        .attr("cx", (d) => d.x)
+        .attr("cy", (d) => d.y)
+        .attr("r", 5)
+        .attr("fill", "red");
+    }
+  }, [points]);
 
   return (
     <ContextMenu>
