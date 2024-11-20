@@ -15,7 +15,8 @@ interface ScreenSize {
 }
 
 interface MapComponentProps {
-  features: FeatureCollection;
+  // features: FeatureCollection;
+  features: any;
 }
 
 interface CoordinatesMap {
@@ -24,37 +25,52 @@ interface CoordinatesMap {
 }
 
 interface Point {
-  x: number;
-  y: number;
+  longitude: number;
+  latitude: number;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
-  // TODO: REFACTOR
-  // const [heroSelect, setHeroSelect] = useState("batman");
-  // const [minHero, setMinHero] = useState(null);
-  // const [maxHero, setMaxHero] = useState(null);
+const testPoints: Point[] = [
+  {
+    longitude: 113.2377372098928,
+    latitude: 74.82238189130301,
+  },
+  {
+    longitude: 125.75427779651253,
+    latitude: 76.3624417881254,
+  },
+  {
+    longitude: 109.14429686582179,
+    latitude: 63.51489294696842,
+  },
+];
 
+const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   const [screenSize, setScreenSize] = useState<ScreenSize>({
     width: document.documentElement.clientWidth,
     height: document.documentElement.clientHeight,
   });
 
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   const tooltipDiv = useRef<HTMLDivElement | null>(null);
 
-  const [clickCoords, setClickCoords] = useState<CoordinatesMap | null>(null);
   const [points, setPoints] = useState<Point[]>([]);
 
-  const [selectedRegion, setSelectedRegion] = useState<{
-    feature: any;
-    centroid: [number, number];
-  } | null>(null);
-
-  const [selectedPath, setPath] = useState<string>("");
+  const projection = d3
+    .geoAlbers()
+    .rotate([-105, 0]) //  .rotate([-105,0])
+    .center([-10, 65])
+    .parallels([50, 70]) //.parallels([52, 64])
+    .scale(700)
+    .translate([screenSize.width / 2, screenSize.height / 2])
+    .precision(0.1);
+  // Path
+  const path = d3.geoPath();
+  const pathGenerator = path.projection(projection);
 
   const drawMap = (features: FeatureCollection) => {
-    const mapProjection = d3
+    const projection = d3
       .geoAlbers()
       .rotate([-105, 0]) //  .rotate([-105,0])
       .center([-10, 65])
@@ -64,76 +80,33 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
       .precision(0.1);
 
     // Path
-    const mapPath = d3.geoPath().projection(mapProjection);
+    const path = d3.geoPath();
+    const pathGenerator = path.projection(projection);
+    console.log(pathGenerator);
 
     document.body.style.overflow = "hidden";
 
-    const svg = d3
-      .select(mapContainerRef.current)
-      .append("svg")
-      .attr("width", screenSize.width)
-      .attr("height", screenSize.height)
-      .style("background-color", "#82A9FD");
+    const svg = d3.select(svgRef.current).style("background-color", "#82A9FD");
 
     svg.selectAll("*").remove();
-
-    const g = svg.append("g");
-
-    tooltipDiv.current = d3
-      .select(mapContainerRef.current)
-      .append("div")
-      .attr("class", "map-tooltip")
-      .style("opacity", 0);
-
-    // Tooltip
 
     // Zoom
     const zoomBehavior = d3
       .zoom()
       .scaleExtent([1 / 2, 2])
-      .on("zoom", (event) => {
-        g.attr("transform", event.transform);
-      });
-
-    svg.call(zoomBehavior);
-
-    g.selectAll("path")
-      .data(features as any)
-      .enter()
-      .append("path")
-      .attr("d", mapPath)
-      .style("stroke", "#82A9FD")
-      .style("stroke-width", "0.5")
-      .style("fill", "rgb(255,255,225)")
-      .attr("class", "region")
-      .on("contextmenu", (event: MouseEvent, d) => {
-        console.log(event);
-        const clickX = event.pageX;
-        const clickY = event.pageY;
-        const [long, lat] = mapProjection?.invert([clickX, clickY]);
-        console.log(
-          `Page X: ${clickX}\tPage Y: ${clickY}\nlongitude: ${long}\tlatitude: ${lat}`
-        );
-        setClickCoords({ long, lat });
-        const [x, y] = d3.pointer(event);
-        setPoints((prevPoints) => [...prevPoints, { x, y }]);
-        // event.preventDefault();
-      })
-      .on("click", function (event, d) {
-        d3.selectAll(".region").style("fill", "rgb(255,255,255)");
-        d3.select(this).style("fill", "red");
-        const [[x0, y0], [x1, y1]] = mapPath.bounds(d);
-        event.stopPropagation();
+      .on("zoom", (event, d) => {
+        // svg.selectAll("path").attr("transform", event.transform);
+        const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
         svg
           .transition()
-          .duration(750)
+          .duration(1000)
           .call(
-            zoomBehavior.transform,
+            zoom.transform,
             d3.zoomIdentity
               .translate(screenSize.width / 2, screenSize.height / 2)
               .scale(
                 Math.min(
-                  8,
+                  22,
                   0.9 /
                     Math.max(
                       (x1 - x0) / screenSize.width,
@@ -141,6 +114,53 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
                     )
                 )
               )
+              .translate(-(x0 + x1) / 2, -(y0 + y1) / 2),
+            d3.pointer(event, svg.node())
+          );
+      });
+
+    svg.call(zoomBehavior);
+
+    svg
+      .append("g")
+      .selectAll("path")
+      .data(features as any)
+      .enter()
+      .append("path")
+      .attr("d", pathGenerator)
+      .style("stroke", "#82A9FD")
+      .style("stroke-width", "0.5")
+      .style("fill", "rgb(255,255,225)")
+      .attr("class", "region")
+      .on("click", function (event, d) {
+        d3.selectAll(".region").style("fill", "rgb(255,255,255)");
+        d3.select(event.target).style("fill", "rgba(255,0,0,0.5");
+        console.log(event.target);
+
+        const [longitude, latitude] = d.geometry.coordinates[0][0];
+
+        console.log(`long: ${longitude}\t lat: ${latitude}`);
+
+        const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
+        const translate = [screenSize.width / 2, screenSize.height / 2];
+        const scale = Math.min(
+          8,
+          0.9 /
+            Math.max(
+              (x1 - x0) / screenSize.width,
+              (y1 - y0) / screenSize.height
+            )
+        );
+
+        event.stopPropagation();
+        svg
+          .transition()
+          .duration(1000)
+          .call(
+            zoomBehavior.transform,
+            d3.zoomIdentity
+              .translate(translate[0], translate[1])
+              .scale(scale)
               .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
           );
       });
@@ -195,45 +215,72 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     // };
   };
 
-  useEffect(() => {
-    drawMap(features);
-  }, [features, setSelectedRegion]);
+  const handleClickPath = (event, d) => {
+    const svg = d3.select(svgRef.current);
+    const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
+    const translate = [screenSize.width / 2, screenSize.height / 2];
+    const scale = Math.min(
+      8,
+      0.9 /
+        Math.max((x1 - x0) / screenSize.width, (y1 - y0) / screenSize.height)
+    );
+
+    event.stopPropagation();
+    svg
+      .transition()
+      .duration(1000)
+      .call(
+        zoomBehavior.transform,
+        d3.zoomIdentity
+          .translate(translate[0], translate[1])
+          .scale(scale)
+          .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+      );
+  };
+
+  const [selectedRegion, setRegion] = useState(null);
+
+  const zoom = d3.zoom().on("zoom", (event) => {
+    const g = d3.select(svgRef.current).select("g");
+    g.attr("transform", event.transform);
+  });
 
   useEffect(() => {
-    if (mapContainerRef.current) {
-      const svg = d3.select(mapContainerRef.current).select("svg");
-      // Обновление точек на карте
+    // drawMap(features);
+    const svg = d3.select(svgRef.current).style("background-color", "#82A9FD");
+    svg.on("click", function (event, d) {
+      console.log(event.target);
 
-      svg
-        .selectAll("circle")
-        .data(points)
-        .join("circle")
-        .attr("cx", (d) => d.x)
-        .attr("cy", (d) => d.y)
-        .attr("r", 5)
-        .attr("fill", "red");
-    }
-  }, [points]);
+      d3.select(event.target).style("fill", "red");
+    });
+
+    svg.call(zoom);
+  }, [features]);
+
+  useEffect(() => {}, [selectedRegion]);
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger className="">
-        <div ref={mapContainerRef}></div>
-      </ContextMenuTrigger>
-      <ContextMenuContent className="w-64">
-        <ContextMenuItem>
-          Coords: {`${JSON.stringify(clickCoords)}`}
-        </ContextMenuItem>
-        <ContextMenuItem inset>
-          Back
-          <ContextMenuShortcut>⌘[</ContextMenuShortcut>
-        </ContextMenuItem>
-        <ContextMenuItem inset disabled>
-          Forward
-          <ContextMenuShortcut>⌘]</ContextMenuShortcut>
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <div ref={mapContainerRef}>
+      <svg
+        ref={svgRef}
+        width={screenSize.width}
+        height={screenSize.height}
+        viewBox={`0 0 ${screenSize.width} ${screenSize.height}`}
+      >
+        <g>
+          {features.map((d) => (
+            <path
+              key={d.properties.id}
+              // onClick={() => setRegion(d)}
+              d={pathGenerator(d)}
+              fill="#FFFFFF"
+              stroke="#82A9FD"
+              strokeWidth="0.3"
+            />
+          ))}
+        </g>
+      </svg>
+    </div>
   );
 };
 
