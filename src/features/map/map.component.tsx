@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { FeatureCollection, Feature } from "geojson";
-import { Tooltip } from "@radix-ui/react-tooltip";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Feature } from "geojson";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface EthnicGroupPoint {
   idPoint: number;
@@ -32,8 +32,14 @@ interface ScreenSize {
 }
 
 interface MapComponentProps {
-  // features: FeatureCollection;
   features: any;
+}
+
+interface Tooltip {
+  open: boolean;
+  x: number;
+  y: number;
+  data: EthnicGroupPoint & { regionName: string };
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
@@ -45,7 +51,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const tooltipDiv = useRef<HTMLDivElement | null>(null);
+  const [tooltipData, setTooltipData] = useState<Tooltip | null>(null);
 
   const projection = d3
     .geoAlbers()
@@ -88,26 +94,37 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   }
 
   const handleClickPath = useCallback((d: FeatureMap) => {
+    setTooltipData(null);
     const svg = d3.select(svgRef.current);
     d3.selectAll("path").attr("class", "fill-stone-100");
     d3.selectAll("circle").remove();
     const g = svg.select(`#region_${d.properties.id}`);
 
-    g.select("path").attr("class", "fill-orange-500");
+    g.selectChildren("path").attr("class", "fill-orange-500");
 
     d.properties.ethnicGroupsPoints.map((ethnicGroupPoint) => {
       const point = projection([
         ethnicGroupPoint.longitude,
         ethnicGroupPoint.latitude,
       ]);
-      g.append("circle")
 
+      g.append("circle")
         .attr("fill", "#82A9FD")
+        .attr("stroke", "#FFFFFF")
+        .attr("stroke-width", "0.5")
         .attr("cx", point[0])
         .attr("cy", point[1])
-        .attr("r", "3")
+        .attr("r", "4")
         .attr("class", "cursor-pointer")
-        .on("click", (event, d) => {
+        .on("click", (event) => {
+          const [x, y] = d3.pointer(event);
+
+          setTooltipData({
+            open: true,
+            x: event.clientX + 25,
+            y: event.clientY - 100,
+            data: { ...ethnicGroupPoint, regionName: d.properties.name },
+          });
           console.log(ethnicGroupPoint);
         });
     });
@@ -149,6 +166,43 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
           })}
         </g>
       </svg>
+
+      {tooltipData && (
+        <div
+          style={{
+            position: "absolute",
+            left: tooltipData.x - 20,
+            top: tooltipData.y - 100,
+
+            pointerEvents: "none",
+          }}
+        >
+          <Card className="min-h-22">
+            <CardHeader>
+              <div className="flex flex-col space-y-1 justify-content-center">
+                <span className="text-center font-medium text-lg">
+                  {tooltipData.data.ethnicGroupName}
+                </span>
+                <span className="text-center text-sm">
+                  {tooltipData.data.regionName.toLowerCase()}
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent className="flex flex-col space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full flex flex-row justify-content-between"
+              >
+                <span>книги</span>
+                <span className="self-end">0</span>
+              </Button>
+              <Button variant="ghost" className="w-full flex flex-row">
+                <span>аудиокниги</span>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
