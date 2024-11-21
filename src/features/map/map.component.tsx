@@ -1,6 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { FeatureCollection, Feature } from "geojson";
+import { Tooltip } from "@radix-ui/react-tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+interface EthnicGroupPoint {
+  idPoint: number;
+  ethnicGroupId: number;
+  ethnicGroupName: string;
+  latitude: number;
+  longitude: number;
+}
 
 interface FeatureProperties {
   id: string;
@@ -9,6 +19,7 @@ interface FeatureProperties {
   shapeID: string;
   shapeISO: string;
   shapeType: string;
+  ethnicGroupsPoints: EthnicGroupPoint[];
 }
 
 interface FeatureMap extends Feature {
@@ -24,31 +35,6 @@ interface MapComponentProps {
   // features: FeatureCollection;
   features: any;
 }
-
-interface CoordinatesMap {
-  long: number;
-  lat: number;
-}
-
-interface Point {
-  longitude: number;
-  latitude: number;
-}
-
-const testPoints: Point[] = [
-  {
-    longitude: 113.2377372098928,
-    latitude: 74.82238189130301,
-  },
-  {
-    longitude: 125.75427779651253,
-    latitude: 76.3624417881254,
-  },
-  {
-    longitude: 109.14429686582179,
-    latitude: 63.51489294696842,
-  },
-];
 
 const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   const [screenSize, setScreenSize] = useState<ScreenSize>({
@@ -103,17 +89,29 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
 
   const handleClickPath = useCallback((d: FeatureMap) => {
     const svg = d3.select(svgRef.current);
-    d3.selectAll("path").attr("fill", "#FFFFFF");
+    d3.selectAll("path").attr("class", "fill-stone-100");
     d3.selectAll("circle").remove();
     const g = svg.select(`#region_${d.properties.id}`);
-    g.select("path").attr("fill", "red");
-    // const g = svg.select(`g[data-key]="${d.properties.id}"`);
-    // const centroid = pathGenerator.centroid(d);
-    // g.append("circle")
-    //   .attr("fill", "#82A9FD")
-    //   .attr("cx", centroid[0])
-    //   .attr("cy", centroid[1])
-    //   .attr("r", "2");
+
+    g.select("path").attr("class", "fill-orange-500");
+
+    d.properties.ethnicGroupsPoints.map((ethnicGroupPoint) => {
+      const point = projection([
+        ethnicGroupPoint.longitude,
+        ethnicGroupPoint.latitude,
+      ]);
+      g.append("circle")
+
+        .attr("fill", "#82A9FD")
+        .attr("cx", point[0])
+        .attr("cy", point[1])
+        .attr("r", "3")
+        .attr("class", "cursor-pointer")
+        .on("click", (event, d) => {
+          console.log(ethnicGroupPoint);
+        });
+    });
+
     zoomedPath(svg, d);
   }, []);
 
@@ -146,12 +144,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
                   d={pathGenerator(feature)}
                   fill="#FFFFFF"
                 />
-                {/* <circle
-                  cx={centroid[0]}
-                  cy={centroid[1]}
-                  r={3}
-                  className="centroid-point fill-soft-blue"
-                /> */}
               </g>
             );
           })}
