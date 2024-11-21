@@ -121,8 +121,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
 
           setTooltipData({
             open: true,
-            x: event.clientX + 25,
-            y: event.clientY - 100,
+            x: event.clientX,
+            y: event.clientY - 200,
             data: { ...ethnicGroupPoint, regionName: d.properties.name },
           });
           console.log(ethnicGroupPoint);
@@ -171,8 +171,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
         <div
           style={{
             position: "absolute",
-            left: tooltipData.x - 20,
-            top: tooltipData.y - 100,
+            left: tooltipData.x,
+            top: tooltipData.y,
 
             pointerEvents: "none",
           }}
