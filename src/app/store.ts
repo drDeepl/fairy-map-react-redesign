@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import appReducer from "./appSlice";
-import mapReducer from "../features/map/mapSlice";
-import authReducer from "../features/auth/authSlice";
+import mapReducer from "../features/map/map.slice";
+import authReducer from "../features/auth/auth.slice";
 
 const store = configureStore({
   reducer: {

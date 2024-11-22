@@ -1,4 +1,4 @@
-import { JwtPayload } from "@/features/auth/authSlice";
+import { JwtPayload } from "@/features/auth/auth.slice";
 
 export function getTokenLocalStorage(): string | null {
   return localStorage.getItem("accessToken");

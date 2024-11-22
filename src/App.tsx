@@ -8,7 +8,7 @@ import WelcomePage from "./pages/welcome.page.tsx";
 import ErrorMessageScreen from "./pages/error-message.page.tsx";
 import AdminPage from "./features/admin/admin.page.tsx";
 import { useEffect } from "react";
-import { JwtPayload, setUser } from "./features/auth/authSlice.ts";
+import { JwtPayload, setUser } from "./features/auth/auth.slice.ts";
 import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./app/store.ts";

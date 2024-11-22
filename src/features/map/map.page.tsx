@@ -7,7 +7,7 @@ import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { AuthState, setVerifyedCaptcha } from "../auth/authSlice";
+import { AuthState, setVerifyedCaptcha } from "../auth/auth.slice";
 
 import AuthForm from "../auth/auth.form.component";
 import ErrorMessageScreen from "@/pages/error-message.page";

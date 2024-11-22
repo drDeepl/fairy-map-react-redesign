@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/api/v1/auth/signup": {
+  "/api/auth/signup": {
     parameters: {
       query?: never;
       header?: never;
@@ -21,7 +21,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/auth/signin": {
+  "/api/auth/signin": {
     parameters: {
       query?: never;
       header?: never;
@@ -38,7 +38,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/auth/refresh": {
+  "/api/auth/refresh": {
     parameters: {
       query?: never;
       header?: never;
@@ -55,7 +55,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/auth/logout": {
+  "/api/auth/logout": {
     parameters: {
       query?: never;
       header?: never;
@@ -72,7 +72,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user/me": {
+  "/api/user/me": {
     parameters: {
       query?: never;
       header?: never;
@@ -89,7 +89,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user/{userId}": {
+  "/api/user/{userId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -109,7 +109,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user/delete/{userId}": {
+  "/api/user/delete/{userId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -129,7 +129,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/add": {
+  "/api/constituent/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -149,7 +149,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/add/ethnic-group": {
+  "/api/constituent/add/ethnic-group": {
     parameters: {
       query?: never;
       header?: never;
@@ -169,7 +169,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/ethnic-group/delete": {
+  "/api/constituent/ethnic-group/delete": {
     parameters: {
       query?: never;
       header?: never;
@@ -189,7 +189,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/ethnic-group/{constituentId}": {
+  "/api/constituent/ethnic-group/{constituentId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -206,7 +206,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/all": {
+  "/api/constituent/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -223,7 +223,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/edit/{id}": {
+  "/api/constituent/edit/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -243,7 +243,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/constituent/{id}": {
+  "/api/constituent/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -263,7 +263,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/add": {
+  "/api/ethnic-group/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -283,7 +283,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/all": {
+  "/api/ethnic-group/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -300,7 +300,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/{ethnicGroupId}": {
+  "/api/ethnic-group/{ethnicGroupId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -317,7 +317,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/edit/{id}": {
+  "/api/ethnic-group/edit/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -337,7 +337,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/{id}": {
+  "/api/ethnic-group/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -357,7 +357,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/language/add": {
+  "/api/ethnic-group/language/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -377,7 +377,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/language/all": {
+  "/api/ethnic-group/language/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -394,7 +394,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/ethnic-group/language/{id}": {
+  "/api/ethnic-group/language/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -414,7 +414,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/map.json": {
+  "/api/map/map.json": {
     parameters: {
       query?: never;
       header?: never;
@@ -431,7 +431,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/ethnic-groups": {
+  "/api/map/ethnic-groups": {
     parameters: {
       query?: never;
       header?: never;
@@ -448,7 +448,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/ethnic-groups/{constituentId}": {
+  "/api/map/ethnic-groups/{constituentId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -465,7 +465,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/ethnic-groups/{name}": {
+  "/api/map/ethnic-groups/{name}": {
     parameters: {
       query?: never;
       header?: never;
@@ -482,7 +482,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/ethnic-groups/{pointId}": {
+  "/api/map/ethnic-groups/{pointId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -502,7 +502,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/map/constituents/filled": {
+  "/api/map/constituents/filled": {
     parameters: {
       query?: never;
       header?: never;
@@ -519,7 +519,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/ethnic-groups/{ethnicGroupId}/constituents/{constituentId}": {
+  "/api/admin/ethnic-groups/{ethnicGroupId}/constituents/{constituentId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -539,7 +539,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/ethnic-groups/{pointId}": {
+  "/api/admin/ethnic-groups/{pointId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -559,7 +559,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/story/add": {
+  "/api/admin/story/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -579,7 +579,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/story/edit/{storyId}": {
+  "/api/admin/story/edit/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -599,7 +599,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/story/delete/{storyId}": {
+  "/api/admin/story/delete/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -619,7 +619,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/admin/story/text/add/{storyId}": {
+  "/api/admin/story/text/add/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -639,7 +639,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/all": {
+  "/api/story/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -656,7 +656,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/by-name/{name}": {
+  "/api/story/by-name/{name}": {
     parameters: {
       query?: never;
       header?: never;
@@ -673,7 +673,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/{storyId}": {
+  "/api/story/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -690,7 +690,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/languages/{storyId}": {
+  "/api/story/languages/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -707,7 +707,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/ethnic-group/{ethnicGroupId}": {
+  "/api/story/ethnic-group/{ethnicGroupId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -724,7 +724,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/text/{storyId}": {
+  "/api/story/text/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -741,7 +741,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/audio/{audioId}": {
+  "/api/story/audio/{audioId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -761,7 +761,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/audio": {
+  "/api/story/audio": {
     parameters: {
       query?: never;
       header?: never;
@@ -771,7 +771,7 @@ export interface paths {
     get?: never;
     /**
      * добавление озвучки к сказке
-     * @description пример запроса: /api/v1/story/audio?storyId=8 | необходима роль администратора
+     * @description пример запроса: /api/story/audio?storyId=8 | необходима роль администратора
      */
     put: operations["StoryController_setUserAudioToStory"];
     post?: never;
@@ -781,7 +781,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/image/{storyId}": {
+  "/api/story/image/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -798,7 +798,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/image/upload/{storyId}": {
+  "/api/story/image/upload/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -818,7 +818,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/image/delete/{storyId}": {
+  "/api/story/image/delete/{storyId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -838,7 +838,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/rating/{audioId}": {
+  "/api/story/rating/{audioId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -855,7 +855,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/rating/my/{userAudioId}": {
+  "/api/story/rating/my/{userAudioId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -872,7 +872,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/story/rating/add": {
+  "/api/story/rating/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -889,7 +889,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user-audio/my-audios": {
+  "/api/user-audio/my-audios": {
     parameters: {
       query?: never;
       header?: never;
@@ -906,7 +906,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user-audio/my-audios/approved": {
+  "/api/user-audio/my-audios/approved": {
     parameters: {
       query?: never;
       header?: never;
@@ -923,7 +923,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user-audio/{userAudioId}": {
+  "/api/user-audio/{userAudioId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -940,7 +940,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user-audio/upload/{languageId}": {
+  "/api/user-audio/upload/{languageId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -960,7 +960,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/user-audio/delete/{userAudioId}": {
+  "/api/user-audio/delete/{userAudioId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -980,7 +980,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/my-requests": {
+  "/api/audio-story-request/my-requests": {
     parameters: {
       query?: never;
       header?: never;
@@ -997,7 +997,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/all": {
+  "/api/audio-story-request/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -1017,7 +1017,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/by-user/{userId}": {
+  "/api/audio-story-request/by-user/{userId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1037,7 +1037,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/add": {
+  "/api/audio-story-request/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -1054,7 +1054,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/edit/{audioStoryReqeustId}": {
+  "/api/audio-story-request/edit/{audioStoryReqeustId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1074,7 +1074,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/audio-story-request/delete/{audioStoryRequestId}": {
+  "/api/audio-story-request/delete/{audioStoryRequestId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1094,7 +1094,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/type/all": {
+  "/api/request/type/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -1111,7 +1111,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/type/{typeRequestId}": {
+  "/api/request/type/{typeRequestId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1128,7 +1128,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/type/add": {
+  "/api/request/type/add": {
     parameters: {
       query?: never;
       header?: never;
@@ -1148,7 +1148,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/type/edit/{typeRequestId}": {
+  "/api/request/type/edit/{typeRequestId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1168,7 +1168,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/type/delete/{typeRequestId}": {
+  "/api/request/type/delete/{typeRequestId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1188,7 +1188,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/request/status/all": {
+  "/api/request/status/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -1205,7 +1205,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/all": {
+  "/api/add-story-request/all": {
     parameters: {
       query?: never;
       header?: never;
@@ -1214,7 +1214,7 @@ export interface paths {
     };
     /**
      * получение всех заявок на добавление сказки
-     * @description необходима роль администратора. пример запроса: /api/v1/add-story-request/all?start=1&count=10
+     * @description необходима роль администратора. пример запроса: /api/add-story-request/all?start=1&count=10
      */
     get: operations["AddStoryRequestController_getAddStoryRequestAll"];
     put?: never;
@@ -1225,7 +1225,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/my-requests": {
+  "/api/add-story-request/my-requests": {
     parameters: {
       query?: never;
       header?: never;
@@ -1242,7 +1242,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/by-user/{userId}": {
+  "/api/add-story-request/by-user/{userId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1262,7 +1262,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/create": {
+  "/api/add-story-request/create": {
     parameters: {
       query?: never;
       header?: never;
@@ -1279,7 +1279,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/edit/{addStoryRequestId}": {
+  "/api/add-story-request/edit/{addStoryRequestId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1289,7 +1289,7 @@ export interface paths {
     get?: never;
     /**
      * обновление заявки
-     * @description необходима роль администратора. статус заявки берется из /api/v1/request/status/all | Необходима роль moder | После успешного редактирования данные заявки так же передаются пользователю с userId по веб-сокету
+     * @description необходима роль администратора. статус заявки берется из /api/request/status/all | Необходима роль moder | После успешного редактирования данные заявки так же передаются пользователю с userId по веб-сокету
      */
     put: operations["AddStoryRequestController_editStatusAddStoryReqeust"];
     post?: never;
@@ -1299,7 +1299,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/v1/add-story-request/delete/{addStoryRequestId}": {
+  "/api/add-story-request/delete/{addStoryRequestId}": {
     parameters: {
       query?: never;
       header?: never;

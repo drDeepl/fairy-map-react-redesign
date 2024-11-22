@@ -5,6 +5,7 @@ import {
   parsePayloadFromAccessToken,
   setTokenLocalStorage,
 } from "@/common/helpers/token.helper";
+import { BaseAppState } from "@/common/interfaces/state.interface";
 
 export interface JwtPayload {
   sub: string;
@@ -14,10 +15,7 @@ export interface JwtPayload {
   exp: number;
 }
 
-export interface AuthState {
-  loading: boolean;
-  error: ApiErrorResponse | null;
-  success: boolean;
+export interface AuthState extends BaseAppState {
   user: null | JwtPayload;
   verifyedCaptcha: boolean;
   dataFormValid: boolean;

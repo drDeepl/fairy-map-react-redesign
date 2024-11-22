@@ -4,7 +4,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
-import { setError, setLoad, setSuccess, setVerifyedCaptcha } from "./authSlice";
+import {
+  setError,
+  setLoad,
+  setSuccess,
+  setVerifyedCaptcha,
+} from "./auth.slice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
