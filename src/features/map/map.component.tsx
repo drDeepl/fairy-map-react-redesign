@@ -1,8 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Feature } from "geojson";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { BookHeadphones, LibraryBig } from "lucide-react";
+import { Select, SelectTrigger } from "@/components/ui/select";
+import { SelectValue } from "@radix-ui/react-select";
 
 interface EthnicGroupPoint {
   idPoint: number;
@@ -26,32 +35,28 @@ interface FeatureMap extends Feature {
   properties: FeatureProperties;
 }
 
-interface ScreenSize {
+interface MapComponentProps {
+  features: any;
   width: number;
   height: number;
 }
 
-interface MapComponentProps {
-  features: any;
-}
-
 interface Tooltip {
   open: boolean;
-  x: number;
-  y: number;
-  data: EthnicGroupPoint & { regionName: string };
+  data?: EthnicGroupPoint;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
-  const [screenSize, setScreenSize] = useState<ScreenSize>({
-    width: document.documentElement.clientWidth,
-    height: document.documentElement.clientHeight,
-  });
-
+const MapComponent: React.FC<MapComponentProps> = ({
+  features,
+  width,
+  height,
+}) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const [tooltipData, setTooltipData] = useState<Tooltip | null>(null);
+  const [tooltip, setTooltip] = useState<Tooltip>({
+    open: false,
+  });
 
   const projection = d3
     .geoAlbers()
@@ -59,13 +64,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     .center([-10, 65])
     .parallels([50, 70]) //.parallels([52, 64])
     .scale(700)
-    .translate([screenSize.width / 2, screenSize.height / 2])
+    .translate([width / 2, height / 2])
     .precision(0.1);
   // Path
   const path = d3.geoPath();
   const pathGenerator = path.projection(projection);
-
-  const [selectedFeature, setFeature] = useState<FeatureMap | null>(null);
 
   const zoom = d3.zoom().on("zoom", (event) => {
     const g = d3.select(svgRef.current).select("g");
@@ -74,11 +77,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
 
   function zoomedPath(svg: any, d: any) {
     const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
-    const translate = [screenSize.width / 2, screenSize.height / 2];
+    const translate = [width / 2, height / 2];
     const scale = Math.min(
       8,
-      0.9 /
-        Math.max((x1 - x0) / screenSize.width, (y1 - y0) / screenSize.height)
+      0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
     );
 
     svg
@@ -94,43 +96,26 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
   }
 
   const handleClickPath = useCallback((d: FeatureMap) => {
-    setTooltipData(null);
     const svg = d3.select(svgRef.current);
     d3.selectAll("path").attr("class", "fill-stone-100");
-    d3.selectAll("circle").remove();
+    d3.selectAll("circle").style("opacity", "0");
     const g = svg.select(`#region_${d.properties.id}`);
 
     g.selectChildren("path").attr("class", "fill-orange-500");
 
-    d.properties.ethnicGroupsPoints.map((ethnicGroupPoint) => {
-      const point = projection([
-        ethnicGroupPoint.longitude,
-        ethnicGroupPoint.latitude,
-      ]);
+    const circle = g.selectChildren(`circle`);
 
-      g.append("circle")
-        .attr("fill", "#82A9FD")
-        .attr("stroke", "#FFFFFF")
-        .attr("stroke-width", "0.5")
-        .attr("cx", point[0])
-        .attr("cy", point[1])
-        .attr("r", "4")
-        .attr("class", "cursor-pointer")
-        .on("click", (event) => {
-          const [x, y] = d3.pointer(event);
-
-          setTooltipData({
-            open: true,
-            x: event.clientX,
-            y: event.clientY - 200,
-            data: { ...ethnicGroupPoint, regionName: d.properties.name },
-          });
-          console.log(ethnicGroupPoint);
-        });
-    });
+    circle.style("opacity", "1");
 
     zoomedPath(svg, d);
   }, []);
+
+  const handleClickPoint = (open: boolean) => {
+    setTooltip((prevTooltip) => ({
+      ...prevTooltip,
+      open: open,
+    }));
+  };
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).style("background-color", "#82A9FD");
@@ -141,9 +126,9 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
     <div ref={mapContainerRef}>
       <svg
         ref={svgRef}
-        width={screenSize.width}
-        height={screenSize.height}
-        viewBox={`0 0 ${screenSize.width} ${screenSize.height}`}
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
       >
         <g>
           {features.map((feature: FeatureMap) => {
@@ -161,48 +146,70 @@ const MapComponent: React.FC<MapComponentProps> = ({ features }) => {
                   d={pathGenerator(feature)}
                   fill="#FFFFFF"
                 />
+                {feature.properties.ethnicGroupsPoints.map(
+                  (ethnicGroupPoint: EthnicGroupPoint) => {
+                    const point = projection([
+                      ethnicGroupPoint.longitude,
+                      ethnicGroupPoint.latitude,
+                    ]);
+                    return (
+                      <DropdownMenu
+                        key={ethnicGroupPoint.idPoint}
+                        onOpenChange={(open: boolean) => {
+                          if (!tooltip.open) {
+                            const color = open ? "red" : "#82A9FD";
+                            d3.select(
+                              `circle#circle-${ethnicGroupPoint.idPoint}`
+                            ).attr("fill", color);
+                          }
+                        }}
+                      >
+                        <DropdownMenuTrigger asChild>
+                          <circle
+                            onClick={() => handleClickPoint(true)}
+                            id={`circle-${ethnicGroupPoint.idPoint}`}
+                            className={`cursor-pointer opacity-0 ethnic-group-point-region-${feature.properties.id}`}
+                            fill="#82A9FD"
+                            stroke="#FFFFFF"
+                            strokeWidth="0.5"
+                            cx={point[0]}
+                            cy={point[1]}
+                            r="4"
+                          />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="flex flex-col pb-5 px-8">
+                          <DropdownMenuLabel className="text-center text-lg">
+                            <p>{ethnicGroupPoint.ethnicGroupName}</p>
+                            <p className="text-sm lowercase text-zinc-500 self-center font-normal">
+                              {feature.properties.name}
+                            </p>
+                          </DropdownMenuLabel>
+
+                          <Select>
+                            <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-5">
+                              <LibraryBig className="stroke-gray-600" />
+                              <SelectValue placeholder="книги" />
+                              <span className="justify-end">0</span>
+                            </SelectTrigger>
+                          </Select>
+
+                          <Select>
+                            <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-3">
+                              <BookHeadphones className="stroke-gray-600" />
+                              <SelectValue placeholder="аудиокниги" />
+                              <span className="">0</span>
+                            </SelectTrigger>
+                          </Select>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    );
+                  }
+                )}
               </g>
             );
           })}
         </g>
       </svg>
-
-      {tooltipData && (
-        <div
-          style={{
-            position: "absolute",
-            left: tooltipData.x,
-            top: tooltipData.y,
-
-            pointerEvents: "none",
-          }}
-        >
-          <Card className="min-h-22">
-            <CardHeader>
-              <div className="flex flex-col space-y-1 justify-content-center">
-                <span className="text-center font-medium text-lg">
-                  {tooltipData.data.ethnicGroupName}
-                </span>
-                <span className="text-center text-sm">
-                  {tooltipData.data.regionName.toLowerCase()}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="flex flex-col space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full flex flex-row justify-content-between"
-              >
-                <span>книги</span>
-                <span className="self-end">0</span>
-              </Button>
-              <Button variant="ghost" className="w-full flex flex-row">
-                <span>аудиокниги</span>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 };

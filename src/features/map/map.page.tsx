@@ -15,7 +15,17 @@ import { useNavigate } from "react-router-dom";
 
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 
+interface ScreenSize {
+  width: number;
+  height: number;
+}
+
 const MapPage: React.FC = () => {
+  const [screenSize, setScreenSize] = useState<ScreenSize>({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+  });
+
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
@@ -91,7 +101,15 @@ const MapPage: React.FC = () => {
           onClose={() => handleCloseAuthForm()}
         />
       </div>
-      {mapState.dataMap ? <MapComponent features={mapState.dataMap} /> : ""}
+      {mapState.dataMap ? (
+        <MapComponent
+          features={mapState.dataMap}
+          width={screenSize.width}
+          height={screenSize.height}
+        />
+      ) : (
+        ""
+      )}
     </div>
   );
 };
