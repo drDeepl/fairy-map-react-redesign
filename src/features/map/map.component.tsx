@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BookHeadphones, LibraryBig } from "lucide-react";
 import { Select, SelectTrigger } from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
+import { SelectContent, SelectValue } from "@radix-ui/react-select";
+import { BookState } from "../book/book.slice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/app/store";
+import { getBookByEthnicGroup } from "../book/book.actions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface EthnicGroupPoint {
   idPoint: number;
@@ -52,11 +57,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
   height,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const [tooltip, setTooltip] = useState<Tooltip>({
-    open: false,
-  });
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  const bookState: BookState = useSelector((state: RootState) => state.book);
+  const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
   const projection = d3
     .geoAlbers()
@@ -66,6 +71,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     .scale(700)
     .translate([width / 2, height / 2])
     .precision(0.1);
+
   // Path
   const path = d3.geoPath();
   const pathGenerator = path.projection(projection);
@@ -95,6 +101,14 @@ const MapComponent: React.FC<MapComponentProps> = ({
       );
   }
 
+  useEffect(() => {
+    if (tooltip?.open) {
+      if (tooltip.data) {
+        dispatch(getBookByEthnicGroup(tooltip.data.ethnicGroupId));
+      }
+    }
+  }, [tooltip]);
+
   const handleClickPath = useCallback((d: FeatureMap) => {
     const svg = d3.select(svgRef.current);
     d3.selectAll("path").attr("class", "fill-stone-100");
@@ -110,12 +124,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   }, []);
 
-  const handleClickPoint = (open: boolean) => {
-    setTooltip((prevTooltip) => ({
-      ...prevTooltip,
-      open: open,
-    }));
-  };
+  const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
+    console.log("handleClickPoint");
+    dispatch(getBookByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
+  });
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).style("background-color", "#82A9FD");
@@ -155,18 +167,24 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     return (
                       <DropdownMenu
                         key={ethnicGroupPoint.idPoint}
+                        modal={false}
                         onOpenChange={(open: boolean) => {
-                          if (!tooltip.open) {
-                            const color = open ? "red" : "#82A9FD";
-                            d3.select(
-                              `circle#circle-${ethnicGroupPoint.idPoint}`
-                            ).attr("fill", color);
+                          const color = open ? "red" : "#82A9FD";
+                          d3.select(
+                            `circle#circle-${ethnicGroupPoint.idPoint}`
+                          ).attr("fill", color);
+
+                          if (open) {
+                            dispatch(
+                              getBookByEthnicGroup(
+                                ethnicGroupPoint.ethnicGroupId
+                              )
+                            );
                           }
                         }}
                       >
                         <DropdownMenuTrigger asChild>
                           <circle
-                            onClick={() => handleClickPoint(true)}
                             id={`circle-${ethnicGroupPoint.idPoint}`}
                             className={`cursor-pointer opacity-0 ethnic-group-point-region-${feature.properties.id}`}
                             fill="#82A9FD"
@@ -184,14 +202,17 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               {feature.properties.name}
                             </p>
                           </DropdownMenuLabel>
-
-                          <Select>
-                            <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-5">
-                              <LibraryBig className="stroke-gray-600" />
-                              <SelectValue placeholder="книги" />
-                              <span className="justify-end">0</span>
-                            </SelectTrigger>
-                          </Select>
+                          {bookState.loading ? (
+                            <Skeleton className="w-48 h-8" />
+                          ) : (
+                            <Select>
+                              <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-5">
+                                <LibraryBig className="stroke-gray-600" />
+                                <SelectValue placeholder="книги" />
+                                <span className="justify-end">0</span>
+                              </SelectTrigger>
+                            </Select>
+                          )}
 
                           <Select>
                             <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-3">

@@ -15,7 +15,7 @@ const initialState: BookState = {
   bookData: null,
 };
 const bookSlice = createSlice({
-  name: "auth",
+  name: "book",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

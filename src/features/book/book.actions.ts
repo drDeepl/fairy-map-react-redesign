@@ -12,6 +12,7 @@ export const getBookByEthnicGroup = createAsyncThunk(
       const response = await apiClient.get(
         `/api/story/ethnic-group/${ethnicGroupId}`
       );
+      console.log(response);
       return response.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
