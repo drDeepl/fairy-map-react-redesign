@@ -1,4 +1,4 @@
-import apiClient from "@/api/apiClient";
+import { mapControllerGetMapTopojson } from "@/api/client";
 import { handleApiErrorResponse } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
@@ -6,8 +6,7 @@ export const fetchMapData = createAsyncThunk(
   "map/fetchMapData",
   async (arg, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get("/api/map/map.json");
-      return response;
+      return await mapControllerGetMapTopojson();
     } catch (error) {
       const errorResponse = handleApiErrorResponse(error);
       return rejectWithValue(errorResponse);

@@ -1,16 +1,16 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
-import { components } from "@/api/schema/schema";
+
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  addBook,
-  getBookByEthnicGroup,
+  createBook,
   getListBooks,
   getListBooksByEthnicGroup,
 } from "./book.actions";
+import { Components } from "@/api/client";
 
 export interface ListBookState extends BaseAppState {
-  books: Array<components["schemas"]["StoryDto"]>;
+  books: Components.Schemas.StoryDto[];
 }
 
 const initialState: ListBookState = {
@@ -19,10 +19,15 @@ const initialState: ListBookState = {
   error: null,
   books: [],
 };
-const bookSlice = createSlice({
+
+const bookListSlice = createSlice({
   name: "listBook",
   initialState,
-  reducers: {},
+  reducers: {
+    addBook: (state, action: PayloadAction<Components.Schemas.StoryDto>) => {
+      state.books.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getListBooks.pending, (state) => {
@@ -53,23 +58,23 @@ const bookSlice = createSlice({
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       })
-      .addCase(addBook.pending, (state) => {
+      .addCase(createBook.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(addBook.fulfilled, (state, action) => {
+      .addCase(createBook.fulfilled, (state, action) => {
         state.books.push(action.payload);
         state.loading = false;
         state.success = true;
       })
-      .addCase(addBook.rejected, (state, action) => {
+      .addCase(createBook.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       });
   },
 });
 
-export const {} = bookSlice.actions;
+export const { addBook } = bookListSlice.actions;
 
-export default bookSlice.reducer;
+export default bookListSlice.reducer;

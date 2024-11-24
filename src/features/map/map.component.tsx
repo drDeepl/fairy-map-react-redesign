@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Feature } from "geojson";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +11,11 @@ import {
 import { BookHeadphones, LibraryBig } from "lucide-react";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { SelectContent, SelectValue } from "@radix-ui/react-select";
-import { BookState } from "../book/book.slice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/app/store";
-import { getBookByEthnicGroup } from "../book/book.actions";
+import { getListBooksByEthnicGroup } from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ListBookState } from "../book/list-book.slice";
 
 interface EthnicGroupPoint {
   idPoint: number;
@@ -60,7 +59,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const bookState: BookState = useSelector((state: RootState) => state.book);
+
+  const listBookState: ListBookState = useSelector(
+    (state: RootState) => state.listtBook
+  );
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
   const projection = d3
@@ -104,7 +106,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     if (tooltip?.open) {
       if (tooltip.data) {
-        dispatch(getBookByEthnicGroup(tooltip.data.ethnicGroupId));
+        dispatch(getListBooksByEthnicGroup(tooltip.data.ethnicGroupId));
       }
     }
   }, [tooltip]);
@@ -126,7 +128,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
     console.log("handleClickPoint");
-    dispatch(getBookByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
+    dispatch(getListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
   });
 
   useEffect(() => {
@@ -135,10 +137,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }, [features]);
 
   useEffect(() => {
-    if (bookState.success) {
-      console.log(bookState.bookData);
+    if (listBookState.success) {
+      console.log(listBookState.books);
     }
-  }, [bookState]);
+  }, [listBookState]);
 
   return (
     <div ref={mapContainerRef}>
@@ -204,7 +206,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               {feature.properties.name}
                             </p>
                           </DropdownMenuLabel>
-                          {bookState.loading ? (
+                          {listBookState.loading ? (
                             <Skeleton className="w-48 h-8" />
                           ) : (
                             <Select>

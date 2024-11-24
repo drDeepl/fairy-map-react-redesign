@@ -19,23 +19,6 @@ const bookSlice = createSlice({
   name: "book",
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(getBookByEthnicGroup.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
-      .addCase(getBookByEthnicGroup.fulfilled, (state, action) => {
-        state.bookData = action.payload;
-        state.loading = false;
-        state.success = true;
-      })
-      .addCase(getBookByEthnicGroup.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as ApiErrorResponse;
-      });
-  },
 });
 
 export const {} = bookSlice.actions;

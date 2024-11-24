@@ -33,7 +33,7 @@ const mapSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMapData.fulfilled, (state, action) => {
-        const data = action.payload.data;
+        const data = action.payload;
         const geoJson = feature(data, data.objects.map);
 
         const simplifyOptions = { tolerance: 0.008, highQuality: false };

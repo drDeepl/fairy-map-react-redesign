@@ -11,7 +11,7 @@ import {
 } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const addBook = createAsyncThunk(
+export const createBook = createAsyncThunk(
   "book/addBook",
   async (dto: Components.Schemas.AddStoryDto, { rejectWithValue }) => {
     try {

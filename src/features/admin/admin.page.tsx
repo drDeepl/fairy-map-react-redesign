@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/dialog";
 import AddBookForm from "../book/components/forms/add-book.form";
 import { BookState } from "../book/book.slice";
+import { createBook } from "../book/book.actions";
+import { Components } from "@/api/client";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,10 +47,8 @@ const AdminPage: React.FC = () => {
     }
   }, [authState.user]);
 
-  const handleOnSubmitAddBook = (
-    values: components["schemas"]["AddStoryDto"]
-  ) => {
-    dispatch(addBook(values));
+  const handleOnSubmitAddBook = (values: Components.Schemas.AddStoryDto) => {
+    dispatch(createBook(values));
   };
 
   const menuItems = [
@@ -111,7 +111,6 @@ const AdminPage: React.FC = () => {
             <DialogTitle>
               <span>добавить сказку</span>
             </DialogTitle>
-            <DialogDescription>hey</DialogDescription>
             <AddBookForm
               loading={bookState.loading}
               onSubmit={handleOnSubmitAddBook}
