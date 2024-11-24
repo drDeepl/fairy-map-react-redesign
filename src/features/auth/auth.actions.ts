@@ -1,4 +1,8 @@
-import apiClient from "@/api/apiClient";
+import {
+  authControllerSignIn,
+  authControllerSignUp,
+  Components,
+} from "@/api/client";
 import {
   ApiErrorResponse,
   handleApiErrorResponse,
@@ -7,11 +11,12 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const signIn = createAsyncThunk(
   "user/signin",
-  async (signInDto: any, { rejectWithValue }) => {
+  async (
+    signInDto: Components.Schemas.SignInRequestDto,
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await apiClient.post("/api/auth/signin", signInDto);
-
-      return response.data;
+      return await authControllerSignIn(null, signInDto);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
 
@@ -22,11 +27,12 @@ export const signIn = createAsyncThunk(
 
 export const signUp = createAsyncThunk(
   "user/signup",
-  async (signUpDto: any, { rejectWithValue }) => {
+  async (
+    signUpDto: Components.Schemas.SignUpRequestDto,
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await apiClient.post("/api/auth/signup", signUpDto);
-      console.log(response);
-      return response.data;
+      return await authControllerSignUp(null, signUpDto);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
 

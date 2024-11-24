@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -27,10 +27,7 @@ interface SignInFormProps extends AuthFormProps {
   ) => Promise<void>;
 }
 
-const SignInFormComponent: React.FC<SignInFormProps> = ({
-  loading,
-  onSubmit,
-}) => {
+const SignInForm: React.FC<SignInFormProps> = ({ loading, onSubmit }) => {
   const signInForm = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -81,4 +78,4 @@ const SignInFormComponent: React.FC<SignInFormProps> = ({
   );
 };
 
-export default SignInFormComponent;
+export default SignInForm;

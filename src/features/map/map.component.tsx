@@ -134,6 +134,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
     svg.call(zoom);
   }, [features]);
 
+  useEffect(() => {
+    if (bookState.success) {
+      console.log(bookState.bookData);
+    }
+  }, [bookState]);
+
   return (
     <div ref={mapContainerRef}>
       <svg
@@ -175,11 +181,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                           ).attr("fill", color);
 
                           if (open) {
-                            dispatch(
-                              getBookByEthnicGroup(
-                                ethnicGroupPoint.ethnicGroupId
-                              )
-                            );
+                            handleClickPoint(ethnicGroupPoint);
                           }
                         }}
                       >

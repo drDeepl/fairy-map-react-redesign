@@ -1,11 +1,12 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
-import { components } from "@/api/schema/schema";
+
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice } from "@reduxjs/toolkit";
 import { getBookByEthnicGroup } from "./book.actions";
+import { Components } from "@/api/client";
 
 export interface BookState extends BaseAppState {
-  bookData: components["schemas"]["StoryDto"] | null;
+  bookData: Components.Schemas.StoryDto | null;
 }
 
 const initialState: BookState = {
@@ -32,7 +33,6 @@ const bookSlice = createSlice({
       })
       .addCase(getBookByEthnicGroup.rejected, (state, action) => {
         state.loading = false;
-
         state.error = action.payload as ApiErrorResponse;
       });
   },

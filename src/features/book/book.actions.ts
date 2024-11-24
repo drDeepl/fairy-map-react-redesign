@@ -1,22 +1,49 @@
-import apiClient from "@/api/apiClient";
+import {
+  Components,
+  adminControllerAddStory,
+  storyControllerGetAllStories,
+  storyControllerGetStoriesByEthnicGroupId,
+  storyControllerGetStoriesByEthnicGroupIdRaw,
+} from "@/api/client";
 import {
   ApiErrorResponse,
   handleApiErrorResponse,
 } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getBookByEthnicGroup = createAsyncThunk(
-  "book/getBookByEthnicGroup",
-  async (ethnicGroupId: number, { rejectWithValue }) => {
+export const addBook = createAsyncThunk(
+  "book/addBook",
+  async (dto: Components.Schemas.AddStoryDto, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get(
-        `/api/story/ethnic-group/${ethnicGroupId}`
-      );
-      console.log(response);
-      return response.data;
+      return await adminControllerAddStory(null, dto);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
 
+      return rejectWithValue(errorResposne);
+    }
+  }
+);
+
+export const getListBooks = createAsyncThunk(
+  "book/getBooks",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await storyControllerGetAllStories();
+    } catch (err) {
+      const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
+
+      return rejectWithValue(errorResposne);
+    }
+  }
+);
+
+export const getListBooksByEthnicGroup = createAsyncThunk(
+  "book/getBooksByEthnicGroup",
+  async (ethnicGroupId: number, { rejectWithValue }) => {
+    try {
+      return await storyControllerGetStoriesByEthnicGroupIdRaw(ethnicGroupId);
+    } catch (err) {
+      const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
       return rejectWithValue(errorResposne);
     }
   }

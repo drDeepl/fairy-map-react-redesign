@@ -18,14 +18,14 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
-import SignInFormComponent from "./forms/sign-in.form.component";
+import SignInForm from "./forms/sign-in.form.component";
 
-import { components } from "@/api/schema/schema";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
 import { useNavigate } from "react-router-dom";
 
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
+import { Components } from "@/api/client";
 
 enum Tab {
   SignIn = "signin",
@@ -55,7 +55,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   };
 
   const handleSignUp = useCallback(
-    async (values: components["schemas"]["SignUpRequestDto"]) => {
+    async (values: Components.Schemas.SignUpRequestDto) => {
       console.log(authState.verifyedCaptcha);
       authState.verifyedCaptcha
         ? dispatch(signUp(values))
@@ -65,7 +65,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   );
 
   const handleSignIn = useCallback(
-    async (values: components["schemas"]["SignInRequestDto"]) => {
+    async (values: Components.Schemas.SignInRequestDto) => {
       authState.verifyedCaptcha
         ? dispatch(signIn(values))
         : setVisibleCaptcha(true);
@@ -125,10 +125,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
             ) : null}
           </DialogDescription>
           <TabsContent value={Tab.SignIn} className="">
-            <SignInFormComponent
+            <SignInForm
               loading={authState.loading}
               onSubmit={handleSignIn}
-            ></SignInFormComponent>
+            ></SignInForm>
           </TabsContent>
           <TabsContent value={Tab.SignUp}>
             <SignUpFormComponent
