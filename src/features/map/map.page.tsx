@@ -25,9 +25,8 @@ const MapPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
+    useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -96,7 +95,7 @@ const MapPage: React.FC = () => {
       </div>
       {mapState.dataMap ? (
         <MapComponent
-          features={mapState.dataMap}
+          features={mapState.dataMap.features}
           width={width}
           height={height}
         />

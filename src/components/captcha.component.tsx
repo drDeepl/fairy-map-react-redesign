@@ -12,12 +12,10 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
 }) => {
   const captchaRef = useRef<HCaptcha>(null);
 
-  const [token, setToken] = useState(null); // TODO: RESPONSE FROM SERVER
-
   const siteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY;
 
   const handleVerificationSuccess = (token: any) => {
-    setToken(token);
+    console.log(token);
     captchaRef.current?.removeCaptcha();
     onSuccessVerify();
   };

@@ -19,7 +19,6 @@ export const signIn = createAsyncThunk(
       return await authControllerSignIn(null, signInDto);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
-
       return rejectWithValue(errorResposne);
     }
   }

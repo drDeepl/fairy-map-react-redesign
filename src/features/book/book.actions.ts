@@ -41,7 +41,11 @@ export const getListBooksByEthnicGroup = createAsyncThunk(
   "book/getBooksByEthnicGroup",
   async (ethnicGroupId: number, { rejectWithValue }) => {
     try {
-      return await storyControllerGetStoriesByEthnicGroupIdRaw(ethnicGroupId);
+      const response = await storyControllerGetStoriesByEthnicGroupIdRaw(
+        ethnicGroupId
+      );
+
+      return response.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
       return rejectWithValue(errorResposne);

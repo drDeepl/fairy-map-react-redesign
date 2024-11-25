@@ -1,4 +1,4 @@
-import { CaseReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { signIn, signUp } from "./auth.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import {
@@ -38,6 +38,7 @@ const authSlice = createSlice({
     setUser: (state: AuthState, action: PayloadAction<JwtPayload>) => {
       state.user = action.payload;
     },
+
     setVerifyedCaptcha(state: AuthState, action: PayloadAction<boolean>) {
       state.verifyedCaptcha = action.payload;
     },
@@ -81,7 +82,7 @@ const authSlice = createSlice({
         if (action.payload) {
           state.error = action.payload;
         } else {
-          state.error = { message: "что-то пошло не так" };
+          state.error = null;
         }
       })
       .addCase(signUp.pending, (state) => {

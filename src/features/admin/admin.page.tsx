@@ -21,7 +21,6 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
-  DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
 import AddBookForm from "../book/components/forms/add-book.form";
@@ -111,6 +110,7 @@ const AdminPage: React.FC = () => {
             <DialogTitle>
               <span>добавить сказку</span>
             </DialogTitle>
+
             <AddBookForm
               loading={bookState.loading}
               onSubmit={handleOnSubmitAddBook}

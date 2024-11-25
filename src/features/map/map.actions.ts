@@ -6,7 +6,8 @@ export const fetchMapData = createAsyncThunk(
   "map/fetchMapData",
   async (arg, { rejectWithValue }) => {
     try {
-      return await mapControllerGetMapTopojson();
+      const responseData = await mapControllerGetMapTopojson();
+      return responseData.data;
     } catch (error) {
       const errorResponse = handleApiErrorResponse(error);
       return rejectWithValue(errorResponse);

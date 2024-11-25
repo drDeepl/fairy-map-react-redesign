@@ -1,18 +1,15 @@
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import React from "react";
 
 import { CheckCircledIcon } from "@radix-ui/react-icons";
-import { Button } from "./ui/button";
 
 interface SuccessMessageAlertProps {
   title: string;
