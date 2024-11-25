@@ -8,8 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-client": "react-openapi-client-generator docs/api.swagger.v2.json src/api/client.ts",
-    "openapi:generate": "npx openapi-typescript ./docs/api.swagger.json -o ./src/api/schema/schema.d.ts"
+    "generate-client": "react-openapi-client-generator docs/api.swagger.v2.json src/api/client.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.11.0",

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { CaseReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { signIn, signUp } from "./auth.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import {
@@ -6,6 +6,7 @@ import {
   setTokenLocalStorage,
 } from "@/common/helpers/token.helper";
 import { BaseAppState } from "@/common/interfaces/state.interface";
+import { Components } from "@/api/client";
 
 export interface JwtPayload {
   sub: string;
@@ -34,22 +35,22 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser(state: AuthState, action) {
+    setUser: (state: AuthState, action: PayloadAction<JwtPayload>) => {
       state.user = action.payload;
     },
-    setVerifyedCaptcha(state: AuthState, action) {
+    setVerifyedCaptcha(state: AuthState, action: PayloadAction<boolean>) {
       state.verifyedCaptcha = action.payload;
     },
-    setValidDataForm(state: AuthState, action) {
+    setValidDataForm(state: AuthState, action: PayloadAction<boolean>) {
       state.dataFormValid = action.payload;
     },
-    setLoad(state: AuthState, action) {
+    setLoad(state: AuthState, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    setError(state: AuthState, action) {
+    setError(state: AuthState, action: PayloadAction<ApiErrorResponse | null>) {
       state.error = action.payload;
     },
-    setSuccess(state: AuthState, action) {
+    setSuccess(state: AuthState, action: PayloadAction<boolean>) {
       state.success = action.payload;
     },
   },
@@ -60,34 +61,48 @@ const authSlice = createSlice({
         state.error = null;
         state.success = false;
       })
-      .addCase(signIn.fulfilled, (state, action) => {
-        const accessToken: string = action.payload.accessToken;
-        setTokenLocalStorage(accessToken);
-        const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
-        console.log(`token payload ${user}`);
-        state.user = user;
-        state.loading = false;
-        state.success = true;
-      })
+      .addCase(
+        signIn.fulfilled,
+        (
+          state,
+          action: PayloadAction<Components.Schemas.TokensResponseDto>
+        ) => {
+          const accessToken: string = action.payload.accessToken;
+          setTokenLocalStorage(accessToken);
+          const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
+          console.log(`token payload ${user}`);
+          state.user = user;
+          state.loading = false;
+          state.success = true;
+        }
+      )
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
-
-        state.error = action.payload as ApiErrorResponse;
+        if (action.payload) {
+          state.error = action.payload;
+        } else {
+          state.error = { message: "что-то пошло не так" };
+        }
       })
       .addCase(signUp.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(signUp.fulfilled, (state, action) => {
-        const accessToken: string = action.payload.accessToken;
-        setTokenLocalStorage(accessToken);
-        const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
-        console.log(`token payload ${user}`);
-        state.user = user;
-        state.loading = false;
-        state.success = true;
-      })
+      .addCase(
+        signUp.fulfilled,
+        (
+          state,
+          action: PayloadAction<Components.Schemas.TokensResponseDto>
+        ) => {
+          const accessToken: string = action.payload.accessToken;
+          setTokenLocalStorage(accessToken);
+          const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
+          state.user = user;
+          state.loading = false;
+          state.success = true;
+        }
+      )
       .addCase(signUp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;

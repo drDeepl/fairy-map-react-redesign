@@ -1,4 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import appReducer from "./appSlice";
 import mapReducer from "../features/map/map.slice";
 import authReducer from "../features/auth/auth.slice";
@@ -11,11 +11,13 @@ const store = configureStore({
     map: mapReducer,
     auth: authReducer,
     book: bookReducer,
-    listtBook: listBookReducer,
+    listBook: listBookReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = ReturnType<typeof store.dispatch>;
+export type AppDispatch = typeof store.dispatch;
+export type AppStore = typeof store;
+export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;
 
 export default store;

@@ -1,8 +1,6 @@
-import { ApiErrorResponse } from "@/api/helpers/handler-response";
-
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice } from "@reduxjs/toolkit";
-import { getBookByEthnicGroup } from "./book.actions";
+
 import { Components } from "@/api/client";
 
 export interface BookState extends BaseAppState {

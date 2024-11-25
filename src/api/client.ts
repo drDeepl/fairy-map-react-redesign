@@ -546,7 +546,7 @@ export declare namespace Components {
              */
             latitude: number;
             /**
-             *
+             * объект с этнической группой
              */
             ethnicGroup: {
                 /**
@@ -563,6 +563,28 @@ export declare namespace Components {
                 id: number;
             };
         }
+        export interface EthnicGroupPointDto {
+            /**
+             * Уникальный идентификатор точки
+             */
+            idPoint: number;
+            /**
+             * Идентификатор этнической группы
+             */
+            ethnicGroupId: number;
+            /**
+             * Название этнической группы
+             */
+            ethnicGroupName: string;
+            /**
+             * Широта точки
+             */
+            latitude: number;
+            /**
+             * Долгота точки
+             */
+            longitude: number;
+        }
         export interface EthnicGroupToConstituentDto {
             /**
              *
@@ -576,6 +598,64 @@ export declare namespace Components {
              *
              */
             id: number;
+        }
+        export interface FeatureGeometryDto {
+            /**
+             * Тип геометрии
+             */
+            type: string;
+            geometries: GeometryPropertiesDto[];
+        }
+        export interface FeatureGeometryPropertiesDto {
+            /**
+             * id
+             */
+            id: string;
+            /**
+             * feature topojson
+             */
+            name: string;
+            /**
+             * Shape group
+             */
+            shapeGroup: string;
+            /**
+             * Shape ID
+             */
+            shapeID: string;
+            /**
+             * Shape ISO
+             */
+            shapeISO: string;
+            /**
+             * Shape type
+             */
+            shapeType: string;
+            /**
+             * Точки с этническими группами
+             */
+            ethnicGroupsPoints: EthnicGroupPointDto[];
+        }
+        export interface GeometryCollectionDto {
+            /**
+             * Массив свойств объекта
+             */
+            map: FeatureGeometryDto[];
+        }
+        export interface GeometryPropertiesDto {
+            /**
+             * массив с дугам
+             * example:
+             * [
+             *   [
+             *     398223,
+             *     46698
+             *   ]
+             * ]
+             */
+            arcs: any[][];
+            type: string;
+            properties: FeatureGeometryPropertiesDto;
         }
         export interface ImageStoryDto {
             /**
@@ -598,6 +678,105 @@ export declare namespace Components {
              *
              */
             id: number;
+        }
+        export interface MapDto {
+            /**
+             * данные карты
+             */
+            data: {
+                /**
+                 * тип
+                 */
+                type: string;
+                /**
+                 * массив с дугам
+                 * example:
+                 * [
+                 *   [
+                 *     398223,
+                 *     46698
+                 *   ]
+                 * ]
+                 */
+                arcs: any[][];
+                /**
+                 * объект преобразования
+                 */
+                transform: {
+                    /**
+                     * example:
+                     * [
+                     *   0.322,
+                     *   0.943
+                     * ]
+                     */
+                    scale: any[][];
+                    /**
+                     * example:
+                     * [
+                     *   0.322,
+                     *   0.943
+                     * ]
+                     */
+                    translate: any[][];
+                };
+                /**
+                 * Коллекция с геометрией карты
+                 */
+                objects: {
+                    /**
+                     * Массив свойств объекта
+                     */
+                    map: FeatureGeometryDto[];
+                };
+            };
+        }
+        export interface MapTopologyDto {
+            /**
+             * тип
+             */
+            type: string;
+            /**
+             * массив с дугам
+             * example:
+             * [
+             *   [
+             *     398223,
+             *     46698
+             *   ]
+             * ]
+             */
+            arcs: any[][];
+            /**
+             * объект преобразования
+             */
+            transform: {
+                /**
+                 * example:
+                 * [
+                 *   0.322,
+                 *   0.943
+                 * ]
+                 */
+                scale: any[][];
+                /**
+                 * example:
+                 * [
+                 *   0.322,
+                 *   0.943
+                 * ]
+                 */
+                translate: any[][];
+            };
+            /**
+             * Коллекция с геометрией карты
+             */
+            objects: {
+                /**
+                 * Массив свойств объекта
+                 */
+                map: FeatureGeometryDto[];
+            };
         }
         export interface RatingAudioStoryDto {
             /**
@@ -724,6 +903,24 @@ export declare namespace Components {
              * refresh token
              */
             refreshToken: string;
+        }
+        export interface TransformDto {
+            /**
+             * example:
+             * [
+             *   0.322,
+             *   0.943
+             * ]
+             */
+            scale: any[][];
+            /**
+             * example:
+             * [
+             *   0.322,
+             *   0.943
+             * ]
+             */
+            translate: any[][];
         }
         export interface TypeRequestDto {
             /**
@@ -1450,7 +1647,7 @@ export declare namespace Paths {
     }
     namespace MapControllerGetMapTopojson {
         namespace Responses {
-            export type $200 = Components.Schemas.StreamableFile;
+            export type $200 = Components.Schemas.MapDto;
             export interface $400 {
             }
         }

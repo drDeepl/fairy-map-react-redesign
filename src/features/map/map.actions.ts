@@ -1,4 +1,4 @@
-import { mapControllerGetMapTopojson } from "@/api/client";
+import { Components, mapControllerGetMapTopojson } from "@/api/client";
 import { handleApiErrorResponse } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 

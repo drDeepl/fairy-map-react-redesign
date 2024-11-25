@@ -38,7 +38,7 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   const authState = useSelector((state: RootState) => state.auth);
@@ -51,7 +51,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
   };
 
   const hundleErrorCaptcha = (error: any) => {
-    dispatch(setError({ message: "ошибка подтверждения капчи" }));
+    console.error(error);
+    dispatch(
+      setError({
+        message: "ошибка подтверждения капчи",
+      })
+    );
   };
 
   const handleSignUp = useCallback(
@@ -105,9 +110,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
       <DialogContent className="max-w-sm p-9">
         <Tabs
           defaultValue={Tab.SignIn}
-          onValueChange={(value: string) => {
+          onValueChange={() => {
             clearForm();
-            // setCurrentTab(value);
           }}
         >
           <DialogTitle>

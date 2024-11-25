@@ -1,7 +1,7 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createBook,
   getListBooks,
@@ -13,12 +13,14 @@ export interface ListBookState extends BaseAppState {
   books: Components.Schemas.StoryDto[];
 }
 
-const initialState: ListBookState = {
+export const initialState: ListBookState = {
   loading: false,
   success: false,
   error: null,
   books: [],
 };
+
+const getListBooksReducer = createReducer(initialState, (builder) => {});
 
 const bookListSlice = createSlice({
   name: "listBook",

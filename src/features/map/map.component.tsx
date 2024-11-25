@@ -12,32 +12,11 @@ import { BookHeadphones, LibraryBig } from "lucide-react";
 import { Select, SelectTrigger } from "@/components/ui/select";
 import { SelectContent, SelectValue } from "@radix-ui/react-select";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/app/store";
+import { AppDispatch, RootState } from "@/app/store";
 import { getListBooksByEthnicGroup } from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListBookState } from "../book/list-book.slice";
-
-interface EthnicGroupPoint {
-  idPoint: number;
-  ethnicGroupId: number;
-  ethnicGroupName: string;
-  latitude: number;
-  longitude: number;
-}
-
-interface FeatureProperties {
-  id: string;
-  name: string;
-  shapeGroup: string;
-  shapeID: string;
-  shapeISO: string;
-  shapeType: string;
-  ethnicGroupsPoints: EthnicGroupPoint[];
-}
-
-interface FeatureMap extends Feature {
-  properties: FeatureProperties;
-}
+import { EthnicGroupPoint, FeatureMap } from "./map.interface";
 
 interface MapComponentProps {
   features: any;
@@ -61,7 +40,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const listBookState: ListBookState = useSelector(
-    (state: RootState) => state.listtBook
+    (state: RootState) => state.listBook
   );
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
