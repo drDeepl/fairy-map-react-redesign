@@ -6,6 +6,7 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { fetchMapData } from "./map.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import { FeatureProperties, MapTopology } from "./map.interface";
+import { Components } from "@/api/client";
 
 export interface MapSlice {
   loading: boolean;
@@ -31,27 +32,25 @@ const mapSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        fetchMapData.fulfilled,
-        (state, action: PayloadAction<MapTopology>) => {
-          const data: MapTopology = action.payload;
-          const geoJson = feature(data, data.objects.map) as FeatureCollection<
-            Geometry,
-            GeoJsonProperties
-          >;
+      .addCase(fetchMapData.fulfilled, (state, action) => {
+        console.log(action.payload);
+        const data = action.payload;
+        const geoJson = feature(data, data.objects.map) as FeatureCollection<
+          Geometry,
+          GeoJsonProperties
+        >;
 
-          const simplifyOptions = { tolerance: 0.008, highQuality: false };
+        const simplifyOptions = { tolerance: 0.008, highQuality: false };
 
-          const simplifyFeatures = turf.simplify(
-            geoJson,
-            simplifyOptions
-          ) as FeatureCollection<Geometry, FeatureProperties>;
+        const simplifyFeatures = turf.simplify(
+          geoJson,
+          simplifyOptions
+        ) as FeatureCollection<Geometry, FeatureProperties>;
 
-          state.dataMap = simplifyFeatures;
+        state.dataMap = simplifyFeatures;
 
-          state.loading = false;
-        }
-      )
+        state.loading = false;
+      })
       .addCase(fetchMapData.rejected, (state, action) => {
         state.error = action.payload as ApiErrorResponse;
 
