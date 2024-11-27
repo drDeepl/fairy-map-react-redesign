@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/app/store";
-import { Components } from "@/api/schemas/client";
+import React from "react";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,9 +24,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { EthnicGroupListState } from "@/features/ethnic-group/ethnic-group-list.slice";
-import { fetchEthnicGroups } from "@/features/ethnic-group/ethnic-group-list.actions";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -38,10 +33,11 @@ import {
 } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
+import { Components } from "@/api/schemas/client";
 
 interface AddBookFormProps {
   open: boolean;
-  errorrs: Record<string, string> | null;
+  errors: Record<string, string> | null;
   loading: boolean;
   ethnicGroups: Components.Schemas.EthnicGroupDto[];
   onSubmit: (values: Components.Schemas.AddStoryDto) => void;

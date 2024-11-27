@@ -43,19 +43,16 @@ const AdminPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log("admin.page");
     if (!authState.user) {
       navigate(-1);
     } else {
       dispatch(fetchEthnicGroups()).then(() => {
-        console.log("ethnic groups fetched");
         setLoading(false);
       });
     }
   }, [authState.user]);
 
   const handleOnClickAddBook = () => {
-    console.log("on click add book");
     setOpenAddBookForm(true);
   };
 
