@@ -1,5 +1,5 @@
 import "./App.css";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 
 import MapPage from "./features/map/map.page.tsx";
 import { RouteApp } from "./pages/constants/route.enum.ts";
@@ -16,17 +16,30 @@ import { AppDispatch } from "./app/store.ts";
 function App() {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const lastCurrentRouter: string | null = localStorage.getItem(
+      "lastCurrentRouter"
+    );
+
+    console.log(lastCurrentRouter);
     const user: JwtPayload | null = checkValidAccessTokenInLocalStorage();
 
     if (user) {
       dispatch(setUser(user));
     }
+    lastCurrentRouter ? navigate(lastCurrentRouter) : navigate("");
   }, []);
 
+  window.addEventListener("beforeunload", (event: BeforeUnloadEvent) => {
+    // Сообщение для отображения в диалоговом окне (не везде поддерживается)
+    const currentRouter: string = location.pathname;
+    localStorage.setItem("lastCurrentRouter", currentRouter);
+  });
+
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">
       <Routes location={location}>
         <Route
           key={RouteApp.HomePage}
