@@ -20,8 +20,6 @@ export const initialState: ListBookState = {
   books: [],
 };
 
-const getListBooksReducer = createReducer(initialState, (builder) => {});
-
 const bookListSlice = createSlice({
   name: "listBook",
   initialState,

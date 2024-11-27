@@ -7,6 +7,7 @@ export interface ApiErrorResponse {
 
 export const handleApiErrorResponse = (error: any): ApiErrorResponse => {
   console.log("handleApiErrorResponse");
+  console.log(error);
 
   const errorResponse = {
     message: "что-то пошло не так",

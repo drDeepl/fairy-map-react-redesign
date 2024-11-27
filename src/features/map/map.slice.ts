@@ -6,7 +6,6 @@ import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { fetchMapData } from "./map.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import { FeatureProperties, MapTopology } from "./map.interface";
-import { Components } from "@/api/client";
 
 export interface MapSlice {
   loading: boolean;
@@ -33,8 +32,7 @@ const mapSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchMapData.fulfilled, (state, action) => {
-        console.log(action.payload);
-        const data = action.payload;
+        const data = action.payload.data;
         const geoJson = feature(data, data.objects.map) as FeatureCollection<
           Geometry,
           GeoJsonProperties
@@ -53,7 +51,6 @@ const mapSlice = createSlice({
       })
       .addCase(fetchMapData.rejected, (state, action) => {
         state.error = action.payload as ApiErrorResponse;
-
         state.loading = false;
       });
   },

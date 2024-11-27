@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/store";
 import { Components } from "@/api/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,12 +24,11 @@ import {
   SelectContent,
   SelectItem,
 } from "@radix-ui/react-select";
-import { RootState } from "@/app/store";
+
 import { EthnicGroupListState } from "@/features/ethnic-group/ethnic-group-list.slice";
-import { useSelector } from "react-redux";
-import { dispatch } from "d3";
+
 import { fetchEthnicGroups } from "@/features/ethnic-group/ethnic-group-list.actions";
-import { Skeleton } from "@/components/ui/skeleton";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AddBookFormProps {
   loading: boolean;
@@ -35,7 +36,9 @@ interface AddBookFormProps {
 }
 
 const AddBookForm: React.FC<AddBookFormProps> = ({ loading, onSubmit }) => {
-  const ethnicGrooupListState: EthnicGroupListState = useSelector(
+  const dispatch = useDispatch<AppDispatch>();
+
+  const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
 
@@ -48,36 +51,48 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ loading, onSubmit }) => {
     },
   });
 
+  useEffect(() => {
+    dispatch(fetchEthnicGroups());
+  }, []);
+
+  useEffect(() => {
+    console.log(ethnicGroupListState.ethnicGroups);
+  }, [ethnicGroupListState.success]);
+
   return (
-    <Form {...addBookForm}>
-      <form onSubmit={addBookForm.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={addBookForm.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Название сказки</FormLabel>
-              <FormControl>
-                <Input placeholder="" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={addBookForm.control}
-          name="text"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Текст сказки</FormLabel>
-              <FormControl>
-                <Textarea placeholder="" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* <FormField
+    <ScrollArea>
+      <Form {...addBookForm}>
+        <form
+          onSubmit={addBookForm.handleSubmit(onSubmit)}
+          className="space-y-8"
+        >
+          <FormField
+            control={addBookForm.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Название сказки</FormLabel>
+                <FormControl>
+                  <Input placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={addBookForm.control}
+            name="text"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Текст сказки</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* <FormField
           control={addBookForm.control}
           name="ethnicGroupId"
           render={({ field }) => (
@@ -110,14 +125,15 @@ const AddBookForm: React.FC<AddBookFormProps> = ({ loading, onSubmit }) => {
             </FormItem>
           )}
         /> */}
-        <Button disabled={loading} className="w-full" type="submit">
-          {loading ? (
-            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          добавить
-        </Button>
-      </form>
-    </Form>
+          <Button disabled={loading} className="w-full" type="submit">
+            {loading ? (
+              <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
+            добавить
+          </Button>
+        </form>
+      </Form>
+    </ScrollArea>
   );
 };
 

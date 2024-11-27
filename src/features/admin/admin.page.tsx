@@ -30,6 +30,7 @@ import { Components } from "@/api/client";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
