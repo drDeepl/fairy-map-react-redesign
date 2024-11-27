@@ -5,7 +5,7 @@ import { feature } from "topojson-client";
 import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { fetchMapData } from "./map.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
-import { FeatureProperties, MapTopology } from "./map.interface";
+import { FeatureProperties } from "./map.interface";
 
 export interface MapSlice {
   loading: boolean;

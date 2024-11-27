@@ -4,7 +4,7 @@ import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createBook,
-  getListBooks,
+  fetchListBooks,
   getListBooksByEthnicGroup,
 } from "./book.actions";
 import { Components } from "@/api/schemas/client";
@@ -30,17 +30,17 @@ const bookListSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getListBooks.pending, (state) => {
+      .addCase(fetchListBooks.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(getListBooks.fulfilled, (state, action) => {
+      .addCase(fetchListBooks.fulfilled, (state, action) => {
         state.books = action.payload;
         state.loading = false;
         state.success = true;
       })
-      .addCase(getListBooks.rejected, (state, action) => {
+      .addCase(fetchListBooks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       })

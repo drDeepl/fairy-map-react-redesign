@@ -11,6 +11,7 @@ export const createBook = createAsyncThunk(
   async (dto: Components.Schemas.AddStoryDto, thunkApi) => {
     try {
       const res = await apiClient.AdminController_addStory(null, dto);
+      console.log(res.data);
       return thunkApi.fulfillWithValue(res.data);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
@@ -20,11 +21,12 @@ export const createBook = createAsyncThunk(
   }
 );
 
-export const getListBooks = createAsyncThunk(
+export const fetchListBooks = createAsyncThunk(
   "book/getBooks",
   async (_, thunkApi) => {
     try {
       const res = await apiClient.StoryController_getAllStories();
+      console.log(res.data);
       return thunkApi.fulfillWithValue(res.data);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);

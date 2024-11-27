@@ -20,11 +20,14 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 import AddBookForm from "../book/components/forms/add-book.form";
-import { BookState } from "../book/book.slice";
-import { createBook } from "../book/book.actions";
+
+import { createBook, fetchListBooks } from "../book/book.actions";
 import { Components } from "@/api/schemas/client";
 import { fetchEthnicGroups } from "../ethnic-group/ethnic-group-list.actions";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
+import { ListBookState } from "../book/list-book.slice";
+import { bookTableColumns } from "../book/components/table/book.table.columns";
+import { DataTable } from "@/components/data-table";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -33,7 +36,9 @@ const AdminPage: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const bookState: BookState = useSelector((state: RootState) => state.book);
+  const listBookState: ListBookState = useSelector(
+    (state: RootState) => state.listBook
+  );
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
@@ -46,9 +51,9 @@ const AdminPage: React.FC = () => {
     if (!authState.user) {
       navigate(-1);
     } else {
-      dispatch(fetchEthnicGroups()).then(() => {
-        setLoading(false);
-      });
+      dispatch(fetchEthnicGroups());
+      dispatch(fetchListBooks());
+      setLoading(false);
     }
   }, [authState.user]);
 
@@ -119,12 +124,14 @@ const AdminPage: React.FC = () => {
           <BookPlus />
         </Button>
 
+        <DataTable columns={bookTableColumns} data={listBookState.books} />
+
         {openAddBookForm ? (
           <AddBookForm
             open={openAddBookForm}
-            errorrs={null}
+            errors={null}
             ethnicGroups={ethnicGroupListState.ethnicGroups}
-            loading={bookState.loading}
+            loading={listBookState.loading}
             onSubmit={handleOnSubmitAddBook}
             onCancel={handleOnCloseAddBookForm}
           />
