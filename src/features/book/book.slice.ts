@@ -1,7 +1,7 @@
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice } from "@reduxjs/toolkit";
 
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 
 export interface BookState extends BaseAppState {
   bookData: Components.Schemas.StoryDto | null;

@@ -23,7 +23,6 @@ function App() {
       "lastCurrentRouter"
     );
 
-    console.log(lastCurrentRouter);
     const user: JwtPayload | null = checkValidAccessTokenInLocalStorage();
 
     if (user) {

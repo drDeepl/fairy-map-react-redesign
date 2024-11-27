@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import AddBookForm from "../book/components/forms/add-book.form";
 import { BookState } from "../book/book.slice";
 import { createBook } from "../book/book.actions";
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 import { fetchEthnicGroups } from "../ethnic-group/ethnic-group-list.actions";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
 

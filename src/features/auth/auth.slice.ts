@@ -6,7 +6,7 @@ import {
   setTokenLocalStorage,
 } from "@/common/helpers/token.helper";
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 
 export interface JwtPayload {
   sub: string;

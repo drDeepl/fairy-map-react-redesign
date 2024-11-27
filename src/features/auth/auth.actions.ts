@@ -3,7 +3,7 @@ import {
   handleApiErrorResponse,
 } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
 export const signIn = createAsyncThunk(

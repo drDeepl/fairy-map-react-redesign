@@ -7,7 +7,7 @@ import {
   getListBooks,
   getListBooksByEthnicGroup,
 } from "./book.actions";
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 
 export interface ListBookState extends BaseAppState {
   books: Components.Schemas.StoryDto[];

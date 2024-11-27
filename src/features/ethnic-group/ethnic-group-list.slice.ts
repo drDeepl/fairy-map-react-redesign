@@ -1,4 +1,4 @@
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchEthnicGroups } from "./ethnic-group-list.actions";

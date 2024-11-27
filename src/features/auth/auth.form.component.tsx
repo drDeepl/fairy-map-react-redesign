@@ -25,7 +25,7 @@ import SignUpFormComponent from "./forms/sign-up.form.component";
 import { useNavigate } from "react-router-dom";
 
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
-import { Components } from "@/api/client";
+import { Components } from "@/api/schemas/client";
 
 enum Tab {
   SignIn = "signin",
