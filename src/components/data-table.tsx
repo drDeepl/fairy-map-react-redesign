@@ -4,8 +4,9 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Table } from "lucide-react";
+
 import {
+  Table,
   TableHeader,
   TableRow,
   TableHead,
@@ -28,21 +29,15 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
 
-  table.getRowModel().rows.map((row) => {
-    row.getVisibleCells().map((cell) => {
-      console.log(flexRender(cell.column.columnDef.cell, cell.getContext()));
-    });
-  });
-
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-center capitalize">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -59,11 +54,12 @@ export function DataTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
+                className="cursor-pointer lowercase"
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="text-center">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

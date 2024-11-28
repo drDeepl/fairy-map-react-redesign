@@ -64,11 +64,12 @@ const bookListSlice = createSlice({
         state.success = false;
       })
       .addCase(createBook.fulfilled, (state, action) => {
-        state.books.push(action.payload);
+        state.books.unshift(action.payload);
         state.loading = false;
         state.success = true;
       })
       .addCase(createBook.rejected, (state, action) => {
+        console.error(action.payload);
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       });

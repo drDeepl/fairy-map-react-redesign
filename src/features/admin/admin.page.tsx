@@ -13,6 +13,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { BookHeadphones, BookPlus, LibraryBig, SwatchBook } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -28,6 +35,10 @@ import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
 import { ListBookState } from "../book/list-book.slice";
 import { bookTableColumns } from "../book/components/table/book.table.columns";
 import { DataTable } from "@/components/data-table";
+import PreviewBookCardComponent from "../book/components/book-card.component";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import ListBookCarousel from "../book/components/list-book-carousel.component";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -117,15 +128,18 @@ const AdminPage: React.FC = () => {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <main className="flex flex-col w-full px-4">
+      <main className="flex flex-col w-full px-4 mx-2">
         <SidebarTrigger className="" />
 
         <Button onClick={handleOnClickAddBook}>
           <BookPlus />
         </Button>
 
-        <DataTable columns={bookTableColumns} data={listBookState.books} />
-
+        {/* <DataTable columns={bookTableColumns} data={listBookState.books} /> */}
+        <ListBookCarousel
+          load={listBookState.loading}
+          books={listBookState.books}
+        />
         {openAddBookForm ? (
           <AddBookForm
             open={openAddBookForm}

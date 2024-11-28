@@ -26,7 +26,7 @@ export const fetchListBooks = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       const res = await apiClient.StoryController_getAllStories();
-      console.log(res.data);
+
       return thunkApi.fulfillWithValue(res.data);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
