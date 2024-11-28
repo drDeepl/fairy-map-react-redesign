@@ -80,6 +80,11 @@ const AdminPage: React.FC = () => {
     setOpenAddBookForm(false);
   };
 
+  const handleOnClickPreviewBook = (book: Components.Schemas.StoryDto) => {
+    // TODO:
+    console.error("TODO: handleOnClickPreviewBook", book);
+  };
+
   const menuItems = [
     {
       title: "сказки",
@@ -139,6 +144,7 @@ const AdminPage: React.FC = () => {
         <ListBookCarousel
           load={listBookState.loading}
           books={listBookState.books}
+          onClickBook={handleOnClickPreviewBook}
         />
         {openAddBookForm ? (
           <AddBookForm

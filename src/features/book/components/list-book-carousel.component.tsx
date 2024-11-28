@@ -10,14 +10,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PreviewBookCardComponent from "./book-card.component";
 import React from "react";
 import { Components } from "@/api/schemas/client";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface ListBookCarouselProps {
   books: Components.Schemas.StoryDto[];
   load: boolean;
+  onClickBook: (book: Components.Schemas.StoryDto) => void;
 }
 
-const ListBookCarousel: React.FC<ListBookCarouselProps> = ({ load, books }) => {
+const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
+  load,
+  books,
+  onClickBook,
+}) => {
+  const handleOnClickBook = (book: Components.Schemas.StoryDto) => {
+    console.log("on click book", book);
+    onClickBook(book);
+  };
   return (
     <div className="flex justify-center my-8">
       <Carousel
@@ -26,12 +34,12 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({ load, books }) => {
         }}
         className="md:w-full md:max-w-md lg:max-w-4xl"
       >
-        <CarouselContent className="">
+        <CarouselContent>
           {load
-            ? Array.from({ length: 5 }).map((_, index) => {
+            ? Array.from({ length: 5 }).map((_, idx) => {
                 return (
                   <CarouselItem
-                    key={index}
+                    key={`load_${idx}`}
                     className="my-4 mx-6 md:basis-1/3 lg:basis-1/5 w-40 h-64"
                   >
                     <Card className="w-40 h-64 p-0 m-0 border-none">
@@ -45,7 +53,8 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({ load, books }) => {
                 return (
                   <CarouselItem
                     key={book.id}
-                    className="my-4 mx-6 md:basis-1/3 lg:basis-1/5 w-40 h-64"
+                    onClick={() => handleOnClickBook(book)}
+                    className="my-4 mx-6 md:basis-1/3 lg:basis-1/5 w-40 h-64 cursor-pointer"
                   >
                     <PreviewBookCardComponent book={book} />
                   </CarouselItem>
