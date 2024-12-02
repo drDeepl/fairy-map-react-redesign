@@ -843,6 +843,41 @@ declare namespace Components {
                 id: number;
             };
         }
+        export interface StoryWithImgResponseDto {
+            /**
+             * название истории
+             */
+            name: string;
+            /**
+             * id сказки
+             */
+            id: number;
+            /**
+             * id аудиозаписи
+             */
+            audioId: number | null;
+            /**
+             * id этнической группы
+             */
+            ethnicGroup: {
+                /**
+                 *
+                 */
+                name: string;
+                /**
+                 *
+                 */
+                languageId: number;
+                /**
+                 *
+                 */
+                id: number;
+            };
+            /**
+             * url для получения обложки сказки
+             */
+            srcImg: string;
+        }
         export interface StoryWithTextDto {
             /**
              * название истории
@@ -1194,6 +1229,26 @@ declare namespace Paths {
             }
         }
     }
+    namespace AdminControllerDeleteStoryImgByStoryId {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            storyId: Parameters.StoryId;
+        }
+        namespace Responses {
+            export interface $200 {
+            }
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
     namespace AdminControllerEditSotry {
         export interface HeaderParameters {
             authorization?: Parameters.Authorization;
@@ -1208,6 +1263,46 @@ declare namespace Paths {
         export type RequestBody = Components.Schemas.EditStoryDto;
         namespace Responses {
             export type $200 = Components.Schemas.StoryDto;
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
+    namespace AdminControllerSetUserAudioToStory {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            storyId: Parameters.StoryId;
+        }
+        export type RequestBody = Components.Schemas.AddAudioStoryDto;
+        namespace Responses {
+            export interface $200 {
+            }
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
+    namespace AdminControllerUploadStoryImage {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            storyId: Parameters.StoryId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.CreatedImageStoryDto;
             export interface $400 {
             }
             export interface $401 {
@@ -1765,29 +1860,9 @@ declare namespace Paths {
             }
         }
     }
-    namespace StoryControllerDeleteStoryImgByStoryId {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type StoryId = number;
-        }
-        export interface PathParameters {
-            storyId: Parameters.StoryId;
-        }
-        namespace Responses {
-            export interface $200 {
-            }
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
     namespace StoryControllerGetAllStories {
         namespace Responses {
-            export type $200 = Components.Schemas.StoryDto[];
+            export type $200 = Components.Schemas.StoryWithImgResponseDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -1811,10 +1886,12 @@ declare namespace Paths {
     }
     namespace StoryControllerGetImgStoryById {
         namespace Parameters {
-            export type StoryId = number;
+            export type Filename = string;
+            export type StoryId = string;
         }
         export interface PathParameters {
             storyId: Parameters.StoryId;
+            filename: Parameters.Filename;
         }
         namespace Responses {
             export type $200 = Components.Schemas.ImageStoryDto;
@@ -1879,7 +1956,7 @@ declare namespace Paths {
             ethnicGroupId: Parameters.EthnicGroupId;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.StoryDto[];
+            export type $200 = Components.Schemas.StoryWithImgResponseDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -1926,46 +2003,6 @@ declare namespace Paths {
         namespace Responses {
             export type $200 = Components.Schemas.TextStoryDto;
             export interface $400 {
-            }
-        }
-    }
-    namespace StoryControllerSetUserAudioToStory {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type StoryId = number;
-        }
-        export interface QueryParameters {
-            storyId: Parameters.StoryId;
-        }
-        export type RequestBody = Components.Schemas.AddAudioStoryDto;
-        namespace Responses {
-            export interface $200 {
-            }
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace StoryControllerUploadStoryImage {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type StoryId = number;
-        }
-        export interface PathParameters {
-            storyId: Parameters.StoryId;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.CreatedImageStoryDto;
-            export interface $400 {
-            }
-            export interface $401 {
             }
         }
     }
@@ -2410,6 +2447,30 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
   /**
+   * AdminController_setUserAudioToStory - добавление озвучки к сказке
+   */
+  'AdminController_setUserAudioToStory'(
+    parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
+    data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
+  /**
+   * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
+   */
+  'AdminController_uploadStoryImage'(
+    parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
+  /**
+   * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
+   */
+  'AdminController_deleteStoryImgByStoryId'(
+    parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
+  /**
    * StoryController_getAllStories - получение всех сказок
    */
   'StoryController_getAllStories'(
@@ -2468,16 +2529,6 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
   /**
-   * StoryController_setUserAudioToStory - добавление озвучки к сказке
-   * 
-   * пример запроса: /api/story/audio?storyId=8 | необходима роль администратора
-   */
-  'StoryController_setUserAudioToStory'(
-    parameters?: Parameters<Paths.StoryControllerSetUserAudioToStory.QueryParameters & Paths.StoryControllerSetUserAudioToStory.HeaderParameters> | null,
-    data?: Paths.StoryControllerSetUserAudioToStory.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerSetUserAudioToStory.Responses.$200>
-  /**
    * StoryController_getImgStoryById - получение обложки для сказки по storyId
    */
   'StoryController_getImgStoryById'(
@@ -2485,26 +2536,6 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
-  /**
-   * StoryController_uploadStoryImage - загрузка обложки для выбранной сказки
-   * 
-   * необходима роль администратора
-   */
-  'StoryController_uploadStoryImage'(
-    parameters?: Parameters<Paths.StoryControllerUploadStoryImage.PathParameters & Paths.StoryControllerUploadStoryImage.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerUploadStoryImage.Responses.$200>
-  /**
-   * StoryController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки по storyId
-   * 
-   * необходима роль администратора
-   */
-  'StoryController_deleteStoryImgByStoryId'(
-    parameters?: Parameters<Paths.StoryControllerDeleteStoryImgByStoryId.PathParameters & Paths.StoryControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerDeleteStoryImgByStoryId.Responses.$200>
   /**
    * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
    */
@@ -2986,7 +3017,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.EthnicGroupControllerDeleteLanguageById.Responses.$200>
   }
-  ['/api/map/map.json']: {
+  ['/api/map']: {
     /**
      * MapController_getMapTopojson - получить данные для отрисовки карты
      */
@@ -3112,6 +3143,36 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
   }
+  ['/api/admin/story/{storyId}/audio']: {
+    /**
+     * AdminController_setUserAudioToStory - добавление озвучки к сказке
+     */
+    'put'(
+      parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
+      data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/image/upload']: {
+    /**
+     * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/image']: {
+    /**
+     * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
+  }
   ['/api/story/all']: {
     /**
      * StoryController_getAllStories - получение всех сказок
@@ -3184,19 +3245,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
   }
-  ['/api/story/audio']: {
-    /**
-     * StoryController_setUserAudioToStory - добавление озвучки к сказке
-     * 
-     * пример запроса: /api/story/audio?storyId=8 | необходима роль администратора
-     */
-    'put'(
-      parameters?: Parameters<Paths.StoryControllerSetUserAudioToStory.QueryParameters & Paths.StoryControllerSetUserAudioToStory.HeaderParameters> | null,
-      data?: Paths.StoryControllerSetUserAudioToStory.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerSetUserAudioToStory.Responses.$200>
-  }
-  ['/api/story/image/{storyId}']: {
+  ['/api/story/{storyId}/image/{filename}']: {
     /**
      * StoryController_getImgStoryById - получение обложки для сказки по storyId
      */
@@ -3205,30 +3254,6 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
-  }
-  ['/api/story/image/upload/{storyId}']: {
-    /**
-     * StoryController_uploadStoryImage - загрузка обложки для выбранной сказки
-     * 
-     * необходима роль администратора
-     */
-    'put'(
-      parameters?: Parameters<Paths.StoryControllerUploadStoryImage.PathParameters & Paths.StoryControllerUploadStoryImage.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerUploadStoryImage.Responses.$200>
-  }
-  ['/api/story/image/delete/{storyId}']: {
-    /**
-     * StoryController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки по storyId
-     * 
-     * необходима роль администратора
-     */
-    'delete'(
-      parameters?: Parameters<Paths.StoryControllerDeleteStoryImgByStoryId.PathParameters & Paths.StoryControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerDeleteStoryImgByStoryId.Responses.$200>
   }
   ['/api/story/rating/{audioId}']: {
     /**

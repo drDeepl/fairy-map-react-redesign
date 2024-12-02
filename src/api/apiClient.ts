@@ -30,6 +30,8 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: any) => {
+    console.error("interceptors error", error);
+
     return Promise.reject(error);
   }
 );

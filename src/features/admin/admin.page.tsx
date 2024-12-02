@@ -7,6 +7,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -46,6 +47,7 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [openInfoBook, setOpenInfoBook] = useState<boolean>(true);
 
   const listBookState: ListBookState = useSelector(
     (state: RootState) => state.listBook
@@ -109,7 +111,7 @@ const AdminPage: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar variant="inset">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -133,30 +135,27 @@ const AdminPage: React.FC = () => {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      <main className="flex flex-col w-full px-4 mx-2">
-        <SidebarTrigger className="" />
-
-        <Button onClick={handleOnClickAddBook}>
-          <BookPlus />
-        </Button>
-
-        {/* <DataTable columns={bookTableColumns} data={listBookState.books} /> */}
-        <ListBookCarousel
-          load={listBookState.loading}
-          books={listBookState.books}
-          onClickBook={handleOnClickPreviewBook}
-        />
-        {openAddBookForm ? (
-          <AddBookForm
-            open={openAddBookForm}
-            errors={null}
-            ethnicGroups={ethnicGroupListState.ethnicGroups}
-            loading={listBookState.loading}
-            onSubmit={handleOnSubmitAddBook}
-            onCancel={handleOnCloseAddBookForm}
+      <SidebarInset className="lg:w-full md:min-w-52">
+        <section className="mx-8">
+          <SidebarTrigger />
+          <ListBookCarousel
+            load={listBookState.loading}
+            books={listBookState.books}
+            onClickBook={handleOnClickPreviewBook}
+            onClickAddBook={handleOnClickAddBook}
           />
-        ) : null}
-      </main>
+          {openAddBookForm ? (
+            <AddBookForm
+              open={openAddBookForm}
+              errors={null}
+              ethnicGroups={ethnicGroupListState.ethnicGroups}
+              loading={listBookState.loading}
+              onSubmit={handleOnSubmitAddBook}
+              onCancel={handleOnCloseAddBookForm}
+            />
+          ) : null}
+        </section>
+      </SidebarInset>
     </SidebarProvider>
   );
 };
