@@ -36,14 +36,29 @@ export const fetchListBooks = createAsyncThunk(
   }
 );
 
-export const getListBooksByEthnicGroup = createAsyncThunk(
-  "book/getBooksByEthnicGroup",
+export const fetchListBooksByEthnicGroup = createAsyncThunk(
+  "book/fetchBooksByEthnicGroup",
   async (ethnicGroupId: number, thunkApi) => {
     try {
       const res = await apiClient.StoryController_getStoriesByEthnicGroupId(
         ethnicGroupId
       );
 
+      return thunkApi.fulfillWithValue(res.data);
+    } catch (err) {
+      const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
+      return thunkApi.rejectWithValue(errorResposne);
+    }
+  }
+);
+
+export const fetchAudiosByBookId = createAsyncThunk(
+  "book/fetchAudiosByBookId",
+  async (bookId: number, thunkApi) => {
+    try {
+      const res = await apiClient.StoryController_getLanguagesForCurrentStory(
+        bookId
+      );
       return thunkApi.fulfillWithValue(res.data);
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);

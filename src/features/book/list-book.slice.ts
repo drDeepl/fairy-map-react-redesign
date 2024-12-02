@@ -1,16 +1,16 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import { createReducer, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createBook,
   fetchListBooks,
-  getListBooksByEthnicGroup,
+  fetchListBooksByEthnicGroup,
 } from "./book.actions";
 import { Components } from "@/api/schemas/client";
 
 export interface ListBookState extends BaseAppState {
-  books: Components.Schemas.StoryDto[];
+  books: Components.Schemas.StoryWithImgResponseDto[];
 }
 
 export const initialState: ListBookState = {
@@ -24,7 +24,10 @@ const bookListSlice = createSlice({
   name: "listBook",
   initialState,
   reducers: {
-    addBook: (state, action: PayloadAction<Components.Schemas.StoryDto>) => {
+    addBook: (
+      state,
+      action: PayloadAction<Components.Schemas.StoryWithImgResponseDto>
+    ) => {
       state.books.push(action.payload);
     },
   },
@@ -44,17 +47,17 @@ const bookListSlice = createSlice({
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       })
-      .addCase(getListBooksByEthnicGroup.pending, (state) => {
+      .addCase(fetchListBooksByEthnicGroup.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
       })
-      .addCase(getListBooksByEthnicGroup.fulfilled, (state, action) => {
+      .addCase(fetchListBooksByEthnicGroup.fulfilled, (state, action) => {
         state.books = action.payload;
         state.loading = false;
         state.success = true;
       })
-      .addCase(getListBooksByEthnicGroup.rejected, (state, action) => {
+      .addCase(fetchListBooksByEthnicGroup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
       })
@@ -64,7 +67,7 @@ const bookListSlice = createSlice({
         state.success = false;
       })
       .addCase(createBook.fulfilled, (state, action) => {
-        state.books.unshift(action.payload);
+        state.books.unshift({ ...action.payload, srcImg: null });
         state.loading = false;
         state.success = true;
       })

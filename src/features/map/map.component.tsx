@@ -13,7 +13,7 @@ import { Select, SelectTrigger } from "@/components/ui/select";
 import { SelectContent, SelectValue } from "@radix-ui/react-select";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import { getListBooksByEthnicGroup } from "../book/book.actions";
+import { fetchListBooksByEthnicGroup } from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupPoint, FeatureMap } from "./map.interface";
@@ -85,7 +85,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     if (tooltip?.open) {
       if (tooltip.data) {
-        dispatch(getListBooksByEthnicGroup(tooltip.data.ethnicGroupId));
+        dispatch(fetchListBooksByEthnicGroup(tooltip.data.ethnicGroupId));
       }
     }
   }, [tooltip]);
@@ -107,7 +107,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
     console.log("handleClickPoint");
-    dispatch(getListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
+    dispatch(fetchListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
   });
 
   useEffect(() => {
