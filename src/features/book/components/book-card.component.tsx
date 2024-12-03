@@ -1,17 +1,9 @@
 import { Components } from "@/api/schemas/client";
 import React, { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CircleHelp } from "lucide-react";
-import { QuestionMarkIcon } from "@radix-ui/react-icons";
+
+import NotCoverBook from "@/components/not-cover-book.component";
 
 interface PreviewBookCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -28,11 +20,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
       <CardContent className="flex flex-col m-0 p-0">
         <AspectRatio ratio={3 / 4} className="">
           {!story.srcImg ? (
-            <div className="flex items-center justify-center bg-slate-200 size-full rounded-t-xl">
-              {/* <CircleHelp className="size-28 stroke-zinc-400 stroke-1 self-center" /> */}
-              {/* <span className="text-5xl text-zinc-700">?</span> */}
-              <QuestionMarkIcon className="size-14 text-zinc-600 opacity-60" />
-            </div>
+            <NotCoverBook />
           ) : (
             <img
               src={story.srcImg}

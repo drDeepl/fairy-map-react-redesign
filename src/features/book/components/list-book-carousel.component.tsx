@@ -10,23 +10,23 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PreviewBookCardComponent from "./book-card.component";
 import React from "react";
 import { Components } from "@/api/schemas/client";
-import { Button } from "@/components/ui/button";
-import { BookPlus } from "lucide-react";
 
 interface ListBookCarouselProps {
-  books: Components.Schemas.StoryDto[];
+  books: Components.Schemas.StoryWithImgResponseDto[];
   load: boolean;
-  onClickBook: (book: Components.Schemas.StoryDto) => void;
-  onClickAddBook: () => void;
+  onClickBook: (book: Components.Schemas.StoryWithImgResponseDto) => void;
+  children?: React.ReactNode;
 }
 
 const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
   load,
   books,
   onClickBook,
-  onClickAddBook,
+  children,
 }) => {
-  const handleOnClickBook = (book: Components.Schemas.StoryDto) => {
+  const handleOnClickBook = (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => {
     console.log("on click book", book);
     onClickBook(book);
   };
@@ -39,14 +39,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
         className="flex flex-col justify-center"
       >
         <div className="relative self-center my-6">
-          <Button
-            variant="secondary"
-            onClick={onClickAddBook}
-            className="w-36 border border-slate-500"
-          >
-            <span className="">добавить сказку</span>
-            <BookPlus />
-          </Button>
+          {children}
           <CarouselNext className="border border-zinc-600" />
           <CarouselPrevious className="border border-zinc-600" />
         </div>
