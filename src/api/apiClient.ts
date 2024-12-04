@@ -5,7 +5,7 @@ import OpenAPIClientAxios, {
 import { Client } from "./schemas/client";
 import { getTokenLocalStorage } from "@/common/helpers/token.helper";
 const api = new OpenAPIClientAxios({
-  definition: "https://fairy-map-nest.onrender.com/api/v1-json",
+  definition: `${import.meta.env.VITE_API_URL}api/v1-json`,
 });
 
 api.init<Client>();

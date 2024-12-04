@@ -1,7 +1,7 @@
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Components } from "@/api/schemas/client";
-import { fetchAudiosByBookId } from "./book.actions";
+import { fetchAudiosByBookId, uploadBookCover } from "./book.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 export interface BookState extends BaseAppState {

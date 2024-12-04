@@ -6,6 +6,7 @@ import {
   createBook,
   fetchListBooks,
   fetchListBooksByEthnicGroup,
+  uploadBookCover,
 } from "./book.actions";
 import { Components } from "@/api/schemas/client";
 
@@ -75,7 +76,29 @@ const bookListSlice = createSlice({
         console.error(action.payload);
         state.loading = false;
         state.error = action.payload as ApiErrorResponse;
-      });
+      })
+      .addCase(uploadBookCover.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(
+        uploadBookCover.fulfilled,
+        (
+          state,
+          action: PayloadAction<Components.Schemas.CreatedImageStoryDto>
+        ) => {
+          state.loading = false;
+
+          state.books.map((book) => {
+            if (book.id === action.payload.storyId) {
+              // book.srcImg = action.payload.srcImg;
+              console.log(book);
+            }
+          });
+          state.success = true;
+        }
+      );
   },
 });
 

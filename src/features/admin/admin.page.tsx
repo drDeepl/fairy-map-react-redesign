@@ -8,7 +8,11 @@ import { useNavigate } from "react-router-dom";
 
 import AddBookForm from "../book/components/forms/add-book.form";
 
-import { createBook, fetchListBooks } from "../book/book.actions";
+import {
+  createBook,
+  fetchListBooks,
+  uploadBookCover,
+} from "../book/book.actions";
 
 import { fetchEthnicGroups } from "../ethnic-group/ethnic-group-list.actions";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
@@ -21,6 +25,7 @@ import AdminSidebarLayout from "./layouts/admin-sidebar.layout";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
+import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
 
 interface BookInfoState {
   open: boolean;
@@ -76,6 +81,11 @@ const AdminPage: React.FC = () => {
   const handleCloseInfoBook = () => {
     setBookInfo(null);
   };
+
+  const handleOnUploadBookCover = (dto: CoverUploadDto) => {
+    dispatch(uploadBookCover(dto));
+  };
+
   if (loading) {
     return <LoadSpinner />;
   }
@@ -113,6 +123,7 @@ const AdminPage: React.FC = () => {
           open={bookInfo.open}
           book={bookInfo.bookItem}
           onClose={handleCloseInfoBook}
+          onUploadCover={handleOnUploadBookCover}
         />
       ) : null}
     </AdminSidebarLayout>

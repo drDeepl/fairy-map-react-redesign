@@ -27,11 +27,15 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { dispatch } from "d3";
+import { uploadBookCover } from "../book.actions";
+import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 
 interface BookInfoCardProps {
   open: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
   onClose: () => void;
+  onUploadCover: (dto: CoverUploadDto) => void;
 }
 
 interface TextAction {
@@ -43,6 +47,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   open,
   book,
   onClose,
+  onUploadCover,
 }) => {
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
@@ -65,13 +70,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   const handleUploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("handleOnClickCover");
     if (event.target.files && event.target.files.length > 0) {
-      console.log(event.target.files[0]);
+      onUploadCover({ storyId: book.id, img: event.target.files[0] });
     }
-  };
-
-  const handleOnClickCover = () => {
-    alert("ФУНКЦИЯ НАХОДИТСЯ В РАЗРАБОТКЕ");
-    setCoverMenuOpen(!coverMenuOpen);
   };
 
   return (
@@ -87,32 +87,29 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         <DialogHeader>
           {textAction.fullScreen ? null : (
             <div className="grid grid-cols-2 grid-rows-1 my-4 animate-out">
-              <Popover open={coverMenuOpen}>
-                <PopoverTrigger onClick={handleOnClickCover}>
-                  <div className="col-span-1 w-52 h-56 cursor-pointer">
-                    {book.srcImg ? (
-                      <img
-                        src={book.srcImg}
-                        alt={book.name}
-                        className="rounded-t-xl w-52 h-56"
-                      />
-                    ) : (
-                      <div className="size-full">
-                        <NotCoverBook />
-                      </div>
-                    )}
-                  </div>
-                  <PopoverContent className="shadow-2xl">
-                    <div className="flex flex-col space-y-2 justify-center">
-                      <Input
-                        id="picture"
-                        type="file"
-                        onChange={handleUploadFile}
-                      />
+              <div className="col-span-1 w-52 h-56">
+                <Label htmlFor="picture" className="cursor-pointer ">
+                  {book.srcImg ? (
+                    <img
+                      src={book.srcImg}
+                      alt={book.name}
+                      className="rounded-t-xl w-52 h-56"
+                    />
+                  ) : (
+                    <div className="size-full">
+                      <NotCoverBook />
                     </div>
-                  </PopoverContent>
-                </PopoverTrigger>
-              </Popover>
+                  )}
+                </Label>
+                <Input
+                  className="invisible"
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadFile}
+                />
+              </div>
+
               <div className="col-span-1">
                 <DialogTitle>{book.name}</DialogTitle>
                 <DialogDescription>{book.ethnicGroup.name}</DialogDescription>
