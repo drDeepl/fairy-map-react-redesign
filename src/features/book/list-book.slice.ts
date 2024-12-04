@@ -86,16 +86,17 @@ const bookListSlice = createSlice({
         uploadBookCover.fulfilled,
         (
           state,
-          action: PayloadAction<Components.Schemas.CreatedImageStoryDto>
+          action: PayloadAction<Components.Schemas.ImgStoryResponseDto>
         ) => {
           state.loading = false;
 
           state.books.map((book) => {
-            if (book.id === action.payload.storyId) {
-              // book.srcImg = action.payload.srcImg;
-              console.log(book);
+            if (book.id == action.payload.storyId) {
+              book.srcImg = action.payload.srcUrl;
+              return book;
             }
           });
+
           state.success = true;
         }
       );
