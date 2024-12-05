@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useState } from "react";
+import { Component, useState } from "react";
 
 import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
@@ -27,20 +27,29 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { dispatch } from "d3";
-import { uploadBookCover } from "../book.actions";
+
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
+import ListAudios from "./audio-book/list-audios.component";
 
 interface BookInfoCardProps {
   open: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
   onClose: () => void;
-  onUploadCover: (dto: CoverUploadDto) => void;
+  onUploadCover: (
+    dto: CoverUploadDto
+  ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
 }
 
 interface TextAction {
   show: boolean;
   fullScreen: boolean;
+}
+
+interface InfoBookState {
+  loadCover: boolean;
+  loadAudio: boolean;
+  audios: Components.Schemas.AudioStoryLanguageDto[];
+  book: Components.Schemas.StoryWithImgResponseDto;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
@@ -54,7 +63,12 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     fullScreen: false,
   });
 
-  const [coverMenuOpen, setCoverMenuOpen] = useState<boolean>(false);
+  const [infoBookState, setInfoBookState] = useState<InfoBookState>({
+    loadCover: false,
+    loadAudio: false,
+    audios: [],
+    book: book,
+  });
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
@@ -67,10 +81,20 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     console.log(textAction);
   };
 
-  const handleUploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleOnClickCover");
+  const handleUploadFile = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files.length > 0) {
-      onUploadCover({ storyId: book.id, img: event.target.files[0] });
+      const updatedBook = await onUploadCover({
+        storyId: book.id,
+        img: event.target.files[0],
+      });
+      console.error(updatedBook);
+
+      setInfoBookState((prevState) => ({
+        ...prevState,
+        book: updatedBook,
+      }));
     }
   };
 
@@ -86,14 +110,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
       <DialogContent>
         <DialogHeader>
           {textAction.fullScreen ? null : (
-            <div className="grid grid-cols-2 grid-rows-1 my-4 animate-out">
-              <div className="col-span-1 w-52 h-56">
-                <Label htmlFor="picture" className="cursor-pointer ">
-                  {book.srcImg ? (
+            <div className="flex my-4 animate-out gap-4">
+              <div className="w-44 h-56">
+                <Label htmlFor="picture" className="cursor-pointer">
+                  {infoBookState.book.srcImg ? (
                     <img
-                      src={book.srcImg}
-                      alt={book.name}
-                      className="rounded-t-xl w-52 h-56"
+                      src={infoBookState.book.srcImg}
+                      alt={infoBookState.book.name}
+                      className="rounded-t-xl w-44 h-56 object-cover"
                     />
                   ) : (
                     <div className="size-full">
@@ -109,10 +133,13 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   onChange={handleUploadFile}
                 />
               </div>
+              <div className="">
+                <DialogTitle>{infoBookState.book.name}</DialogTitle>
+                <DialogDescription>
+                  {infoBookState.book.ethnicGroup.name}
+                </DialogDescription>
 
-              <div className="col-span-1">
-                <DialogTitle>{book.name}</DialogTitle>
-                <DialogDescription>{book.ethnicGroup.name}</DialogDescription>
+                <ListAudios audios={infoBookState.audios} />
               </div>
             </div>
           )}

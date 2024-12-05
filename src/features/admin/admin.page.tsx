@@ -29,6 +29,7 @@ import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
 
 interface BookInfoState {
   open: boolean;
+  loadCover: boolean;
   bookItem: Components.Schemas.StoryWithImgResponseDto;
 }
 
@@ -74,16 +75,21 @@ const AdminPage: React.FC = () => {
   const handleOnClickPreviewBook = (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    // TODO:
-    setBookInfo((prevState) => ({ ...prevState, open: true, bookItem: book }));
-    console.error("TODO: handleOnClickPreviewBook", book);
+    setBookInfo((prevState) => ({
+      ...prevState,
+      loadCover: false,
+      open: true,
+      bookItem: book,
+    }));
   };
   const handleCloseInfoBook = () => {
     setBookInfo(null);
   };
 
-  const handleOnUploadBookCover = (dto: CoverUploadDto) => {
-    dispatch(uploadBookCover(dto));
+  const handleOnUploadBookCover = async (
+    dto: CoverUploadDto
+  ): Promise<Components.Schemas.StoryWithImgResponseDto> => {
+    return dispatch(uploadBookCover(dto)).unwrap();
   };
 
   if (loading) {

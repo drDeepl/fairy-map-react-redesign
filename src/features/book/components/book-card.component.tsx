@@ -13,7 +13,6 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
   book: story,
 }) => {
   const [loadCover, setLoadCover] = useState<boolean>(true);
-  console.log(story);
 
   return (
     <Card className="w-40 drop-shadow-xl drop-shadow-slate-300 h-64 rounded-xl">

@@ -1,7 +1,12 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+  current,
+  isActionCreator,
+} from "@reduxjs/toolkit";
 import {
   createBook,
   fetchListBooks,
@@ -31,6 +36,7 @@ const bookListSlice = createSlice({
     ) => {
       state.books.push(action.payload);
     },
+    updateBook: (state) => {},
   },
   extraReducers: (builder) => {
     builder
@@ -40,6 +46,7 @@ const bookListSlice = createSlice({
         state.success = false;
       })
       .addCase(fetchListBooks.fulfilled, (state, action) => {
+        console.error("fetchListBooks");
         state.books = action.payload;
         state.loading = false;
         state.success = true;
@@ -68,7 +75,7 @@ const bookListSlice = createSlice({
         state.success = false;
       })
       .addCase(createBook.fulfilled, (state, action) => {
-        state.books.unshift({ ...action.payload, srcImg: null });
+        state.books[action.payload.id] = { ...action.payload, srcImg: null };
         state.loading = false;
         state.success = true;
       })
@@ -86,17 +93,17 @@ const bookListSlice = createSlice({
         uploadBookCover.fulfilled,
         (
           state,
-          action: PayloadAction<Components.Schemas.ImgStoryResponseDto>
+          action: PayloadAction<Components.Schemas.StoryWithImgResponseDto>
         ) => {
+          console.log(action.payload);
+
+          const bookIndex = state.books.findIndex(
+            (book) => action.payload.id === book.id
+          );
+
+          state.books[bookIndex] = action.payload;
+
           state.loading = false;
-
-          state.books.map((book) => {
-            if (book.id == action.payload.storyId) {
-              book.srcImg = action.payload.srcUrl;
-              return book;
-            }
-          });
-
           state.success = true;
         }
       );
