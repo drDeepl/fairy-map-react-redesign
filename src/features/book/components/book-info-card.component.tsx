@@ -15,21 +15,24 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { Component, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+import {
+  EnterFullScreenIcon,
+  PlayIcon,
+  TrackNextIcon,
+  TrackPreviousIcon,
+} from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 import ListAudios from "./audio-book/list-audios.component";
+import apiClient from "@/api/apiClient";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookInfoCardProps {
   open: boolean;
@@ -48,8 +51,14 @@ interface TextAction {
 interface InfoBookState {
   loadCover: boolean;
   loadAudio: boolean;
-  audios: Components.Schemas.AudioStoryLanguageDto[];
+  audios: Components.Schemas.AudioStoryResponseDto[];
   book: Components.Schemas.StoryWithImgResponseDto;
+}
+
+interface AudioState {
+  isPlaying: boolean;
+  load: boolean;
+  audio: Components.Schemas.AudioStoryResponseDto | null;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
@@ -65,10 +74,25 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
-    loadAudio: false,
+    loadAudio: true,
     audios: [],
     book: book,
   });
+
+  useEffect(() => {
+    apiClient
+      .StoryController_getAudiosByStoryId(book.id)
+      .then((result) => {
+        console.log(result);
+        setInfoBookState((prevState) => ({
+          ...prevState,
+          audios: result.data,
+        }));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
@@ -96,6 +120,23 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         book: updatedBook,
       }));
     }
+  };
+
+  const [audioState, setAudioState] = useState<AudioState>({
+    isPlaying: false,
+    audio: null,
+    load: false,
+  });
+
+  const handleOnSelectAudio = async (
+    audio: Components.Schemas.AudioStoryResponseDto
+  ) => {
+    setAudioState((prevState) => ({ ...prevState, load: true }));
+    const audioFile = await apiClient.StoryController_getAudioStoryById(
+      audio.audioId
+    );
+    setAudioState((prevState) => ({ ...prevState, load: false, audio: audio }));
+    console.log(audioFile);
   };
 
   return (
@@ -139,7 +180,20 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   {infoBookState.book.ethnicGroup.name}
                 </DialogDescription>
 
-                <ListAudios audios={infoBookState.audios} />
+                <ListAudios
+                  audios={infoBookState.audios}
+                  onSelectAudio={handleOnSelectAudio}
+                />
+                {audioState.audio && !audioState.load ? (
+                  <div className="flex space-x-4 justify-center mt-2">
+                    <TrackPreviousIcon className="size-6 cursor-pointer" />
+                    <PlayIcon className="size-6 cursor-pointer" />
+                    <TrackNextIcon className="size-6 cursor-pointer" />
+                  </div>
+                ) : null}
+                {audioState.load ? (
+                  <Skeleton className="w-full h-10 mt-2" />
+                ) : null}
               </div>
             </div>
           )}

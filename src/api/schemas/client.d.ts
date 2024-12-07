@@ -197,10 +197,6 @@ declare namespace Components {
                  */
                 id: number;
                 /**
-                 * id аудиозаписи
-                 */
-                audioId: number | null;
-                /**
                  * id этнической группы
                  */
                 ethnicGroup: {
@@ -219,21 +215,26 @@ declare namespace Components {
                 };
             };
         }
-        export interface AudioStoryLanguageDto {
+        export interface AudioStoryRequestEntity {
+            id: number;
+            userId: number;
+            userAudioId: number;
+            status: string;
+            typeId: number;
+            storyId: number;
+            comment: string;
+        }
+        export interface AudioStoryResponseDto {
             /**
-             * audioStoryId
+             * id озвучки
              */
             id: number;
             /**
-             * ид озвучки пользователя
+             * id сказки
              */
-            userAudioId: number;
+            storyId: number;
             /**
-             * средняя оценка озвучки
-             */
-            moderateScore: number;
-            /**
-             * информация о языке
+             * язык озвучки
              */
             language: {
                 /**
@@ -246,11 +247,15 @@ declare namespace Components {
                 id: number;
             };
             /**
-             * информация об авторе
+             * id файла с озвучкой
              */
-            authors: {
+            audioId: number;
+            /**
+             * автор озвучки
+             */
+            author: {
                 /**
-                 * номер пользователя
+                 * id пользователя
                  */
                 id: number;
                 /**
@@ -262,19 +267,14 @@ declare namespace Components {
                  */
                 lastName: string;
             };
-        }
-        export interface AudioStoryRequestEntity {
-            id: number;
-            userId: number;
-            userAudioId: number;
-            status: string;
-            typeId: number;
-            storyId: number;
-            comment: string;
-        }
-        export interface AuthorUserDto {
             /**
-             * номер пользователя
+             * рейтинг озвучки
+             */
+            moderateScore: number;
+        }
+        export interface AuthorAudioStoryResponseDto {
+            /**
+             * id пользователя
              */
             id: number;
             /**
@@ -812,10 +812,6 @@ declare namespace Components {
              */
             id: number;
             /**
-             * id аудиозаписи
-             */
-            audioId: number | null;
-            /**
              * id этнической группы
              */
             ethnicGroup: {
@@ -842,10 +838,6 @@ declare namespace Components {
              * id сказки
              */
             id: number;
-            /**
-             * id аудиозаписи
-             */
-            audioId: number | null;
             /**
              * id этнической группы
              */
@@ -877,10 +869,6 @@ declare namespace Components {
              * id сказки
              */
             id: number;
-            /**
-             * id аудиозаписи
-             */
-            audioId: number | null;
             /**
              * id этнической группы
              */
@@ -1274,6 +1262,27 @@ declare namespace Paths {
         namespace Responses {
             export interface $200 {
             }
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
+    namespace AdminControllerUploadAudioStory {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type LanguageId = number;
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            storyId: Parameters.StoryId;
+            languageId: Parameters.LanguageId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AudioStoryResponseDto;
             export interface $400 {
             }
             export interface $401 {
@@ -1861,13 +1870,28 @@ declare namespace Paths {
     }
     namespace StoryControllerGetAudioStoryById {
         namespace Parameters {
-            export type AudioId = number;
+            export type StoryAudioId = number;
         }
         export interface PathParameters {
-            audioId: Parameters.AudioId;
+            storyAudioId: Parameters.StoryAudioId;
         }
         namespace Responses {
             export type $200 = Components.Schemas.StreamableFile;
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
+    namespace StoryControllerGetAudiosByStoryId {
+        namespace Parameters {
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            storyId: Parameters.StoryId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AudioStoryResponseDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -1890,21 +1914,6 @@ declare namespace Paths {
             export interface $401 {
             }
             export interface $404 {
-            }
-        }
-    }
-    namespace StoryControllerGetLanguagesForCurrentStory {
-        namespace Parameters {
-            export type StoryId = number;
-        }
-        export interface PathParameters {
-            storyId: Parameters.StoryId;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.AudioStoryLanguageDto[];
-            export interface $400 {
-            }
-            export interface $401 {
             }
         }
     }
@@ -2385,82 +2394,6 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>
   /**
-   * AdminController_addEthnicalGroupPoint - добавление точки этнической группы на карту
-   * 
-   * необходима роль администратора
-   */
-  'AdminController_addEthnicalGroupPoint'(
-    parameters?: Parameters<Paths.AdminControllerAddEthnicalGroupPoint.PathParameters & Paths.AdminControllerAddEthnicalGroupPoint.HeaderParameters> | null,
-    data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>
-  /**
-   * AdminController_deleteEthnicalGroupPoint - удаление точки этнической группы
-   * 
-   * необходима роль администратора
-   */
-  'AdminController_deleteEthnicalGroupPoint'(
-    parameters?: Parameters<Paths.AdminControllerDeleteEthnicalGroupPoint.PathParameters & Paths.AdminControllerDeleteEthnicalGroupPoint.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>
-  /**
-   * AdminController_addStory - добавление сказки
-   */
-  'AdminController_addStory'(
-    parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
-    data?: Paths.AdminControllerAddStory.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>
-  /**
-   * AdminController_editSotry - редактирование сказки
-   */
-  'AdminController_editSotry'(
-    parameters?: Parameters<Paths.AdminControllerEditSotry.PathParameters & Paths.AdminControllerEditSotry.HeaderParameters> | null,
-    data?: Paths.AdminControllerEditSotry.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerEditSotry.Responses.$200>
-  /**
-   * AdminController_deleteStoryById - удаление сказки
-   */
-  'AdminController_deleteStoryById'(
-    parameters?: Parameters<Paths.AdminControllerDeleteStoryById.PathParameters & Paths.AdminControllerDeleteStoryById.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerDeleteStoryById.Responses.$200>
-  /**
-   * AdminController_addTextStory - добавление текста сказки
-   */
-  'AdminController_addTextStory'(
-    parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
-    data?: Paths.AdminControllerAddTextStory.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
-  /**
-   * AdminController_setUserAudioToStory - добавление озвучки к сказке
-   */
-  'AdminController_setUserAudioToStory'(
-    parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
-    data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
-  /**
-   * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
-   */
-  'AdminController_uploadStoryImage'(
-    parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
-  /**
-   * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
-   */
-  'AdminController_deleteStoryImgByStoryId'(
-    parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
-  /**
    * StoryController_getAllStories - получение всех сказок
    */
   'StoryController_getAllStories'(
@@ -2485,13 +2418,13 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
   /**
-   * StoryController_getLanguagesForCurrentStory - получение доступных языков озвучки для выбранной сказки
+   * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
    */
-  'StoryController_getLanguagesForCurrentStory'(
-    parameters?: Parameters<Paths.StoryControllerGetLanguagesForCurrentStory.PathParameters> | null,
+  'StoryController_getAudiosByStoryId'(
+    parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetLanguagesForCurrentStory.Responses.$200>
+  ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
   /**
    * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
    */
@@ -2760,6 +2693,90 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200>
+  /**
+   * AdminController_addEthnicalGroupPoint - добавление точки этнической группы на карту
+   * 
+   * необходима роль администратора
+   */
+  'AdminController_addEthnicalGroupPoint'(
+    parameters?: Parameters<Paths.AdminControllerAddEthnicalGroupPoint.PathParameters & Paths.AdminControllerAddEthnicalGroupPoint.HeaderParameters> | null,
+    data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>
+  /**
+   * AdminController_deleteEthnicalGroupPoint - удаление точки этнической группы
+   * 
+   * необходима роль администратора
+   */
+  'AdminController_deleteEthnicalGroupPoint'(
+    parameters?: Parameters<Paths.AdminControllerDeleteEthnicalGroupPoint.PathParameters & Paths.AdminControllerDeleteEthnicalGroupPoint.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>
+  /**
+   * AdminController_addStory - добавление сказки
+   */
+  'AdminController_addStory'(
+    parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
+    data?: Paths.AdminControllerAddStory.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>
+  /**
+   * AdminController_editSotry - редактирование сказки
+   */
+  'AdminController_editSotry'(
+    parameters?: Parameters<Paths.AdminControllerEditSotry.PathParameters & Paths.AdminControllerEditSotry.HeaderParameters> | null,
+    data?: Paths.AdminControllerEditSotry.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerEditSotry.Responses.$200>
+  /**
+   * AdminController_deleteStoryById - удаление сказки
+   */
+  'AdminController_deleteStoryById'(
+    parameters?: Parameters<Paths.AdminControllerDeleteStoryById.PathParameters & Paths.AdminControllerDeleteStoryById.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteStoryById.Responses.$200>
+  /**
+   * AdminController_addTextStory - добавление текста сказки
+   */
+  'AdminController_addTextStory'(
+    parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
+    data?: Paths.AdminControllerAddTextStory.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
+  /**
+   * AdminController_setUserAudioToStory - добавление озвучки к сказке
+   */
+  'AdminController_setUserAudioToStory'(
+    parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
+    data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
+  /**
+   * AdminController_uploadAudioStory - загрузка озвучки для сказки
+   */
+  'AdminController_uploadAudioStory'(
+    parameters?: Parameters<Paths.AdminControllerUploadAudioStory.PathParameters & Paths.AdminControllerUploadAudioStory.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerUploadAudioStory.Responses.$200>
+  /**
+   * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
+   */
+  'AdminController_uploadStoryImage'(
+    parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
+  /**
+   * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
+   */
+  'AdminController_deleteStoryImgByStoryId'(
+    parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
 }
 
 export interface PathsDictionary {
@@ -3069,100 +3086,6 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>
   }
-  ['/api/admin/ethnic-groups/{ethnicGroupId}/constituents/{constituentId}']: {
-    /**
-     * AdminController_addEthnicalGroupPoint - добавление точки этнической группы на карту
-     * 
-     * необходима роль администратора
-     */
-    'post'(
-      parameters?: Parameters<Paths.AdminControllerAddEthnicalGroupPoint.PathParameters & Paths.AdminControllerAddEthnicalGroupPoint.HeaderParameters> | null,
-      data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>
-  }
-  ['/api/admin/ethnic-groups/{pointId}']: {
-    /**
-     * AdminController_deleteEthnicalGroupPoint - удаление точки этнической группы
-     * 
-     * необходима роль администратора
-     */
-    'delete'(
-      parameters?: Parameters<Paths.AdminControllerDeleteEthnicalGroupPoint.PathParameters & Paths.AdminControllerDeleteEthnicalGroupPoint.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>
-  }
-  ['/api/admin/story/add']: {
-    /**
-     * AdminController_addStory - добавление сказки
-     */
-    'post'(
-      parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
-      data?: Paths.AdminControllerAddStory.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>
-  }
-  ['/api/admin/story/edit/{storyId}']: {
-    /**
-     * AdminController_editSotry - редактирование сказки
-     */
-    'put'(
-      parameters?: Parameters<Paths.AdminControllerEditSotry.PathParameters & Paths.AdminControllerEditSotry.HeaderParameters> | null,
-      data?: Paths.AdminControllerEditSotry.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerEditSotry.Responses.$200>
-  }
-  ['/api/admin/story/delete/{storyId}']: {
-    /**
-     * AdminController_deleteStoryById - удаление сказки
-     */
-    'delete'(
-      parameters?: Parameters<Paths.AdminControllerDeleteStoryById.PathParameters & Paths.AdminControllerDeleteStoryById.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerDeleteStoryById.Responses.$200>
-  }
-  ['/api/admin/story/text/add/{storyId}']: {
-    /**
-     * AdminController_addTextStory - добавление текста сказки
-     */
-    'post'(
-      parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
-      data?: Paths.AdminControllerAddTextStory.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
-  }
-  ['/api/admin/story/{storyId}/audio']: {
-    /**
-     * AdminController_setUserAudioToStory - добавление озвучки к сказке
-     */
-    'put'(
-      parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
-      data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
-  }
-  ['/api/admin/story/{storyId}/image/upload']: {
-    /**
-     * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
-     */
-    'post'(
-      parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
-  }
-  ['/api/admin/story/{storyId}/image']: {
-    /**
-     * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
-     */
-    'delete'(
-      parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
-  }
   ['/api/story/all']: {
     /**
      * StoryController_getAllStories - получение всех сказок
@@ -3193,15 +3116,15 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
   }
-  ['/api/story/languages/{storyId}']: {
+  ['/api/story/{storyId}/audio/all']: {
     /**
-     * StoryController_getLanguagesForCurrentStory - получение доступных языков озвучки для выбранной сказки
+     * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
      */
     'get'(
-      parameters?: Parameters<Paths.StoryControllerGetLanguagesForCurrentStory.PathParameters> | null,
+      parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetLanguagesForCurrentStory.Responses.$200>
+    ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
   }
   ['/api/story/ethnic-group/{ethnicGroupId}']: {
     /**
@@ -3223,7 +3146,7 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>
   }
-  ['/api/story/audio/{audioId}']: {
+  ['/api/story/audio/{storyAudioId}']: {
     /**
      * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
      * 
@@ -3530,6 +3453,110 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200>
+  }
+  ['/api/admin/ethnic-groups/{ethnicGroupId}/constituents/{constituentId}']: {
+    /**
+     * AdminController_addEthnicalGroupPoint - добавление точки этнической группы на карту
+     * 
+     * необходима роль администратора
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerAddEthnicalGroupPoint.PathParameters & Paths.AdminControllerAddEthnicalGroupPoint.HeaderParameters> | null,
+      data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>
+  }
+  ['/api/admin/ethnic-groups/{pointId}']: {
+    /**
+     * AdminController_deleteEthnicalGroupPoint - удаление точки этнической группы
+     * 
+     * необходима роль администратора
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteEthnicalGroupPoint.PathParameters & Paths.AdminControllerDeleteEthnicalGroupPoint.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>
+  }
+  ['/api/admin/story/add']: {
+    /**
+     * AdminController_addStory - добавление сказки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
+      data?: Paths.AdminControllerAddStory.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>
+  }
+  ['/api/admin/story/edit/{storyId}']: {
+    /**
+     * AdminController_editSotry - редактирование сказки
+     */
+    'put'(
+      parameters?: Parameters<Paths.AdminControllerEditSotry.PathParameters & Paths.AdminControllerEditSotry.HeaderParameters> | null,
+      data?: Paths.AdminControllerEditSotry.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerEditSotry.Responses.$200>
+  }
+  ['/api/admin/story/delete/{storyId}']: {
+    /**
+     * AdminController_deleteStoryById - удаление сказки
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteStoryById.PathParameters & Paths.AdminControllerDeleteStoryById.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteStoryById.Responses.$200>
+  }
+  ['/api/admin/story/text/add/{storyId}']: {
+    /**
+     * AdminController_addTextStory - добавление текста сказки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
+      data?: Paths.AdminControllerAddTextStory.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/audio']: {
+    /**
+     * AdminController_setUserAudioToStory - добавление озвучки к сказке
+     */
+    'put'(
+      parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
+      data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/language/{languageId}/audio/upload']: {
+    /**
+     * AdminController_uploadAudioStory - загрузка озвучки для сказки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerUploadAudioStory.PathParameters & Paths.AdminControllerUploadAudioStory.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerUploadAudioStory.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/image/upload']: {
+    /**
+     * AdminController_uploadStoryImage - загрузка обложки для выбранной сказки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AdminControllerUploadStoryImage.PathParameters & Paths.AdminControllerUploadStoryImage.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerUploadStoryImage.Responses.$200>
+  }
+  ['/api/admin/story/{storyId}/image']: {
+    /**
+     * AdminController_deleteStoryImgByStoryId - удаление обложки для выбранной сказки
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteStoryImgByStoryId.PathParameters & Paths.AdminControllerDeleteStoryImgByStoryId.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
   }
 }
 
