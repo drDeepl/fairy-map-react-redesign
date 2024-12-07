@@ -33,6 +33,7 @@ import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 import ListAudios from "./audio-book/list-audios.component";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
+import AudioPlayer from "react-modern-audio-player";
 
 interface BookInfoCardProps {
   open: boolean;
@@ -128,15 +129,12 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     load: false,
   });
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const handleOnSelectAudio = async (
     audio: Components.Schemas.AudioStoryResponseDto
   ) => {
-    setAudioState((prevState) => ({ ...prevState, load: true }));
-    const audioFile = await apiClient.StoryController_getAudioStoryById(
-      audio.audioId
-    );
     setAudioState((prevState) => ({ ...prevState, load: false, audio: audio }));
-    console.log(audioFile);
   };
 
   return (
@@ -184,16 +182,33 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   audios={infoBookState.audios}
                   onSelectAudio={handleOnSelectAudio}
                 />
-                {audioState.audio && !audioState.load ? (
-                  <div className="flex space-x-4 justify-center mt-2">
-                    <TrackPreviousIcon className="size-6 cursor-pointer" />
-                    <PlayIcon className="size-6 cursor-pointer" />
-                    <TrackNextIcon className="size-6 cursor-pointer" />
-                  </div>
-                ) : null}
-                {audioState.load ? (
-                  <Skeleton className="w-full h-10 mt-2" />
-                ) : null}
+                <div className="flex w-full pt-2">
+                  {audioState.audio && !audioState.load ? (
+                    <AudioPlayer
+                      playList={[{ id: 1, src: audioState.audio?.srcAudio }]}
+                      activeUI={{
+                        playButton: true,
+                        progress: "bar",
+                        volume: true,
+                        volumeSlider: true,
+                        trackTime: true,
+                      }}
+                      placement={{
+                        interface: {
+                          templateArea: {
+                            trackTimeDuration: "row1-6",
+                            progress: "row1-4",
+                            playButton: "row1-1",
+                            volume: "row2-1",
+                          },
+                        },
+                      }}
+                    />
+                  ) : null}
+                  {audioState.load ? (
+                    <Skeleton className="w-full h-10 mt-2" />
+                  ) : null}
+                </div>
               </div>
             </div>
           )}

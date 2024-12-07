@@ -247,9 +247,9 @@ declare namespace Components {
                 id: number;
             };
             /**
-             * id файла с озвучкой
+             * ссылка на файл с озвучкой
              */
-            audioId: number;
+            srcAudio: string;
             /**
              * автор озвучки
              */
