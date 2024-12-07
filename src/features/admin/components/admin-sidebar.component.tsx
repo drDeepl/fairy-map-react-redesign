@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   SidebarContent,
   SidebarGroup,
@@ -9,27 +10,14 @@ import {
   SidebarHeader,
   Sidebar,
 } from "@/components/ui/sidebar";
-import { LibraryBig, BookHeadphones, SwatchBook } from "lucide-react";
+import { ItemSidebar } from "../interfaces/sidebar.interfaces";
+import { menuItems } from "../constants/sidebar-items";
 
-const AdminSidebar = () => {
-  const menuItems = [
-    {
-      title: "сказки",
-      url: "#",
-      icon: LibraryBig,
-    },
-    {
-      title: "озвучки",
-      url: "#",
-      icon: BookHeadphones,
-    },
-    {
-      title: "заявки",
-      url: "#",
-      icon: SwatchBook,
-    },
-  ];
+interface AdminSidebarProps {
+  onClickItem: (item: ItemSidebar) => void;
+}
 
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClickItem }) => {
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
@@ -42,13 +30,10 @@ const AdminSidebar = () => {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
-                      onClick={() => console.log(`click on ${item.title}`)}
-                    >
+                    <Button variant="outline" onClick={() => onClickItem(item)}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

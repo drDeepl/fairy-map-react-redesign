@@ -58,10 +58,8 @@ export const fetchAudiosByBookId = createAsyncThunk(
   "book/fetchAudiosByBookId",
   async (bookId: number, thunkApi) => {
     try {
-      const res = await apiClient.StoryController_getLanguagesForCurrentStory(
-        bookId
-      );
-      return thunkApi.fulfillWithValue(res.data);
+      const res = await apiClient.StoryController_getAudiosByStoryId(bookId);
+      return res.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
       return thunkApi.rejectWithValue(errorResposne);

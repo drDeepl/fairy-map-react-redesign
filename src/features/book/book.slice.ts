@@ -1,12 +1,12 @@
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Components } from "@/api/schemas/client";
-import { fetchAudiosByBookId, uploadBookCover } from "./book.actions";
+import { fetchAudiosByBookId } from "./book.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 export interface BookState extends BaseAppState {
   selectedBook: Components.Schemas.StoryWithImgResponseDto | null;
-  bookAudios: Components.Schemas.AudioStoryLanguageDto[];
+  audios: Components.Schemas.AudioStoryResponseDto[];
 }
 
 const initialState = {
@@ -14,13 +14,20 @@ const initialState = {
   success: false,
   error: null,
   selectedBook: null,
-  bookAudios: [],
+  audios: [],
 };
 
 const bookSlice = createSlice({
   name: "book",
   initialState,
-  reducers: {},
+  reducers: {
+    setBook: (
+      state,
+      action: PayloadAction<Components.Schemas.StoryWithImgResponseDto | null>
+    ) => {
+      state.selectedBook = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAudiosByBookId.pending, (state) => {
@@ -32,9 +39,9 @@ const bookSlice = createSlice({
         fetchAudiosByBookId.fulfilled,
         (
           state,
-          action: PayloadAction<Components.Schemas.AudioStoryLanguageDto[]>
+          action: PayloadAction<Components.Schemas.AudioStoryResponseDto[]>
         ) => {
-          state.bookAudios = action.payload;
+          state.audios = action.payload;
           state.loading = false;
           state.success = true;
         }
@@ -48,5 +55,6 @@ const bookSlice = createSlice({
       );
   },
 });
+export const { setBook } = bookSlice.actions;
 
 export default bookSlice.reducer;

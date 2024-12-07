@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PreviewBookCardComponent from "./book-card.component";
 import React from "react";
 import { Components } from "@/api/schemas/client";
-import BookInfoCardComponent from "./book-info-card.component";
 
 interface ListBookCarouselProps {
   books: Components.Schemas.StoryWithImgResponseDto[];

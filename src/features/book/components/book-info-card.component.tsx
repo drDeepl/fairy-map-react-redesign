@@ -15,9 +15,11 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Children } from "react";
 
 import {
+  DotsHorizontalIcon,
+  DotsVerticalIcon,
   EnterFullScreenIcon,
   PlayIcon,
   TrackNextIcon,
@@ -34,6 +36,14 @@ import ListAudios from "./audio-book/list-audios.component";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioPlayer from "react-modern-audio-player";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { fetchAudiosByBookId } from "../book.actions";
+import { useDispatch } from "react-redux";
 
 interface BookInfoCardProps {
   open: boolean;
@@ -60,6 +70,7 @@ interface AudioState {
   isPlaying: boolean;
   load: boolean;
   audio: Components.Schemas.AudioStoryResponseDto | null;
+  children?: React.ReactNode;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
@@ -67,7 +78,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
   onClose,
   onUploadCover,
+  children,
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
     fullScreen: false,
@@ -81,13 +95,12 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   });
 
   useEffect(() => {
-    apiClient
-      .StoryController_getAudiosByStoryId(book.id)
+    dispatch(fetchAudiosByBookId(book.id))
       .then((result) => {
         console.log(result);
         setInfoBookState((prevState) => ({
           ...prevState,
-          audios: result.data,
+          audios: result.payload,
         }));
       })
       .catch((error) => {
@@ -129,8 +142,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     load: false,
   });
 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
   const handleOnSelectAudio = async (
     audio: Components.Schemas.AudioStoryResponseDto
   ) => {
@@ -149,7 +160,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
       <DialogContent>
         <DialogHeader>
           {textAction.fullScreen ? null : (
-            <div className="flex my-4 animate-out gap-4">
+            <div className="w-full flex my-4 animate-out gap-4">
               <div className="w-44 h-56">
                 <Label htmlFor="picture" className="cursor-pointer">
                   {infoBookState.book.srcImg ? (
@@ -164,16 +175,27 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     </div>
                   )}
                 </Label>
+
                 <Input
-                  className="invisible"
+                  className="hidden"
                   id="picture"
                   type="file"
                   accept="image/*"
                   onChange={handleUploadFile}
                 />
               </div>
-              <div className="">
-                <DialogTitle>{infoBookState.book.name}</DialogTitle>
+              <div className="w-2/3">
+                <DialogTitle>
+                  <div className="flex space-x-2">
+                    <span>{infoBookState.book.name}</span>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <DotsHorizontalIcon className="size-5 self-center cursor-pointer" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>{children}</DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </DialogTitle>
                 <DialogDescription>
                   {infoBookState.book.ethnicGroup.name}
                 </DialogDescription>
