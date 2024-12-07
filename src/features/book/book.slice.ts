@@ -27,6 +27,12 @@ const bookSlice = createSlice({
     ) => {
       state.selectedBook = action.payload;
     },
+    addAudio: (
+      state,
+      action: PayloadAction<Components.Schemas.AudioStoryResponseDto>
+    ) => {
+      state.audios.unshift(action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -55,6 +61,6 @@ const bookSlice = createSlice({
       );
   },
 });
-export const { setBook } = bookSlice.actions;
+export const { setBook, addAudio } = bookSlice.actions;
 
 export default bookSlice.reducer;

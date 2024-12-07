@@ -48,6 +48,7 @@ import { useDispatch } from "react-redux";
 interface BookInfoCardProps {
   open: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
+  audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover: (
     dto: CoverUploadDto
@@ -97,7 +98,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   useEffect(() => {
     dispatch(fetchAudiosByBookId(book.id))
       .then((result) => {
-        console.log(result);
         setInfoBookState((prevState) => ({
           ...prevState,
           audios: result.payload,
@@ -113,10 +113,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   const handleFullScreen = (fullScreen: boolean) => {
-    console.log("handle fullScreen");
-    console.log(fullScreen);
     setTextAction((prevState) => ({ ...prevState, fullScreen: fullScreen }));
-    console.log(textAction);
   };
 
   const handleUploadFile = async (

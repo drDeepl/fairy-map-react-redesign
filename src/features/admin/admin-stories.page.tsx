@@ -2,9 +2,9 @@ import { Components } from "@/api/schemas/client";
 import { AppDispatch, RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
-import { ReactHTMLElement, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+
 import { createBook, uploadBookCover } from "../book/book.actions";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import AddBookForm from "../book/components/forms/add-book.form";
@@ -12,15 +12,27 @@ import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
 import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { setBook } from "../book/book.slice";
+import { addAudio, setBook } from "../book/book.slice";
+import apiClient from "@/api/apiClient";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface BookInfoState {
   open: boolean;
   loadCover: boolean;
   bookItem: Components.Schemas.StoryWithImgResponseDto;
+}
+
+interface ListLanguageState {
+  load: boolean;
+  languages: Components.Schemas.LanguageDto[];
 }
 
 const AdminStoriesPage: React.FC = () => {
@@ -35,6 +47,16 @@ const AdminStoriesPage: React.FC = () => {
   const bookState = useSelector((state: RootState) => state.book);
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
+
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
+
+  const [languageListState, setLanguageListState] = useState<ListLanguageState>(
+    {
+      load: true,
+      languages: [],
+    }
+  );
 
   const handleOnClickAddBook = () => {
     setOpenAddBookForm(true);
@@ -64,13 +86,47 @@ const AdminStoriesPage: React.FC = () => {
     return dispatch(uploadBookCover(dto)).unwrap();
   };
 
-  const handleUploadCover = async (
+  const handleUploadAudio = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files && event.target.files.length > 0) {
-      alert(event.target.files[0]);
+      if (bookState.selectedBook && selectedLanguage) {
+        const formData = new FormData();
+        formData.append("audio", event.target.files[0]);
+
+        apiClient
+          .AdminController_uploadAudioStory(
+            {
+              storyId: bookState.selectedBook.id,
+              languageId: selectedLanguage?.id,
+            },
+            formData
+          )
+          .then((addedAudioResponse) => {
+            dispatch(addAudio(addedAudioResponse.data));
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
   };
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleOnSelectLanguage = (language: Components.Schemas.LanguageDto) => {
+    setSelectedLanguage(language);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  useEffect(() => {
+    apiClient.EthnicGroupController_getAllLanguage().then((result) => {
+      setLanguageListState({ load: false, languages: result.data });
+    });
+  });
   return (
     <div>
       <section className="mx-8">
@@ -103,25 +159,41 @@ const AdminStoriesPage: React.FC = () => {
         <BookInfoCardComponent
           open={bookState.selectedBook ? true : false}
           book={bookState.selectedBook}
+          audios={bookState.audios}
           onClose={handleCloseInfoBook}
           onUploadCover={handleOnUploadBookCover}
         >
-          <DropdownMenuItem>
-            <div>
-              <Label htmlFor="audio" className="cursor-pointer">
-                добавить озвучку
-              </Label>
-              <Input
-                className="hidden"
-                id="audio"
-                type="file"
-                accept="audio/*"
-                onChange={handleUploadCover}
-              />
-            </div>
-          </DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>добавить озвучку</DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="h-28 overflow-y-scroll">
+              {languageListState.load ? (
+                <Skeleton className="w-full h-16" />
+              ) : (
+                languageListState.languages.map((language) => (
+                  <DropdownMenuItem
+                    key={`lang_${language.id}`}
+                    onClick={() => handleOnSelectLanguage(language)}
+                  >
+                    {language.name}
+                  </DropdownMenuItem>
+                ))
+              )}
+
+              {!languageListState.load &&
+              languageListState.languages.length === 0 ? (
+                <DropdownMenuItem>языки для озвучки найдены</DropdownMenuItem>
+              ) : null}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
         </BookInfoCardComponent>
       ) : null}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="audio/*"
+        onChange={handleUploadAudio}
+      />
     </div>
   );
 };
