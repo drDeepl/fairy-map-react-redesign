@@ -18,7 +18,6 @@ import { fetchAudiosByBookId } from "../book/book.actions";
 import { setBook } from "../book/book.slice";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import { Components, StoryWithImgResponseDto } from "../../api/schemas/client";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -61,6 +60,7 @@ const MapPage: React.FC = () => {
   const handleClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
+    console.log(book);
     await dispatch(fetchAudiosByBookId(book.id));
     dispatch(setBook(book));
   };
