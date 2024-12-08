@@ -11,6 +11,7 @@ import AdminStoriesPage from "./admin-stories.page";
 import { MenuItem } from "./constants/sidebar-items";
 import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { MapPinnedIcon } from "lucide-react";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

@@ -12,12 +12,20 @@ import {
 } from "@/components/ui/sidebar";
 import { ItemSidebar } from "../interfaces/sidebar.interfaces";
 import { menuItems } from "../constants/sidebar-items";
+import { MapPinnedIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { RouteApp } from "@/pages/constants/route.enum";
 
 interface AdminSidebarProps {
   onClickItem: (item: ItemSidebar) => void;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClickItem }) => {
+  const navigate = useNavigate();
+
+  const handleOnClickMapBtn = () => {
+    navigate(RouteApp.MapPage);
+  };
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
@@ -37,6 +45,18 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClickItem }) => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Button
+                    variant="outline"
+                    onClick={handleOnClickMapBtn}
+                    className="animate-shimmer border border-ghost bg-[linear-gradient(110deg,#FCFAF6,45%,#D4E6FA,55%,#FCFAF6)] bg-[length:200%_100%] px-6 font-medium "
+                  >
+                    <MapPinnedIcon />
+                    <span>карта</span>
+                  </Button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

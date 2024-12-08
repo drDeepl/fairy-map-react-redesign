@@ -8,6 +8,14 @@ export default {
         "cloud-uplaod": "url('./assets/img/cloud-upload.svg')",
       },
       keyframes: {
+        shimmer: {
+          from: {
+            backgroundPosition: "0 0",
+          },
+          to: {
+            backgroundPosition: "-200% 0",
+          },
+        },
         "jump-heart": {
           "0%, 100%": {
             transform: "translateY(-10px)",
@@ -58,6 +66,7 @@ export default {
         },
       },
       animation: {
+        shimmer: "shimmer 2s linear infinite",
         fadeIn: "fadeIn 0.7s ease-out",
         "jump-heart": "jump-heart 1.5s ease-out infinite",
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -69,6 +78,7 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        ghost: "#D4E6FA",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -103,11 +113,11 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
+          1: "hsl(var(--chart-1))",
+          2: "hsl(var(--chart-2))",
+          3: "hsl(var(--chart-3))",
+          4: "hsl(var(--chart-4))",
+          5: "hsl(var(--chart-5))",
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

@@ -19,9 +19,8 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lastCurrentRouter: string | null = localStorage.getItem(
-      "lastCurrentRouter"
-    );
+    const lastCurrentRouter: string | null =
+      localStorage.getItem("lastCurrentRouter");
 
     const user: JwtPayload | null = checkValidAccessTokenInLocalStorage();
 
