@@ -5,7 +5,11 @@ import { BookPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { createBook, uploadBookCover } from "../book/book.actions";
+import {
+  createBook,
+  fetchAudiosByBookId,
+  uploadBookCover,
+} from "../book/book.actions";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import AddBookForm from "../book/components/forms/add-book.form";
 import ListBookCarousel from "../book/components/list-book-carousel.component";
@@ -18,11 +22,11 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { addAudio, setBook } from "../book/book.slice";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Toaster, toast } from "sonner";
 
 export interface BookInfoState {
   open: boolean;
@@ -62,17 +66,22 @@ const AdminStoriesPage: React.FC = () => {
     setOpenAddBookForm(true);
   };
 
-  const handleOnSubmitAddBook = (values: Components.Schemas.AddStoryDto) => {
-    dispatch(createBook(values));
+  const handleOnSubmitAddBook = async (
+    values: Components.Schemas.AddStoryDto
+  ) => {
+    dispatch(createBook(values)).then(() => {
+      handleOnCloseAddBookForm();
+    });
   };
 
   const handleOnCloseAddBookForm = () => {
     setOpenAddBookForm(false);
   };
 
-  const handleOnClickPreviewBook = (
+  const handleOnClickPreviewBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
+    await dispatch(fetchAudiosByBookId(book.id));
     dispatch(setBook(book));
   };
 
@@ -103,6 +112,7 @@ const AdminStoriesPage: React.FC = () => {
             formData
           )
           .then((addedAudioResponse) => {
+            console.log(addedAudioResponse.data);
             dispatch(addAudio(addedAudioResponse.data));
           })
           .catch((error) => {
@@ -150,14 +160,21 @@ const AdminStoriesPage: React.FC = () => {
             errors={null}
             ethnicGroups={ethnicGroupListState.ethnicGroups}
             loading={listBookState.loading}
-            onSubmit={handleOnSubmitAddBook}
+            onSubmit={(values) => {
+              toast.promise(handleOnSubmitAddBook(values), {
+                loading: "добавляю сказку",
+                success: "сказка успешно добавлена",
+              });
+            }}
             onCancel={handleOnCloseAddBookForm}
           />
         ) : null}
       </section>
+      <Toaster position="top-center" richColors />
       {bookState.selectedBook ? (
         <BookInfoCardComponent
           open={bookState.selectedBook ? true : false}
+          load={bookState.loading}
           book={bookState.selectedBook}
           audios={bookState.audios}
           onClose={handleCloseInfoBook}
@@ -192,7 +209,12 @@ const AdminStoriesPage: React.FC = () => {
         ref={fileInputRef}
         className="hidden"
         accept="audio/*"
-        onChange={handleUploadAudio}
+        onChange={(event) => {
+          toast.promise(handleUploadAudio(event), {
+            loading: "добавляю озвучку",
+            success: "озвучка успешно добавлена",
+          });
+        }}
       />
     </div>
   );

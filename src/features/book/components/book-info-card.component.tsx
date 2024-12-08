@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useEffect, useState, useRef, Children } from "react";
+import { useEffect, useState } from "react";
 
 import {
   DotsHorizontalIcon,
@@ -46,6 +46,7 @@ import { fetchAudiosByBookId } from "../book.actions";
 import { useDispatch } from "react-redux";
 
 interface BookInfoCardProps {
+  load: boolean;
   open: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
   audios: Components.Schemas.AudioStoryResponseDto[];
@@ -76,7 +77,9 @@ interface AudioState {
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   open,
+  load,
   book,
+  audios,
   onClose,
   onUploadCover,
   children,
@@ -91,22 +94,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
     loadAudio: true,
-    audios: [],
     book: book,
   });
-
-  useEffect(() => {
-    dispatch(fetchAudiosByBookId(book.id))
-      .then((result) => {
-        setInfoBookState((prevState) => ({
-          ...prevState,
-          audios: result.payload,
-        }));
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, []);
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
@@ -197,10 +186,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   {infoBookState.book.ethnicGroup.name}
                 </DialogDescription>
 
-                <ListAudios
-                  audios={infoBookState.audios}
-                  onSelectAudio={handleOnSelectAudio}
-                />
+                {load ? (
+                  <Skeleton className="w-full h-10" />
+                ) : (
+                  <ListAudios
+                    audios={audios}
+                    onSelectAudio={handleOnSelectAudio}
+                  />
+                )}
                 <div className="flex w-full pt-2">
                   {audioState.audio && !audioState.load ? (
                     <AudioPlayer
@@ -242,7 +235,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 }}
               >
                 <div className="flex justify-between">
-                  <span className="animate-in">
+                  <span className="animate-in text-md">
                     {!textAction.show ? "показать текст" : "скрыть текст"}
                   </span>
                 </div>
