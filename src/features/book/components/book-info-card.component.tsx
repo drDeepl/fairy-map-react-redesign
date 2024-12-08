@@ -91,6 +91,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     fullScreen: false,
   });
 
+  console.error(book);
+
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
     loadAudio: true,

@@ -48,7 +48,6 @@ const AdminStoriesPage: React.FC = () => {
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
-  const bookState = useSelector((state: RootState) => state.book);
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 

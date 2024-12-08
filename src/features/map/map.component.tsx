@@ -8,20 +8,39 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookHeadphones, LibraryBig } from "lucide-react";
-import { Select, SelectTrigger } from "@/components/ui/select";
-import { SelectContent, SelectValue } from "@radix-ui/react-select";
+import { BookHeadphones, LibraryBig, Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectGroup,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import { fetchListBooksByEthnicGroup } from "../book/book.actions";
+import {
+  fetchAudiosByBookId,
+  fetchListBooksByEthnicGroup,
+} from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupPoint, FeatureMap } from "./map.interface";
+import BookInfoCardComponent from "../book/components/book-info-card.component";
+import { Components } from "@/api/schemas/client";
+import apiClient from "@/api/apiClient";
+import LoadSpinner from "@/components/ui/load-spinner";
+import { Button } from "@/components/ui/button";
+import { setBook } from "../book/book.slice";
 
 interface MapComponentProps {
   features: any;
   width: number;
   height: number;
+  onClickBook: (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => Promise<void>;
 }
 
 interface Tooltip {
@@ -29,10 +48,17 @@ interface Tooltip {
   data?: EthnicGroupPoint;
 }
 
+interface SelectedBookState {
+  load: boolean;
+  book: Components.Schemas.StoryWithImgResponseDto | null;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+}
+
 const MapComponent: React.FC<MapComponentProps> = ({
   features,
   width,
   height,
+  onClickBook,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -42,6 +68,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const listBookState: ListBookState = useSelector(
     (state: RootState) => state.listBook
   );
+
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
   const projection = d3
@@ -107,8 +134,20 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
     console.log("handleClickPoint");
+    console.log(ethnicGroupPoint);
     dispatch(fetchListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
   });
+
+  const [loadBook, setLoadBook] = useState<boolean>(false);
+
+  const handleOnClickBook = async (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => {
+    setLoadBook(true);
+    onClickBook(book).then(() => {
+      setLoadBook(false);
+    });
+  };
 
   useEffect(() => {
     const svg = d3.select(svgRef.current).style("background-color", "#82A9FD");
@@ -192,8 +231,27 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-5">
                                 <LibraryBig className="stroke-gray-600" />
                                 <SelectValue placeholder="книги" />
-                                <span className="justify-end">0</span>
+                                <span className="justify-end">
+                                  {listBookState.books.length}
+                                </span>
                               </SelectTrigger>
+                              <SelectContent>
+                                {listBookState.books.map((book) => (
+                                  <Button
+                                    className="w-full"
+                                    variant="ghost"
+                                    disabled={loadBook}
+                                    key={book.id}
+                                    onClick={() => handleOnClickBook(book)}
+                                  >
+                                    {loadBook ? (
+                                      <Loader2 className="animate-spin" />
+                                    ) : null}
+
+                                    {book.name}
+                                  </Button>
+                                ))}
+                              </SelectContent>
                             </Select>
                           )}
 

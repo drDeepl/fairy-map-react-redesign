@@ -14,6 +14,11 @@ import ErrorMessageScreen from "@/pages/error-message.page";
 import { useNavigate } from "react-router-dom";
 
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
+import { fetchAudiosByBookId } from "../book/book.actions";
+import { setBook } from "../book/book.slice";
+import BookInfoCardComponent from "../book/components/book-info-card.component";
+import { Components, StoryWithImgResponseDto } from "../../api/schemas/client";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -21,6 +26,7 @@ const MapPage: React.FC = () => {
 
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
+  const bookState = useSelector((state: RootState) => state.book);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -52,6 +58,13 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const handleClickBook = async (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => {
+    await dispatch(fetchAudiosByBookId(book.id));
+    dispatch(setBook(book));
+  };
+
   useEffect(() => {
     dispatch(fetchMapData());
   }, [dispatch]);
@@ -66,6 +79,8 @@ const MapPage: React.FC = () => {
 
   return (
     <div className="map-pag__content">
+      {/* <Toaster /> */}
+
       <div className="fixed flex items-center justify-between p-4 w-full">
         <Input
           className="min-h-11 max-w-fit bg-slate-50 self-center"
@@ -93,15 +108,26 @@ const MapPage: React.FC = () => {
           onClose={() => handleCloseAuthForm()}
         />
       </div>
+
       {mapState.dataMap ? (
         <MapComponent
           features={mapState.dataMap.features}
           width={width}
           height={height}
+          onClickBook={handleClickBook}
         />
       ) : (
         ""
       )}
+      {bookState.selectedBook ? (
+        <BookInfoCardComponent
+          load={bookState.loading}
+          book={bookState.selectedBook}
+          audios={bookState.audios}
+          open={bookState.selectedBook ? true : false}
+          onClose={() => dispatch(setBook(null))}
+        />
+      ) : null}
     </div>
   );
 };

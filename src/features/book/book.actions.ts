@@ -46,7 +46,8 @@ export const fetchListBooksByEthnicGroup = createAsyncThunk(
         ethnicGroupId
       );
 
-      return thunkApi.fulfillWithValue(res.data);
+      console.log(res.data);
+      return res.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
       return thunkApi.rejectWithValue(errorResposne);
