@@ -146,9 +146,9 @@ const AdminStoriesPage: React.FC = () => {
           onClickBook={handleOnClickPreviewBook}
         >
           <Button
-            variant="secondary"
+            variant="outline"
             onClick={handleOnClickAddBook}
-            className="w-36 border border-slate-500"
+            className="w-42 border border-ghost text-md"
           >
             <span className="">добавить сказку</span>
             <BookPlus />
