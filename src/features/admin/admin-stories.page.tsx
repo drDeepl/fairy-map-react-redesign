@@ -52,8 +52,10 @@ const AdminStoriesPage: React.FC = () => {
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -92,6 +94,7 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnUploadBookCover = async (
     dto: CoverUploadDto
   ): Promise<Components.Schemas.StoryWithImgResponseDto> => {
+    console.log("handleUploadAudio");
     return dispatch(uploadBookCover(dto)).unwrap();
   };
 
@@ -136,7 +139,7 @@ const AdminStoriesPage: React.FC = () => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {
       setLanguageListState({ load: false, languages: result.data });
     });
-  });
+  }, []);
   return (
     <div>
       <section className="mx-8">

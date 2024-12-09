@@ -17,14 +17,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import {
-  DotsHorizontalIcon,
-  DotsVerticalIcon,
-  EnterFullScreenIcon,
-  PlayIcon,
-  TrackNextIcon,
-  TrackPreviousIcon,
-} from "@radix-ui/react-icons";
+import { DotsHorizontalIcon, EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -33,17 +26,18 @@ import { Label } from "@/components/ui/label";
 
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 import ListAudios from "./audio-book/list-audios.component";
-import apiClient from "@/api/apiClient";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioPlayer from "react-modern-audio-player";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { fetchAudiosByBookId } from "../book.actions";
-import { useDispatch } from "react-redux";
+import LoadSpinner from "@/components/ui/load-spinner";
+import apiClient from "@/api/apiClient";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface BookInfoCardProps {
   load: boolean;
@@ -64,8 +58,10 @@ interface TextAction {
 interface InfoBookState {
   loadCover: boolean;
   loadAudio: boolean;
+  loadText: boolean;
   audios: Components.Schemas.AudioStoryResponseDto[];
   book: Components.Schemas.StoryWithImgResponseDto;
+  text: string | null;
 }
 
 interface AudioState {
@@ -84,20 +80,41 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   onUploadCover,
   children,
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
     fullScreen: false,
   });
 
-  console.error(book);
-
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
     loadAudio: true,
+    loadText: false,
     book: book,
+    audios: [],
+    text: null,
   });
+
+  useEffect(() => {
+    setInfoBookState((prevState) => ({ ...prevState, loadText: true }));
+    apiClient
+      .StoryController_getTextStoryByStoryId(book.id)
+      .then((result) => {
+        console.log(result.data);
+        const text = result.data.text
+          ? result.data.text
+          : "текст сказки не найден";
+        setInfoBookState((prevState) => ({
+          ...prevState,
+          text: text,
+          loadText: false,
+        }));
+      })
+      .catch((err: AxiosError) => {
+        const msg =
+          err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
+        toast.error(msg);
+      });
+  }, []);
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
@@ -110,15 +127,16 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setInfoBookState((prevState) => ({ ...prevState, loadCover: true }));
     if (event.target.files && event.target.files.length > 0) {
       const updatedBook = await onUploadCover({
         storyId: book.id,
         img: event.target.files[0],
       });
-      console.error(updatedBook);
 
       setInfoBookState((prevState) => ({
         ...prevState,
+        loadCover: false,
         book: updatedBook,
       }));
     }
@@ -145,24 +163,30 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent className="">
         <DialogHeader>
           {textAction.fullScreen ? null : (
             <div className="w-full flex my-4 animate-out gap-4">
-              <div className="w-44 h-56">
-                <Label htmlFor="picture" className="cursor-pointer">
-                  {infoBookState.book.srcImg ? (
-                    <img
-                      src={infoBookState.book.srcImg}
-                      alt={infoBookState.book.name}
-                      className="rounded-t-xl w-44 h-56 object-cover"
-                    />
-                  ) : (
-                    <div className="size-full">
-                      <NotCoverBook />
-                    </div>
-                  )}
-                </Label>
+              <div className="w-44 h-56 flex justify-items-center justify-center">
+                {infoBookState.loadCover ? (
+                  <div>
+                    <LoadSpinner />
+                  </div>
+                ) : (
+                  <Label htmlFor="picture" className="cursor-pointer">
+                    {infoBookState.book.srcImg ? (
+                      <img
+                        src={infoBookState.book.srcImg}
+                        alt={infoBookState.book.name}
+                        className="rounded-t-xl w-44 h-56 object-cover"
+                      />
+                    ) : (
+                      <div className="size-full">
+                        <NotCoverBook />
+                      </div>
+                    )}
+                  </Label>
+                )}
 
                 <Input
                   className="hidden"
@@ -172,6 +196,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   onChange={handleUploadFile}
                 />
               </div>
+
               <div className="w-2/3">
                 <DialogTitle>
                   <div className="flex space-x-2">
@@ -243,20 +268,26 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 </div>
               </AccordionTrigger>
               <AccordionContent className="max-h-72 rounded-md border overflow-auto">
-                <div className="text-base">
-                  <p className="row-span-1">{loremIpsumText}</p>
-                  <div className="fixed -right-[5rem] bottom-7 w-1/3">
-                    <Button
-                      variant="secondary"
-                      className="size-8 animate-out border border-slate-800"
-                      onClick={() => {
-                        handleFullScreen(!textAction.fullScreen);
-                      }}
-                    >
-                      <EnterFullScreenIcon className=" text-slate-800" />
-                    </Button>
+                {infoBookState.loadText ? (
+                  <LoadSpinner />
+                ) : (
+                  <div className="text-base">
+                    <p className="row-span-1 flex justify-center">
+                      {infoBookState.text}
+                    </p>
+                    <div className="fixed -right-[5rem] bottom-7 w-1/3">
+                      <Button
+                        variant="secondary"
+                        className="size-8 animate-out border border-slate-800"
+                        onClick={() => {
+                          handleFullScreen(!textAction.fullScreen);
+                        }}
+                      >
+                        <EnterFullScreenIcon className=" text-slate-800" />
+                      </Button>
+                    </div>
                   </div>
-                </div>
+                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>
