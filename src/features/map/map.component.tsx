@@ -4,8 +4,15 @@ import { Feature } from "geojson";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { BookHeadphones, LibraryBig, Loader2 } from "lucide-react";
@@ -20,19 +27,18 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import {
-  fetchAudiosByBookId,
-  fetchListBooksByEthnicGroup,
-} from "../book/book.actions";
+import { fetchListBooksByEthnicGroup } from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupPoint, FeatureMap } from "./map.interface";
-import BookInfoCardComponent from "../book/components/book-info-card.component";
+
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
-import LoadSpinner from "@/components/ui/load-spinner";
+
 import { Button } from "@/components/ui/button";
 import { setBook } from "../book/book.slice";
+import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 interface MapComponentProps {
   features: any;
@@ -48,12 +54,15 @@ interface Tooltip {
   data?: EthnicGroupPoint;
 }
 
-interface SelectedBookState {
+interface ListAudioState {
   load: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
 }
 
+interface AudioStoryListState {
+  load: boolean;
+  audios: Components.Schemas.PreviewAudioStoryResponseDto[];
+}
 const MapComponent: React.FC<MapComponentProps> = ({
   features,
   width,
@@ -68,6 +77,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const listBookState: ListBookState = useSelector(
     (state: RootState) => state.listBook
   );
+
+  const [listAudioState, setListAudioState] = useState<ListAudioState>({
+    load: false,
+    audios: [],
+  });
 
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
 
@@ -132,10 +146,35 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   }, []);
 
+  const [audioStoryList, setAudioStoryList] = useState<AudioStoryListState>({
+    load: false,
+    audios: [],
+  });
+
+  const handleOnClickAudio = (audio) => {
+    console.log(audio);
+  };
+
   const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
     console.log("handleClickPoint");
     console.log(ethnicGroupPoint);
     dispatch(fetchListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
+    setAudioStoryList((prevState) => ({ ...prevState, load: true }));
+    apiClient
+      .StoryController_getAudioStoryByEthnicGroup(
+        ethnicGroupPoint.ethnicGroupId
+      )
+      .then((result) => {
+        console.log(result);
+        setAudioStoryList((prevState) => ({
+          ...prevState,
+          load: false,
+          audios: result.data,
+        }));
+      })
+      .catch((error: AxiosError) => {
+        toast.error(error.message);
+      });
   });
 
   const [loadBook, setLoadBook] = useState<boolean>(false);
@@ -254,14 +293,35 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               </SelectContent>
                             </Select>
                           )}
+                          {/* {audioStoryList.load ? (
+                            <Skeleton className="w-48 h-8" />
+                          ) : (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-3">
+                                <BookHeadphones className="stroke-gray-600" />
 
-                          <Select>
-                            <SelectTrigger className="w-48 border-round-5 bg-gray-200 text-gray-700 mt-3">
-                              <BookHeadphones className="stroke-gray-600" />
-                              <SelectValue placeholder="аудиокниги" />
-                              <span className="">0</span>
-                            </SelectTrigger>
-                          </Select>
+                                <span className="">
+                                  {audioStoryList.audios.length}
+                                </span>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                {audioStoryList.audios.map((storyAudio) => (
+                                  <DropdownMenuSub>
+                                    <DropdownMenuSubTrigger>
+                                      {storyAudio.name}
+                                      <DropdownMenuSubContent>
+                                        {storyAudio.audios.map((audio) => (
+                                          <DropdownMenuItem>
+                                            {audio.language.name}
+                                          </DropdownMenuItem>
+                                        ))}
+                                      </DropdownMenuSubContent>
+                                    </DropdownMenuSubTrigger>
+                                  </DropdownMenuSub>
+                                ))}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )} */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     );

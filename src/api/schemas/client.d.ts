@@ -215,6 +215,50 @@ declare namespace Components {
                 };
             };
         }
+        export interface AudioResponseDto {
+            /**
+             * id озвучки
+             */
+            id: number;
+            /**
+             * язык озвучки
+             */
+            language: {
+                /**
+                 *
+                 */
+                name: string;
+                /**
+                 *
+                 */
+                id: number;
+            };
+            /**
+             * ссылка на файл с озвучкой
+             */
+            srcAudio: string;
+            /**
+             * автор озвучки
+             */
+            author: {
+                /**
+                 * id пользователя
+                 */
+                id: number;
+                /**
+                 * имя пользователя
+                 */
+                firstName: string;
+                /**
+                 * фамилия пользователя
+                 */
+                lastName: string;
+            };
+            /**
+             * рейтинг озвучки
+             */
+            moderateScore: number;
+        }
         export interface AudioStoryRequestEntity {
             id: number;
             userId: number;
@@ -763,6 +807,20 @@ declare namespace Components {
                  */
                 map: FeatureGeometryDto[];
             };
+        }
+        export interface PreviewAudioStoryResponseDto {
+            /**
+             * id истории
+             */
+            id: number;
+            /**
+             * название истории
+             */
+            name: string;
+            /**
+             * массив с озвучками
+             */
+            audios: AudioResponseDto[];
         }
         export interface RatingAudioStoryDto {
             /**
@@ -1868,6 +1926,21 @@ declare namespace Paths {
             }
         }
     }
+    namespace StoryControllerGetAudioStoryByEthnicGroup {
+        namespace Parameters {
+            export type EthnicGroupId = number;
+        }
+        export interface PathParameters {
+            ethnicGroupId: Parameters.EthnicGroupId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.PreviewAudioStoryResponseDto[];
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
     namespace StoryControllerGetAudioStoryById {
         namespace Parameters {
             export type StoryAudioId = number;
@@ -2451,6 +2524,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
+  /**
+   * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
+   */
+  'StoryController_getAudioStoryByEthnicGroup'(
+    parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
   /**
    * StoryController_getImgStoryById - получение обложки для сказки по storyId
    */
@@ -3157,6 +3238,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
+  }
+  ['/api/story/audio/ethnic-group/{ethnicGroupId}']: {
+    /**
+     * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
   }
   ['/api/story/{storyId}/image/{filename}']: {
     /**
