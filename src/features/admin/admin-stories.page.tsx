@@ -109,16 +109,16 @@ const AdminStoriesPage: React.FC = () => {
         apiClient
           .AdminController_uploadAudioStory(
             {
-              storyId: bookState.selectedBook.id,
+              storyId: bookState.selectedBook["id"],
               languageId: selectedLanguage?.id,
             },
             formData
           )
-          .then((addedAudioResponse) => {
+          .then((addedAudioResponse: any) => {
             console.log(addedAudioResponse.data);
             dispatch(addAudio(addedAudioResponse.data));
           })
-          .catch((error) => {
+          .catch((error: any) => {
             console.error(error);
           });
       }

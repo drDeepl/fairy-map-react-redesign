@@ -19,8 +19,9 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lastCurrentRouter: string | null =
-      localStorage.getItem("lastCurrentRouter");
+    const lastCurrentRouter: string | null = localStorage.getItem(
+      "lastCurrentRouter"
+    );
 
     const user: JwtPayload | null = checkValidAccessTokenInLocalStorage();
 
@@ -30,7 +31,7 @@ function App() {
     lastCurrentRouter ? navigate(lastCurrentRouter) : navigate("");
   }, []);
 
-  window.addEventListener("beforeunload", (event: BeforeUnloadEvent) => {
+  window.addEventListener("beforeunload", () => {
     // Сообщение для отображения в диалоговом окне (не везде поддерживается)
     const currentRouter: string = location.pathname;
     localStorage.setItem("lastCurrentRouter", currentRouter);

@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { loremIpsumText } from "../constants";
 import {
   Accordion,
   AccordionContent,
@@ -28,7 +27,7 @@ import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 import ListAudios from "./audio-book/list-audios.component";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import AudioPlayer from "react-modern-audio-player";
+import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,9 +44,10 @@ interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
   audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
-  onUploadCover: (
+  onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
+  children?: React.ReactNode;
 }
 
 interface TextAction {
@@ -68,7 +68,6 @@ interface AudioState {
   isPlaying: boolean;
   load: boolean;
   audio: Components.Schemas.AudioStoryResponseDto | null;
-  children?: React.ReactNode;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
@@ -128,17 +127,19 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     setInfoBookState((prevState) => ({ ...prevState, loadCover: true }));
-    if (event.target.files && event.target.files.length > 0) {
-      const updatedBook = await onUploadCover({
-        storyId: book.id,
-        img: event.target.files[0],
-      });
+    if (onUploadCover) {
+      if (event.target.files && event.target.files.length > 0) {
+        const updatedBook = await onUploadCover({
+          storyId: book.id,
+          img: event.target.files[0],
+        });
 
-      setInfoBookState((prevState) => ({
-        ...prevState,
-        loadCover: false,
-        book: updatedBook,
-      }));
+        setInfoBookState((prevState) => ({
+          ...prevState,
+          loadCover: false,
+          book: updatedBook,
+        }));
+      }
     }
   };
 
@@ -173,7 +174,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <LoadSpinner />
                   </div>
                 ) : (
-                  <Label htmlFor="picture" className="cursor-pointer">
+                  <Label
+                    htmlFor="picture"
+                    className={`${onUploadCover ? "cursor-pointer" : ""}`}
+                  >
                     {infoBookState.book.srcImg ? (
                       <img
                         src={infoBookState.book.srcImg}
@@ -188,13 +192,15 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   </Label>
                 )}
 
-                <Input
-                  className="hidden"
-                  id="picture"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleUploadFile}
-                />
+                {onUploadCover ? (
+                  <Input
+                    className="hidden"
+                    id="picture"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadFile}
+                  />
+                ) : null}
               </div>
 
               <div className="w-2/3">
@@ -240,7 +246,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                             playButton: "row1-1",
                             volume: "row2-1",
                           },
-                        },
+                        } as InterfacePlacement,
                       }}
                     />
                   ) : null}

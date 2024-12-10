@@ -17,7 +17,7 @@ import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { fetchAudiosByBookId } from "../book/book.actions";
 import { setBook } from "../book/book.slice";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
-import { Components, StoryWithImgResponseDto } from "../../api/schemas/client";
+import { Components } from "../../api/schemas/client";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -30,8 +30,9 @@ const MapPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -124,7 +125,7 @@ const MapPage: React.FC = () => {
           load={bookState.loading}
           book={bookState.selectedBook}
           audios={bookState.audios}
-          open={bookState.selectedBook ? true : false}
+          open={bookState.selectedBook}
           onClose={() => dispatch(setBook(null))}
         />
       ) : null}

@@ -16,15 +16,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { AuthFormProps } from "@/types/forms/auth.form.interface";
-import { components } from "@/api/schema/schema";
 import { Button } from "@/components/ui/button";
 
 import { ReloadIcon } from "@radix-ui/react-icons";
+import { Components } from "@/api/schemas/client";
 
 interface SignUpFormProps extends AuthFormProps {
-  onSubmit: (
-    values: components["schemas"]["SignUpRequestDto"]
-  ) => Promise<void>;
+  onSubmit: (values: Components.Schemas.SignUpRequestDto) => Promise<void>;
 }
 
 const SignUpFormComponent: React.FC<SignUpFormProps> = ({

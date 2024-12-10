@@ -4,13 +4,15 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+
   "compilerOptions": {
+    "target": "ES2022",
     "typeRoots": ["node_modules/@hcaptcha"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "module": "ESNext",
+    "module": "ES2022",
     "moduleResolution": "Bundler",
     "noUncheckedIndexedAccess": true
   }
