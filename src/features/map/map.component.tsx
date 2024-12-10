@@ -128,13 +128,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
     setListBookState({ load: true, books: [] });
     setAudioStoryList({ load: true, audios: [] });
 
-    apiClient
-      .StoryController_getStoriesByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
+      .get({
+        ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
+      })
       .then((result: any) => {
         setListBookState({ load: false, books: result.data });
       })
       .catch((error: AxiosError) => {
         toast.error(error.message);
+        setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
     apiClient
@@ -142,6 +145,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         ethnicGroupPoint.ethnicGroupId
       )
       .then((result: any) => {
+        console.log(result);
         setAudioStoryList((prevState) => ({
           ...prevState,
           load: false,
@@ -150,13 +154,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
       })
       .catch((error: AxiosError) => {
         toast.error(error.message);
+        setAudioStoryList((prevState) => ({ ...prevState, load: false }));
       });
   };
 
-  const [
-    selectedBook,
-    setSelectedBook,
-  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [selectedBook, setSelectedBook] =
+    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -176,7 +179,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   return (
     <div>
-      <Toaster richColors />
+      <Toaster richColors position="top-center" />
       <svg
         ref={svgRef}
         width={width}
@@ -295,16 +298,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                     audioStoryList.audios.map(
                                       (
                                         storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
-                                      ) => (
-                                        <DropdownMenuItem
-                                          key={storyAudio.id}
-                                          onClick={() =>
-                                            handleOnClickAudio(storyAudio)
-                                          }
-                                        >
-                                          {storyAudio.name}
-                                        </DropdownMenuItem>
-                                      )
+                                      ) => {
+                                        return (
+                                          <DropdownMenuItem
+                                            key={storyAudio.id}
+                                            onClick={() =>
+                                              handleOnClickAudio(storyAudio)
+                                            }
+                                          >
+                                            {storyAudio.name}
+                                          </DropdownMenuItem>
+                                        );
+                                      }
                                     )
                                   ) : (
                                     <DropdownMenuItem>
