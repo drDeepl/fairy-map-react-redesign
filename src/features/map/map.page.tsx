@@ -60,7 +60,6 @@ const MapPage: React.FC = () => {
   const handleClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    console.log(book);
     await dispatch(fetchAudiosByBookId(book.id));
     dispatch(setBook(book));
   };
