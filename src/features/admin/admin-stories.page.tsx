@@ -176,10 +176,7 @@ const AdminStoriesPage: React.FC = () => {
       <Toaster position="top-center" richColors />
       {bookState.selectedBook ? (
         <BookInfoCardComponent
-          open={bookState.selectedBook ? true : false}
-          load={bookState.loading}
           book={bookState.selectedBook}
-          audios={bookState.audios}
           onClose={handleCloseInfoBook}
           onUploadCover={handleOnUploadBookCover}
         >

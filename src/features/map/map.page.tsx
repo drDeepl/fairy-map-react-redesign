@@ -61,8 +61,6 @@ const MapPage: React.FC = () => {
   const handleClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    console.log(book);
-    await dispatch(fetchAudiosByBookId(book.id));
     dispatch(setBook(book));
   };
 
@@ -115,20 +113,10 @@ const MapPage: React.FC = () => {
           features={mapState.dataMap.features}
           width={width}
           height={height}
-          onClickBook={handleClickBook}
         />
       ) : (
         ""
       )}
-      {bookState.selectedBook ? (
-        <BookInfoCardComponent
-          load={bookState.loading}
-          book={bookState.selectedBook}
-          audios={bookState.audios}
-          open={bookState.selectedBook}
-          onClose={() => dispatch(setBook(null))}
-        />
-      ) : null}
     </div>
   );
 };

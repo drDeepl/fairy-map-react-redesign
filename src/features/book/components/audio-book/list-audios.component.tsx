@@ -29,8 +29,10 @@ export const ListAudios: React.FC<ListAudiosProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
-  const [selectedAudio, setSelectedAudio] =
-    useState<Components.Schemas.AudioStoryResponseDto | null>(null);
+  const [
+    selectedAudio,
+    setSelectedAudio,
+  ] = useState<Components.Schemas.AudioStoryResponseDto | null>(null);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

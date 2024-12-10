@@ -36,13 +36,10 @@ import {
 import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 interface BookInfoCardProps {
-  load: boolean;
-  open: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
-  audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
@@ -57,9 +54,7 @@ interface TextAction {
 
 interface InfoBookState {
   loadCover: boolean;
-  loadAudio: boolean;
   loadText: boolean;
-  audios: Components.Schemas.AudioStoryResponseDto[];
   book: Components.Schemas.StoryWithImgResponseDto;
   text: string | null;
 }
@@ -70,11 +65,13 @@ interface AudioState {
   audio: Components.Schemas.AudioStoryResponseDto | null;
 }
 
+interface AudioListState {
+  load: boolean;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+}
+
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
-  open,
-  load,
   book,
-  audios,
   onClose,
   onUploadCover,
   children,
@@ -84,14 +81,28 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     fullScreen: false,
   });
 
+  const [audiosListState, setAudioListState] = useState<AudioListState>({
+    load: true,
+    audios: [],
+  });
+  const [audioState, setAudioState] = useState<AudioState>({
+    isPlaying: false,
+    audio: null,
+    load: false,
+  });
+
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
-    loadAudio: true,
     loadText: false,
     book: book,
-    audios: [],
     text: null,
   });
+
+  const handleAxiosError = (error: AxiosError) => {
+    const msg =
+      error.code === "ERR_NETWORK" ? error.code : "что-то пошло не так";
+    toast.error(msg);
+  };
 
   useEffect(() => {
     setInfoBookState((prevState) => ({ ...prevState, loadText: true }));
@@ -109,9 +120,21 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         }));
       })
       .catch((err: AxiosError) => {
-        const msg =
-          err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
-        toast.error(msg);
+        handleAxiosError(err);
+      });
+
+    apiClient
+      .StoryController_getAudiosByStoryId(book.id)
+      .then(
+        (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
+          setAudioListState({
+            load: false,
+            audios: result.data,
+          });
+        }
+      )
+      .catch((err: AxiosError) => {
+        handleAxiosError(err);
       });
   }, []);
 
@@ -143,24 +166,21 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  const [audioState, setAudioState] = useState<AudioState>({
-    isPlaying: false,
-    audio: null,
-    load: false,
-  });
-
   const handleOnSelectAudio = async (
     audio: Components.Schemas.AudioStoryResponseDto
   ) => {
     setAudioState((prevState) => ({ ...prevState, load: false, audio: audio }));
   };
 
+  const [openDialog, setOpenDialog] = useState<boolean>(true);
+
   return (
     <Dialog
-      open={open}
+      open={openDialog}
       onOpenChange={(open) => {
         if (!open) {
           onClose();
+          setOpenDialog(open);
         }
       }}
     >
@@ -219,11 +239,11 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   {infoBookState.book.ethnicGroup.name}
                 </DialogDescription>
 
-                {load ? (
+                {audiosListState.load ? (
                   <Skeleton className="w-full h-10" />
                 ) : (
                   <ListAudios
-                    audios={audios}
+                    audios={audiosListState.audios}
                     onSelectAudio={handleOnSelectAudio}
                   />
                 )}

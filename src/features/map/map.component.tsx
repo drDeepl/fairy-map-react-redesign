@@ -6,9 +6,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookHeadphones, LibraryBig, Loader2 } from "lucide-react";
+import { BookHeadphones, LibraryBig } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
@@ -22,17 +26,15 @@ import apiClient from "@/api/apiClient";
 
 import { Button } from "@/components/ui/button";
 
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 interface MapComponentProps {
   features: any;
   width: number;
   height: number;
-  onClickBook: (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => Promise<void>;
 }
 
 // interface Tooltip {
@@ -44,30 +46,33 @@ interface AudioStoryListState {
   load: boolean;
   audios: Components.Schemas.PreviewAudioStoryResponseDto[];
 }
+
+interface ListBookState {
+  load: boolean;
+  books: Components.Schemas.StoryWithImgResponseDto[];
+}
+
 const MapComponent: React.FC<MapComponentProps> = ({
   features,
   width,
   height,
-  onClickBook,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dispatch = useDispatch<AppDispatch>();
 
-  const listBookState: ListBookState = useSelector(
-    (state: RootState) => state.listBook
-  );
+  // const listBookState: ListBookState = useSelector(
+  //   (state: RootState) => state.listBook
+  // );
 
-  const [audioStoryList, setAudioStoryList] = useState<AudioStoryListState>({
-    load: false,
-    audios: [],
+  const [listBookState, setListBookState] = useState<ListBookState>({
+    load: true,
+    books: [],
   });
 
-  // const [listAudioState, setListAudioState] = useState<ListAudioState>({
-  //   load: false,
-  //   audios: [],
-  // });
-
-  // const [tooltip, setTooltip] = useState<Tooltip | null>(null);
+  const [audioStoryList, setAudioStoryList] = useState<AudioStoryListState>({
+    load: true,
+    audios: [],
+  });
 
   const projection = d3
     .geoAlbers()
@@ -109,25 +114,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
       );
   }
 
-  // useEffect(() => {
-  //   if (tooltip?.open) {
-  //     if (tooltip.data) {
-  //       dispatch(fetchListBooksByEthnicGroup(tooltip.data.ethnicGroupId));
-  //     }
-  //   }
-  // }, [tooltip]);
-
-  const handleClickPath = useCallback((d: any) => {
+  const handleClickPath = useCallback((d: any, pointsClass: string) => {
     const svg = d3.select(svgRef.current);
-    d3.selectAll("path").attr("class", "fill-stone-100");
-    d3.selectAll("circle").style("opacity", "0");
-    const g = svg.select(`#region_${d.properties.id}`);
 
+    d3.selectAll(`circle`).style("visibility", "hidden");
+
+    d3.selectAll("path").attr("class", "fill-stone-100");
+
+    const g = svg.select(`#region_${d.properties.id}`);
     g.selectChildren("path").attr("class", "fill-orange-500");
 
-    const circle = g.selectChildren(`circle`);
+    const circle = g.selectChildren(`circle.${pointsClass}`);
 
-    circle.style("opacity", "1");
+    circle.style("visibility", "visible");
 
     zoomedPath(svg, d);
   }, []);
@@ -138,17 +137,24 @@ const MapComponent: React.FC<MapComponentProps> = ({
     console.log(audio);
   };
 
-  const handleClickPoint = useCallback((ethnicGroupPoint: EthnicGroupPoint) => {
-    console.log("handleClickPoint");
-    console.log(ethnicGroupPoint);
-    dispatch(fetchListBooksByEthnicGroup(ethnicGroupPoint.ethnicGroupId));
-    setAudioStoryList((prevState) => ({ ...prevState, load: true }));
+  const handleClickPoint = (ethnicGroupPoint: EthnicGroupPoint) => {
+    setListBookState({ load: true, books: [] });
+    setAudioStoryList({ load: true, audios: [] });
+
+    apiClient
+      .StoryController_getStoriesByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+      .then((result: any) => {
+        setListBookState({ load: false, books: result.data });
+      })
+      .catch((error: AxiosError) => {
+        toast.error(error.message);
+      });
+
     apiClient
       .StoryController_getAudioStoryByEthnicGroup(
         ethnicGroupPoint.ethnicGroupId
       )
       .then((result: any) => {
-        console.warn(result);
         setAudioStoryList((prevState) => ({
           ...prevState,
           load: false,
@@ -158,36 +164,32 @@ const MapComponent: React.FC<MapComponentProps> = ({
       .catch((error: AxiosError) => {
         toast.error(error.message);
       });
-  }, []);
+  };
 
-  const [loadBook, setLoadBook] = useState<boolean>(false);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    setLoadBook(true);
-    onClickBook(book).then(() => {
-      setLoadBook(false);
-    });
+    setSelectedBook(book);
   };
 
   useEffect(() => {
     if (svgRef.current) {
+      d3.selectAll(`circle`).style("visibility", "hidden");
       const svg = d3
         .select<SVGSVGElement, unknown>(svgRef.current)
         .style("background-color", "#82A9FD");
       svg.call(zoom);
     }
-  }, [features]);
-
-  useEffect(() => {
-    if (listBookState.success) {
-      console.log(listBookState.books);
-    }
-  }, [listBookState]);
+  }, []);
 
   return (
     <div>
+      <Toaster richColors />
       <svg
         ref={svgRef}
         width={width}
@@ -206,7 +208,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   stroke="#82A9FD"
                   strokeWidth="0.3"
                   onClick={() => {
-                    handleClickPath(feature);
+                    handleClickPath(
+                      feature,
+                      `ethnic-group-point-region-${feature.properties.id}`
+                    );
                   }}
                   d={`${d}`}
                   fill="#FFFFFF"
@@ -222,21 +227,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
                         key={ethnicGroupPoint.idPoint}
                         modal={false}
                         onOpenChange={(open: boolean) => {
-                          const color = open ? "red" : "#82A9FD";
+                          let color = "#82A9FD";
+                          if (open) {
+                            color = "red";
+                            handleClickPoint(ethnicGroupPoint);
+                          }
                           d3.select(
                             `circle#circle-${ethnicGroupPoint.idPoint}`
                           ).attr("fill", color);
-
-                          if (open) {
-                            handleClickPoint(ethnicGroupPoint);
-                          }
                         }}
                       >
                         {point ? (
                           <DropdownMenuTrigger asChild>
                             <circle
                               id={`circle-${ethnicGroupPoint.idPoint}`}
-                              className={`cursor-pointer opacity-0 ethnic-group-point-region-${feature.properties.id}`}
+                              className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
                               fill="#82A9FD"
                               stroke="#FFFFFF"
                               strokeWidth="0.5"
@@ -253,64 +258,75 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               {feature.properties.name}
                             </p>
                           </DropdownMenuLabel>
-                          {listBookState.loading ? (
-                            <Skeleton className="w-48 h-8" />
+                          {listBookState.load ? (
+                            <Skeleton className="flex self-center w-48 h-8 bg-neutral-300" />
                           ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger className="w-48 flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
+                            <DropdownMenuSub>
+                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2">
                                 <LibraryBig className="stroke-gray-600" />
                                 <span className="text-sm">книги</span>
                                 <span className="">
                                   {listBookState.books.length}
                                 </span>
-                                <ChevronDownIcon className="text-zinc-500" />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                {listBookState.books.map((book) => (
-                                  <DropdownMenuItem key={book.id}>
-                                    <Button
-                                      className="w-full"
-                                      variant="ghost"
-                                      disabled={loadBook}
-                                      onClick={() => handleOnClickBook(book)}
-                                    >
-                                      {loadBook ? (
-                                        <Loader2 className="animate-spin" />
-                                      ) : null}
-
-                                      {book.name}
-                                    </Button>
-                                  </DropdownMenuItem>
-                                ))}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                              </DropdownMenuSubTrigger>
+                              <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                  {listBookState.books.length > 0 ? (
+                                    listBookState.books.map((book) => (
+                                      <DropdownMenuItem key={book.id}>
+                                        <Button
+                                          className="w-full"
+                                          variant="ghost"
+                                          onClick={() =>
+                                            handleOnClickBook(book)
+                                          }
+                                        >
+                                          {book.name}
+                                        </Button>
+                                      </DropdownMenuItem>
+                                    ))
+                                  ) : (
+                                    <DropdownMenuItem>
+                                      книги не найдены
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuPortal>
+                            </DropdownMenuSub>
                           )}
                           {audioStoryList.load ? (
-                            <Skeleton className="w-48 h-8" />
+                            <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
                           ) : (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger className="w-48 flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
+                            <DropdownMenuSub>
+                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
                                 <BookHeadphones className="stroke-gray-600" />
                                 <span className="text-sm ">аудиокниги</span>
-                                <ChevronDownIcon className="text-zinc-500" />
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent>
-                                {audioStoryList.audios.map(
-                                  (
-                                    storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
-                                  ) => (
-                                    <DropdownMenuItem
-                                      key={storyAudio.id}
-                                      onClick={() =>
-                                        handleOnClickAudio(storyAudio)
-                                      }
-                                    >
-                                      {storyAudio.name}
+                              </DropdownMenuSubTrigger>
+                              <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                  {audioStoryList.audios.length > 0 ? (
+                                    audioStoryList.audios.map(
+                                      (
+                                        storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
+                                      ) => (
+                                        <DropdownMenuItem
+                                          key={storyAudio.id}
+                                          onClick={() =>
+                                            handleOnClickAudio(storyAudio)
+                                          }
+                                        >
+                                          {storyAudio.name}
+                                        </DropdownMenuItem>
+                                      )
+                                    )
+                                  ) : (
+                                    <DropdownMenuItem>
+                                      <span>Аудиокниги не найдены</span>
                                     </DropdownMenuItem>
-                                  )
-                                )}
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                  )}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuPortal>
+                            </DropdownMenuSub>
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -322,6 +338,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
           })}
         </g>
       </svg>
+      {selectedBook ? (
+        <BookInfoCardComponent
+          book={selectedBook}
+          onClose={() => setSelectedBook(null)}
+        />
+      ) : null}
     </div>
   );
 };
