@@ -128,7 +128,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     setListBookState({ load: true, books: [] });
     setAudioStoryList({ load: true, audios: [] });
 
-    apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
+    apiClient.paths["/api/story/ethnic-group/{ethnicGroupId}"]
       .get({
         ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
       })
@@ -140,10 +140,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    apiClient
-      .StoryController_getAudioStoryByEthnicGroup(
-        ethnicGroupPoint.ethnicGroupId
-      )
+    apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
+      .get(ethnicGroupPoint.ethnicGroupId)
       .then((result: any) => {
         console.log(result);
         setAudioStoryList((prevState) => ({
