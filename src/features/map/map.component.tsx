@@ -14,11 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BookHeadphones, LibraryBig } from "lucide-react";
 
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/app/store";
-import { fetchListBooksByEthnicGroup } from "../book/book.actions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ListBookState } from "../book/list-book.slice";
+
 import { EthnicGroupPoint } from "./map.interface";
 
 import { Components } from "@/api/schemas/client";
@@ -28,7 +25,7 @@ import { Button } from "@/components/ui/button";
 
 import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 interface MapComponentProps {
@@ -36,11 +33,6 @@ interface MapComponentProps {
   width: number;
   height: number;
 }
-
-// interface Tooltip {
-//   open: boolean;
-//   data?: EthnicGroupPoint;
-// }
 
 interface AudioStoryListState {
   load: boolean;
@@ -58,11 +50,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   height,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const dispatch = useDispatch<AppDispatch>();
-
-  // const listBookState: ListBookState = useSelector(
-  //   (state: RootState) => state.listBook
-  // );
 
   const [listBookState, setListBookState] = useState<ListBookState>({
     load: true,

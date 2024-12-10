@@ -6,18 +6,11 @@ import { fetchMapData } from "./map.actions";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { AuthState, setVerifyedCaptcha } from "../auth/auth.slice";
-
 import AuthForm from "../auth/auth.form.component";
 import ErrorMessageScreen from "@/pages/error-message.page";
 import { useNavigate } from "react-router-dom";
-
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
-import { fetchAudiosByBookId } from "../book/book.actions";
-import { setBook } from "../book/book.slice";
-import BookInfoCardComponent from "../book/components/book-info-card.component";
-import { Components } from "../../api/schemas/client";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -25,7 +18,6 @@ const MapPage: React.FC = () => {
 
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
-  const bookState = useSelector((state: RootState) => state.book);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -56,12 +48,6 @@ const MapPage: React.FC = () => {
     } else {
       setAuthFormVisible(true);
     }
-  };
-
-  const handleClickBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => {
-    dispatch(setBook(book));
   };
 
   useEffect(() => {
