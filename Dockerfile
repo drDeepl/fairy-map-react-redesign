@@ -29,7 +29,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Необходимо открыть порт, чтобы Nginx мог обслуживать приложение
-EXPOSE 80
+EXPOSE 5173
 
 # Запустите Nginx в режиме Foreground
 CMD ["nginx", "-g", "daemon off;"]
