@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -44,7 +44,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
                 return (
                   <CarouselItem
                     key={`load_${idx}`}
-                    className="pl-1 w-40 h-64 lg:basis-1/5 md:basis-1/3"
+                    className="pl-1 w-40 h-70 lg:basis-1/5 md:basis-1/3"
                   >
                     <Card className="w-40 h-64 p-0 m-0 border-none">
                       <Skeleton className="w-full h-full bg-primary/10" />
@@ -57,7 +57,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
                   <CarouselItem
                     key={book.id}
                     onClick={() => handleOnClickBook(book)}
-                    className="basis-1/5 my-4 w-40 h-64 cursor-pointer"
+                    className="basis-1/5 my-4 w-44 h-72 cursor-pointer"
                   >
                     <PreviewBookCardComponent book={book} />
                   </CarouselItem>

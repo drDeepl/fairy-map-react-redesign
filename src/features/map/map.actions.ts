@@ -4,7 +4,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchMapData = createAsyncThunk(
   "map/fetchMapData",
-  async (arg, thunkApi) => {
+  async (_, thunkApi) => {
     try {
       const res = await apiClient.MapController_getMapTopojson();
       return thunkApi.fulfillWithValue(res.data);

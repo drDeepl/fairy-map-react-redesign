@@ -1,11 +1,16 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import * as turf from "@turf/turf";
-import { feature } from "topojson-client";
+import {
+  Feature,
+  FeatureCollection,
+  Geometry,
+  GeoJsonProperties,
+} from "geojson";
 
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { fetchMapData } from "./map.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import { FeatureProperties } from "./map.interface";
+import { feature } from "topojson";
 
 export interface MapSlice {
   loading: boolean;
@@ -33,15 +38,15 @@ const mapSlice = createSlice({
       })
       .addCase(fetchMapData.fulfilled, (state, action) => {
         const data = action.payload.data;
-        const geoJson = feature(data, data.objects.map) as FeatureCollection<
-          Geometry,
-          GeoJsonProperties
-        >;
+        const geoJson: Feature<Geometry, GeoJsonProperties> = feature(
+          data as any,
+          data.objects.map as any
+        );
 
         const simplifyOptions = { tolerance: 0.008, highQuality: false };
 
         const simplifyFeatures = turf.simplify(
-          geoJson,
+          geoJson as any,
           simplifyOptions
         ) as FeatureCollection<Geometry, FeatureProperties>;
 

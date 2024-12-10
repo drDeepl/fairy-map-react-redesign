@@ -39,7 +39,7 @@ interface AddBookFormProps {
   open: boolean;
   errors: Record<string, string> | null;
   loading: boolean;
-  ethnicGroups: Components.Schemas.EthnicGroupDto[];
+  ethnicGroups: Components.Schemas.EthnicGroupLanguageDto[];
   onSubmit: (values: Components.Schemas.AddStoryDto) => void;
   onCancel: () => void;
 }
@@ -128,7 +128,9 @@ const AddBookForm: React.FC<AddBookFormProps> = ({
                         <Skeleton className="w-56 h-8" />
                       ) : (
                         ethnicGroups.map(
-                          (ethnicGroup: Components.Schemas.EthnicGroupDto) => {
+                          (
+                            ethnicGroup: Components.Schemas.EthnicGroupLanguageDto
+                          ) => {
                             return (
                               <SelectItem
                                 className="cursor-pointer"

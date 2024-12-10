@@ -6,18 +6,11 @@ import { fetchMapData } from "./map.actions";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
 import { AuthState, setVerifyedCaptcha } from "../auth/auth.slice";
-
 import AuthForm from "../auth/auth.form.component";
 import ErrorMessageScreen from "@/pages/error-message.page";
 import { useNavigate } from "react-router-dom";
-
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
-import { fetchAudiosByBookId } from "../book/book.actions";
-import { setBook } from "../book/book.slice";
-import BookInfoCardComponent from "../book/components/book-info-card.component";
-import { Components, StoryWithImgResponseDto } from "../../api/schemas/client";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -25,13 +18,13 @@ const MapPage: React.FC = () => {
 
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
-  const bookState = useSelector((state: RootState) => state.book);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -55,13 +48,6 @@ const MapPage: React.FC = () => {
     } else {
       setAuthFormVisible(true);
     }
-  };
-
-  const handleClickBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => {
-    await dispatch(fetchAudiosByBookId(book.id));
-    dispatch(setBook(book));
   };
 
   useEffect(() => {
@@ -113,20 +99,10 @@ const MapPage: React.FC = () => {
           features={mapState.dataMap.features}
           width={width}
           height={height}
-          onClickBook={handleClickBook}
         />
       ) : (
         ""
       )}
-      {bookState.selectedBook ? (
-        <BookInfoCardComponent
-          load={bookState.loading}
-          book={bookState.selectedBook}
-          audios={bookState.audios}
-          open={bookState.selectedBook ? true : false}
-          onClose={() => dispatch(setBook(null))}
-        />
-      ) : null}
     </div>
   );
 };

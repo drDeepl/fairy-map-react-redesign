@@ -5,12 +5,12 @@ import { fetchEthnicGroups } from "./ethnic-group-list.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 export interface EthnicGroupListState extends BaseAppState {
-  ethnicGroups: Components.Schemas.EthnicGroupDto[];
+  ethnicGroups: Components.Schemas.EthnicGroupLanguageDto[];
 }
 
 const initialState: EthnicGroupListState = {
   loading: false,
-  error: null,
+  error: undefined,
   success: false,
   ethnicGroups: [],
 };
@@ -21,7 +21,7 @@ const ethnicGroupListSlice = createSlice({
   reducers: {
     addEthnicGroup: (
       state: EthnicGroupListState,
-      action: PayloadAction<Components.Schemas.EthnicGroupDto>
+      action: PayloadAction<Components.Schemas.EthnicGroupLanguageDto>
     ) => {
       state.ethnicGroups.push(action.payload);
     },
@@ -30,14 +30,14 @@ const ethnicGroupListSlice = createSlice({
     builder
       .addCase(fetchEthnicGroups.pending, (state: EthnicGroupListState) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(
         fetchEthnicGroups.fulfilled,
         (
           state: EthnicGroupListState,
-          action: PayloadAction<Components.Schemas.EthnicGroupDto[]>
+          action: PayloadAction<Components.Schemas.EthnicGroupLanguageDto[]>
         ) => {
           state.loading = false;
           state.ethnicGroups = action.payload;

@@ -11,7 +11,7 @@ export const fetchEthnicGroups = createAsyncThunk(
   async (_, thunkApi) => {
     try {
       const res = await apiClient.EthnicGroupController_ethnicGroups();
-      return thunkApi.fulfillWithValue(res.data);
+      return res.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
       return thunkApi.rejectWithValue(errorResposne as ApiErrorResponse);

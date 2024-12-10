@@ -1,5 +1,5 @@
 import { Components } from "@/api/schemas/client";
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
@@ -12,10 +12,8 @@ interface PreviewBookCardProps {
 export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
   book: story,
 }) => {
-  const [loadCover, setLoadCover] = useState<boolean>(true);
-
   return (
-    <Card className="w-40 drop-shadow-xl drop-shadow-slate-300 h-64 rounded-xl">
+    <Card className="w-44 drop-shadow-xl drop-shadow-slate-300 h-72 rounded-xl">
       <CardContent className="flex flex-col m-0 p-0">
         <AspectRatio ratio={3 / 4} className="">
           {!story.srcImg ? (

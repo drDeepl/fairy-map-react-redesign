@@ -24,7 +24,7 @@ export interface AuthState extends BaseAppState {
 
 const initialState: AuthState = {
   loading: false,
-  error: null,
+  error: undefined,
   success: false,
   user: null,
   verifyedCaptcha: false,
@@ -49,7 +49,7 @@ const authSlice = createSlice({
       state.loading = action.payload;
     },
     setError(state: AuthState, action: PayloadAction<ApiErrorResponse | null>) {
-      state.error = action.payload;
+      state.error = action.payload as any;
     },
     setSuccess(state: AuthState, action: PayloadAction<boolean>) {
       state.success = action.payload;
@@ -59,7 +59,7 @@ const authSlice = createSlice({
     builder
       .addCase(signIn.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(
@@ -80,14 +80,14 @@ const authSlice = createSlice({
       .addCase(signIn.rejected, (state, action) => {
         state.loading = false;
         if (action.payload) {
-          state.error = action.payload;
+          state.error = action.payload as any;
         } else {
-          state.error = null;
+          state.error = undefined;
         }
       })
       .addCase(signUp.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(

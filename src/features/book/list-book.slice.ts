@@ -1,12 +1,7 @@
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 
 import { BaseAppState } from "@/common/interfaces/state.interface";
-import {
-  createSlice,
-  PayloadAction,
-  current,
-  isActionCreator,
-} from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createBook,
   fetchListBooks,
@@ -22,7 +17,7 @@ export interface ListBookState extends BaseAppState {
 export const initialState: ListBookState = {
   loading: false,
   success: false,
-  error: null,
+  error: undefined,
   books: [],
 };
 
@@ -36,13 +31,12 @@ const bookListSlice = createSlice({
     ) => {
       state.books.push(action.payload);
     },
-    updateBook: (state) => {},
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchListBooks.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(fetchListBooks.fulfilled, (state, action) => {
@@ -57,7 +51,7 @@ const bookListSlice = createSlice({
       })
       .addCase(fetchListBooksByEthnicGroup.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(fetchListBooksByEthnicGroup.fulfilled, (state, action) => {
@@ -71,7 +65,7 @@ const bookListSlice = createSlice({
       })
       .addCase(createBook.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(createBook.fulfilled, (state, action) => {
@@ -86,7 +80,7 @@ const bookListSlice = createSlice({
       })
       .addCase(uploadBookCover.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = undefined;
         state.success = false;
       })
       .addCase(
