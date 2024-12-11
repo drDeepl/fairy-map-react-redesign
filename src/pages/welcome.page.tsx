@@ -15,7 +15,7 @@ const WelcomePage: React.FC = () => {
   };
 
   return (
-    <div className="bg-[url('./welcome-page-bg.png')] bg-center bg-scroll">
+    <div className="bg-[url('welcome-page-bg.png')] bg-center bg-scroll">
       <motion.div
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
