@@ -11,6 +11,8 @@ import AuthForm from "../auth/auth.form.component";
 import ErrorMessageScreen from "@/pages/error-message.page";
 import { useNavigate } from "react-router-dom";
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
+import { setFeatures } from "./map.slice";
+import { toast, Toaster } from "sonner";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -21,6 +23,8 @@ const MapPage: React.FC = () => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const [load, setLoad] = useState<boolean>(true);
 
   const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
     ""
@@ -51,10 +55,16 @@ const MapPage: React.FC = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchMapData());
+    const features: string | null = localStorage.getItem("features");
+    if (!features) {
+      dispatch(fetchMapData());
+    } else {
+      dispatch(setFeatures(JSON.parse(features)));
+    }
+    setLoad(false);
   }, [dispatch]);
 
-  if (mapState.loading) {
+  if (mapState.loading || load) {
     return <LoadSpinner />;
   }
 
@@ -64,7 +74,7 @@ const MapPage: React.FC = () => {
 
   return (
     <div className="map-pag__content">
-      {/* <Toaster /> */}
+      <Toaster richColors position="top-center" />
 
       <div className="fixed flex items-center justify-between p-4 w-full">
         <Input

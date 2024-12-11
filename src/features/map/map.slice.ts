@@ -29,7 +29,11 @@ const initialState: MapSlice = {
 const mapSlice = createSlice({
   name: "map",
   initialState,
-  reducers: {},
+  reducers: {
+    setFeatures: (state, action) => {
+      state.dataMap = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMapData.pending, (state) => {
@@ -51,6 +55,7 @@ const mapSlice = createSlice({
         ) as FeatureCollection<Geometry, FeatureProperties>;
 
         state.dataMap = simplifyFeatures;
+        localStorage.setItem("features", JSON.stringify(simplifyFeatures));
 
         state.loading = false;
       })
@@ -60,5 +65,7 @@ const mapSlice = createSlice({
       });
   },
 });
+
+export const { setFeatures } = mapSlice.actions;
 
 export default mapSlice.reducer;
