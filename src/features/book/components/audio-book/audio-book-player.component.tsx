@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { ListMusicIcon } from "lucide-react";
 import { Cross2Icon, StarIcon, StarFilledIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
+import StarRating from "@/components/rating.component";
 
 interface PlayListState {
   load: boolean;
@@ -89,28 +90,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
               <div className="flex justify-center items-center space-x-[3px]">
                 {rateState.open ? (
-                  <div className="flex space-x-1">
-                    {Array(5)
-                      .fill(2)
-                      .map((_, val) => {
-                        return (
-                          <StarFilledIcon
-                            key={`star_${val}`}
-                            id={`star_${val}`}
-                            className={`text-slate-50 ml-2 size-6 cursor-pointer stroke-orange-500 hover:text-orange-500`}
-                          />
-                        );
-                      })}
-                    <Cross2Icon
-                      className="size-4 self-center text-slate-500 ml-1 cursor-pointer"
-                      onClick={() =>
-                        setRateState((prevState) => ({
-                          ...prevState,
-                          open: false,
-                        }))
-                      }
-                    />
-                  </div>
+                  <StarRating
+                    onClickRate={(value: number) => toast.success(value)}
+                  />
                 ) : (
                   <StarIcon
                     className={`text-orange-500 ml-2 size-6 cursor-pointer hover:stroke-orange-500 ${
