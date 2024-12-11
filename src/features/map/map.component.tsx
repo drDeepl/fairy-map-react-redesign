@@ -27,6 +27,7 @@ import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
+import AudioBookPlayer from "../book/components/audio-book/audio-book-player.component";
 
 interface MapComponentProps {
   features: any;
@@ -118,16 +119,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   }, []);
 
-  const handleOnClickAudio = (
+  const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
+    toast.info("on click audio");
     console.log(audio);
+    setSelectedAudioBook(audio);
+  };
+
+  const handleOnCloseAudioBook = () => {
+    setSelectedAudioBook(null);
   };
 
   const handleClickPoint = (ethnicGroupPoint: EthnicGroupPoint) => {
-    setListBookState({ load: true, books: [] });
-    setAudioStoryList({ load: true, audios: [] });
-
     apiClient.paths["/api/story/ethnic-group/{ethnicGroupId}"]
       .get({
         ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
@@ -156,8 +160,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
   };
 
-  const [selectedBook, setSelectedBook] =
-    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -215,10 +226,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
                         key={ethnicGroupPoint.idPoint}
                         modal={false}
                         onOpenChange={(open: boolean) => {
+                          setListBookState({ load: true, books: [] });
+                          setAudioStoryList({ load: true, audios: [] });
                           let color = "#82A9FD";
                           if (open) {
                             color = "red";
-                            handleClickPoint(ethnicGroupPoint);
                           }
                           d3.select(
                             `circle#circle-${ethnicGroupPoint.idPoint}`
@@ -226,7 +238,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
                         }}
                       >
                         {point ? (
-                          <DropdownMenuTrigger asChild>
+                          <DropdownMenuTrigger
+                            asChild
+                            onClick={() => {
+                              handleClickPoint(ethnicGroupPoint);
+                            }}
+                          >
                             <circle
                               id={`circle-${ethnicGroupPoint.idPoint}`}
                               className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
@@ -289,6 +306,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
                                 <BookHeadphones className="stroke-gray-600" />
                                 <span className="text-sm ">аудиокниги</span>
+                                <span>{audioStoryList.audios.length}</span>
                               </DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
@@ -301,7 +319,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                           <DropdownMenuItem
                                             key={storyAudio.id}
                                             onClick={() =>
-                                              handleOnClickAudio(storyAudio)
+                                              handleOnClickAudioBook(storyAudio)
                                             }
                                           >
                                             {storyAudio.name}
@@ -332,6 +350,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <BookInfoCardComponent
           book={selectedBook}
           onClose={() => setSelectedBook(null)}
+        />
+      ) : null}
+      {selectedAudioBook ? (
+        <AudioBookPlayer
+          title={selectedAudioBook.name}
+          audios={selectedAudioBook.audios}
+          onClose={handleOnCloseAudioBook}
         />
       ) : null}
     </div>

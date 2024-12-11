@@ -55,6 +55,11 @@ function App() {
           path={RouteApp.AdminPage}
           element={<AdminPage />}
         />
+        {/* <Route
+          key={RouteApp.UserPage}
+          path={RouteApp.UserPage}
+          element={<UserPage />}
+        /> */}
         <Route
           path="*"
           element={<ErrorMessageScreen message="Страница не найдена" />}
