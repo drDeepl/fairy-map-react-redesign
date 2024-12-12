@@ -89,18 +89,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               </span>
 
               <div className="flex justify-center items-center space-x-[3px]">
-                {rateState.open ? (
-                  <StarRating
-                    onClickRate={(value: number) => toast.success(value)}
-                  />
-                ) : (
-                  <StarIcon
-                    className={`text-orange-500 ml-2 size-6 cursor-pointer hover:stroke-orange-500 ${
-                      rateState.load ? "animate-shimmer" : ""
-                    }`}
-                    onClick={handleOnClickStar}
-                  />
-                )}
+                <StarRating
+                  onClickRate={(value: number) => toast.success(value)}
+                />
               </div>
               <span className="font-semibold text-orange-500">
                 {rateState.currentRate > 0 ? rateState.currentRate : null}
