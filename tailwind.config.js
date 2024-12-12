@@ -8,6 +8,23 @@ export default {
         "cloud-uplaod": "url('./assets/img/cloud-upload.svg')",
       },
       keyframes: {
+        tada: {
+          "0%": {
+            transform: "scale3d(1, 1, 1)",
+          },
+          "10%, 20%": {
+            transform: "scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg)",
+          },
+          "30%, 50%, 70%, 90%": {
+            transform: "scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg)",
+          },
+          "40%, 60%, 80%": {
+            transform: "scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg)",
+          },
+          "100%": {
+            transform: "scale3d(1, 1, 1)",
+          },
+        },
         shimmer: {
           from: {
             backgroundPosition: "0 0",
@@ -64,8 +81,40 @@ export default {
             height: "0",
           },
         },
+        "fade-in-left": {
+          "0%": {
+            opacity: 0,
+            transform: "translate3d(-100%, 0, 0)",
+          },
+          "100%": {
+            opacity: 1,
+            transform: "translate3d(0, 0, 0)",
+          },
+        },
+        "fly-in": {
+          "0%": {
+            opacity: "0",
+            transform: "scale3d(0.3, 0.3, 0.3)",
+            transitionTimingFunction: "cubic-bezier(0.215, 0.61, 0.355, 1)",
+          },
+        },
+        "drop-out": {
+          "0%": {
+            opacity: "1",
+            transform: "scale(1)",
+            animationTimingFunction: "cubic-bezier(0.34, 1.61, 0.7, 1)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "scale(0)",
+          },
+        },
       },
       animation: {
+        dropout: "drop-out 0.5s ease-in-out 0.25s 1",
+        flyin: "fly-in 0.6s ease-in-out 0.25s 1",
+        fadeinleft: "fade-in-left 1s ease-in-out 0.25s 1",
+        tada: "tada 1s ease-in-out 0.25s 1",
         shimmer: "shimmer 2s linear infinite",
         fadeIn: "fadeIn 0.7s ease-out",
         "jump-heart": "jump-heart 1.5s ease-out infinite",

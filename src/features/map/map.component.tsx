@@ -23,7 +23,7 @@ import apiClient from "@/api/apiClient";
 
 import { Button } from "@/components/ui/button";
 
-import { toast, Toaster } from "sonner";
+import { toast, Toaster, useSonner } from "sonner";
 import { AxiosError } from "axios";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
@@ -33,6 +33,9 @@ interface MapComponentProps {
   features: any;
   width: number;
   height: number;
+  onClickAudioBook: (
+    audio: Components.Schemas.PreviewAudioStoryResponseDto
+  ) => void;
 }
 
 interface AudioStoryListState {
@@ -49,6 +52,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   features,
   width,
   height,
+  onClickAudioBook,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -119,18 +123,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   }, []);
 
-  const handleOnClickAudioBook = (
-    audio: Components.Schemas.PreviewAudioStoryResponseDto
-  ) => {
-    toast.info("on click audio");
-    console.log(audio);
-    setSelectedAudioBook(audio);
-  };
-
-  const handleOnCloseAudioBook = () => {
-    setSelectedAudioBook(null);
-  };
-
   const handleClickPoint = (ethnicGroupPoint: EthnicGroupPoint) => {
     apiClient.paths["/api/story/ethnic-group/{ethnicGroupId}"]
       .get({
@@ -155,7 +147,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         }));
       })
       .catch((error: AxiosError) => {
-        toast.error(error.message);
+        toast.error(error.message, {
+          className: "toast-map-component",
+        });
         setAudioStoryList((prevState) => ({ ...prevState, load: false }));
       });
   };
@@ -164,11 +158,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     selectedBook,
     setSelectedBook,
   ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
-
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -319,7 +308,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                           <DropdownMenuItem
                                             key={storyAudio.id}
                                             onClick={() =>
-                                              handleOnClickAudioBook(storyAudio)
+                                              onClickAudioBook(storyAudio)
                                             }
                                           >
                                             {storyAudio.name}
@@ -350,13 +339,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <BookInfoCardComponent
           book={selectedBook}
           onClose={() => setSelectedBook(null)}
-        />
-      ) : null}
-      {selectedAudioBook ? (
-        <AudioBookPlayer
-          title={selectedAudioBook.name}
-          audios={selectedAudioBook.audios}
-          onClose={handleOnCloseAudioBook}
         />
       ) : null}
     </div>

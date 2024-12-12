@@ -26,6 +26,8 @@ import { useNavigate } from "react-router-dom";
 
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { Components } from "@/api/schemas/client";
+import { Button } from "@/components/ui/button";
+import SuccessMessageAlert from "@/components/success-message-alert.component";
 
 enum Tab {
   SignIn = "signin",
@@ -88,15 +90,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     dispatch(setError(null));
   };
 
+  const [showDialogSuccessAuth, setShowDialogSuccessAuth] = useState<boolean>(
+    false
+  );
+
   useEffect(() => {
     if (authState.success) {
-      navigate(getRoutePageByUserRole(authState.user!.role));
+      // navigate(getRoutePageByUserRole(authState.user!.role));
+
+      setShowDialogSuccessAuth(true);
     }
 
     return () => {
       dispatch(setSuccess(false));
     };
   }, [authState.success]);
+
+  const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
 
   return (
     <Dialog
@@ -109,11 +119,27 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     >
       <DialogContent className="max-w-sm p-9">
         <Tabs
-          defaultValue={Tab.SignIn}
-          onValueChange={() => {
+          defaultValue={currentTab}
+          onValueChange={(value: string) => {
+            setCurrentTab(value);
             clearForm();
           }}
         >
+          <SuccessMessageAlert
+            title={"Вы успешно зарегистрировались"}
+            open={showDialogSuccessAuth}
+            onSubmit={() =>
+              navigate(getRoutePageByUserRole(authState.user!.role))
+            }
+            onCancel={() => {
+              onClose();
+              setShowDialogSuccessAuth(false);
+            }}
+            buttonsName={{
+              onSubmit: "в личный кабинет",
+              onCancel: "остаться на странице",
+            }}
+          />
           <DialogTitle>
             <TabsList className="grid w-full grid-cols-2 mb-2">
               <TabsTrigger value={Tab.SignIn}>Вход</TabsTrigger>
@@ -139,6 +165,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
               loading={authState.loading}
               onSubmit={handleSignUp}
             />
+          </TabsContent>
+          <TabsContent value={"success"}>
+            <Button>в личный кабинет</Button>
           </TabsContent>
           {visibleCaptcha ? (
             <CaptchaComponent

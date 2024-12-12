@@ -12,7 +12,9 @@ import ErrorMessageScreen from "@/pages/error-message.page";
 import { useNavigate } from "react-router-dom";
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { setFeatures } from "./map.slice";
-import { toast, Toaster } from "sonner";
+import { Components } from "@/api/schemas/client";
+import { toast } from "sonner";
+import AudioBookPlayer from "../book/components/audio-book/audio-book-player.component";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -54,6 +56,23 @@ const MapPage: React.FC = () => {
     }
   };
 
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+
+  const handleOnClickAudioBook = (
+    audio: Components.Schemas.PreviewAudioStoryResponseDto
+  ) => {
+    toast.info("on click audio", { id: "map" });
+    console.log(audio);
+    setSelectedAudioBook(audio);
+  };
+
+  const handleOnCloseAudioBook = () => {
+    setSelectedAudioBook(null);
+  };
+
   useEffect(() => {
     const features: string | null = localStorage.getItem("features");
     if (!features) {
@@ -74,8 +93,6 @@ const MapPage: React.FC = () => {
 
   return (
     <div className="map-pag__content">
-      <Toaster richColors position="top-center" />
-
       <div className="fixed flex items-center justify-between p-4 w-full">
         <Input
           className="min-h-11 max-w-fit bg-slate-50 self-center"
@@ -109,10 +126,19 @@ const MapPage: React.FC = () => {
           features={mapState.dataMap.features}
           width={width}
           height={height}
+          onClickAudioBook={handleOnClickAudioBook}
         />
       ) : (
         ""
       )}
+      {selectedAudioBook ? (
+        <AudioBookPlayer
+          title={selectedAudioBook.name}
+          audios={selectedAudioBook.audios}
+          onClose={handleOnCloseAudioBook}
+          onClickAuth={handleOnClickAvatar}
+        />
+      ) : null}
     </div>
   );
 };

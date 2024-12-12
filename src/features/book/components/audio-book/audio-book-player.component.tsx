@@ -31,6 +31,7 @@ interface AudioBookPlayerProps {
   title: string;
   audios: Components.Schemas.AudioResponseDto[];
   onClose: () => void;
+  onClickAuth: () => void;
 }
 
 interface RateState {
@@ -43,6 +44,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   title,
   audios,
   onClose,
+  onClickAuth,
 }) => {
   const [playListState, setPlayListState] = useState<PlayListState>({
     load: false,
@@ -91,6 +93,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               <div className="flex justify-center items-center space-x-[3px]">
                 <StarRating
                   onClickRate={(value: number) => toast.success(value)}
+                  onClickAuth={onClickAuth}
                 />
               </div>
               <span className="font-semibold text-orange-500">

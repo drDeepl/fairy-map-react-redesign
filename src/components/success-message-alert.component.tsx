@@ -1,6 +1,7 @@
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -9,46 +10,53 @@ import {
 } from "@/components/ui/alert-dialog";
 import React from "react";
 
-import { CheckCircledIcon } from "@radix-ui/react-icons";
+import { CheckCircledIcon, CheckIcon } from "@radix-ui/react-icons";
+import { Button } from "./ui/button";
 
 interface SuccessMessageAlertProps {
   title: string;
-  visible: boolean;
+  open: boolean;
   onSubmit: () => void;
+  onCancel: () => void;
+  buttonsName: Partial<{
+    onSubmit?: string;
+    onCancel?: string;
+  }>;
 }
 
 const SuccessMessageAlert: React.FC<SuccessMessageAlertProps> = ({
   title,
-  visible,
+  open,
   onSubmit,
+  onCancel,
+  buttonsName,
 }) => {
-  const handleOnSubmit = () => {
-    console.log("CLICK ON SUBMIT");
-    onSubmit();
-  };
-
   return (
-    <AlertDialog open={visible}>
-      <AlertDialogContent className="flex flex-col justify-center items-center max-w-xs">
+    <AlertDialog open={open}>
+      <AlertDialogContent className="flex flex-col justify-center">
         <AlertDialogHeader>
-          <AlertDialogTitle className="self-center">
-            <CheckCircledIcon className="text-green-400 size-24 drop-shadow-xl shadow-green-500/50 opacity-1" />
-          </AlertDialogTitle>
-          <AlertDialogDescription
-            className="self-center text-center text-xl text-balance
-            text-slate-800"
-          >
-            {title}
+          <div className="flex items-center justify-center ">
+            <div className="rounded-full bg-green-100 size-14 p-1">
+              <CheckIcon className="size-12 text-green-400" />
+            </div>
+          </div>
+
+          <AlertDialogDescription className="self-center text-lg text-slate-600 font-semibold">
+            <p>{title}!</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction
-            className=" border border-green-500 hover:bg-green-500 hover:text-white shadow-lg shadow-green-500/50"
-            onClick={handleOnSubmit}
+        <div className="flex justify-center space-x-6">
+          <Button
+            variant="outline"
+            className="border border-blue-300"
+            onClick={onSubmit}
           >
-            супер
-          </AlertDialogAction>
-        </AlertDialogFooter>
+            {buttonsName?.onSubmit ? buttonsName.onSubmit : "принять"}
+          </Button>
+          <Button variant="outline" onClick={onCancel}>
+            {buttonsName?.onCancel ? buttonsName.onCancel : "отмена"}
+          </Button>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   );

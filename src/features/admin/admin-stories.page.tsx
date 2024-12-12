@@ -173,7 +173,11 @@ const AdminStoriesPage: React.FC = () => {
           />
         ) : null}
       </section>
-      <Toaster position="top-center" richColors />
+      <Toaster
+        position="top-center"
+        richColors
+        toastOptions={{ className: "toast-admin-page" }}
+      />
       {bookState.selectedBook ? (
         <BookInfoCardComponent
           book={bookState.selectedBook}

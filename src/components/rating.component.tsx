@@ -1,10 +1,16 @@
 import { StarFilledIcon } from "@radix-ui/react-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { RootState, AppDispatch } from "@/app/store";
+
+import { useSelector, useDispatch } from "react-redux";
+
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 interface StarRatingProps {
   onClickRate: (value: number) => void;
+  onClickAuth: () => void;
 }
 
 interface RatingState {
@@ -14,7 +20,16 @@ interface RatingState {
 
 const filledColorClass = "text-orange-500";
 
-const StarRating: React.FC<StarRatingProps> = ({ onClickRate }) => {
+const StarRating: React.FC<StarRatingProps> = ({
+  onClickRate,
+  onClickAuth,
+}) => {
+  const { toast } = useToast();
+
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const dispatch = useDispatch<AppDispatch>();
+
   const [ratingState, setRatingState] = useState<RatingState>({
     open: false,
     currentRating: null,
@@ -48,8 +63,9 @@ const StarRating: React.FC<StarRatingProps> = ({ onClickRate }) => {
 
   return (
     <div className="flex justify-center space-x-1">
+      <Toaster />
       {ratingState.open ? (
-        <div className="flex justify-center space-x-1">
+        <div className="flex justify-center space-x-1 animate-flyin">
           {Array(5)
             .fill(1)
             .map((_, value: number) => {
@@ -85,9 +101,15 @@ const StarRating: React.FC<StarRatingProps> = ({ onClickRate }) => {
         </div>
       ) : (
         <StarFilledIcon
-          className="size-6 text-orange-500 drop-shadow-2xl cursor-pointer hover:stroke-blue-200"
+          className="size-6 text-orange-500 drop-shadow-2xl cursor-pointer animate-flyin"
           onClick={() =>
-            setRatingState((prevState) => ({ ...prevState, open: true }))
+            user
+              ? setRatingState((prevState) => ({ ...prevState, open: true }))
+              : toast({
+                  title:
+                    "поставить оценку могу только авторизованные пользователи",
+                  action: <Button onClick={() => onClickAuth()}>войти</Button>,
+                })
           }
         />
       )}
