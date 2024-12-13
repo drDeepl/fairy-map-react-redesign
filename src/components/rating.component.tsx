@@ -28,23 +28,22 @@ const StarRating: React.FC<StarRatingProps> = ({
 
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const dispatch = useDispatch<AppDispatch>();
-
   const [ratingState, setRatingState] = useState<RatingState>({
     open: false,
     currentRating: null,
   });
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
-    const stars: HTMLCollectionOf<SVGAElement> = document.getElementsByClassName(
-      "stars"
-    );
+    const stars = document.getElementsByClassName("stars") as HTMLCollectionOf<
+      SVGAElement
+    >;
 
     const className = stars[0].getAttribute("class")?.split(" ");
-    className[0] = toReplace;
-
-    for (let i = 0; i < end + 1; i++) {
-      stars.item(i)?.setAttribute("class", className?.join(" "));
+    if (className) {
+      className[0] = toReplace;
+      for (let i = 0; i < end + 1; i++) {
+        stars.item(i)?.setAttribute("class", className.join(" "));
+      }
     }
   };
 

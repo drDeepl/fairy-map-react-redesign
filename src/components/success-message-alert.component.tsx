@@ -1,16 +1,12 @@
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import React from "react";
 
-import { CheckCircledIcon, CheckIcon } from "@radix-ui/react-icons";
+import { CheckIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
 
 interface SuccessMessageAlertProps {
@@ -33,7 +29,7 @@ const SuccessMessageAlert: React.FC<SuccessMessageAlertProps> = ({
 }) => {
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent className="flex flex-col justify-center">
+      <AlertDialogContent className="flex flex-col justify-center w-96 h-58">
         <AlertDialogHeader>
           <div className="flex items-center justify-center ">
             <div className="rounded-full bg-green-100 size-14 p-1">
@@ -53,7 +49,11 @@ const SuccessMessageAlert: React.FC<SuccessMessageAlertProps> = ({
           >
             {buttonsName?.onSubmit ? buttonsName.onSubmit : "принять"}
           </Button>
-          <Button variant="outline" onClick={onCancel}>
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="border border-slate-300"
+          >
             {buttonsName?.onCancel ? buttonsName.onCancel : "отмена"}
           </Button>
         </div>
