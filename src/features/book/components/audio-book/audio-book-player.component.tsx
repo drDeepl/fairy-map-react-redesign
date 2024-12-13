@@ -21,6 +21,7 @@ import { ListMusicIcon } from "lucide-react";
 import { Cross2Icon, StarIcon, StarFilledIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
+import apiClient from "@/api/apiClient";
 
 interface PlayListState {
   load: boolean;
@@ -67,8 +68,8 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     currentRate: 0,
   });
 
-  const handleOnClickStar = () => {
-    setRateState((prevState) => ({ ...prevState, open: !rateState.open }));
+  const handleOnClickRate = (value: number) => {
+    toast.error("Функция находится в разработке");
   };
 
   return (
@@ -92,7 +93,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
               <div className="flex justify-center items-center space-x-[3px]">
                 <StarRating
-                  onClickRate={(value: number) => toast.success(value)}
+                  onClickRate={handleOnClickRate}
                   onClickAuth={onClickAuth}
                 />
               </div>
