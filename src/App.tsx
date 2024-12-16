@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import WelcomePage from "./pages/welcome.page.tsx";
 import ErrorMessageScreen from "./pages/error-message.page.tsx";
 import AdminPage from "./features/admin/admin.page.tsx";
+import UserPage from "./features/user/user.page.tsx";
 // import { useEffect } from "react";
 // import { JwtPayload, setUser } from "./features/auth/auth.slice.ts";
 // import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
@@ -55,11 +56,11 @@ function App() {
           path={RouteApp.AdminPage}
           element={<AdminPage />}
         />
-        {/* <Route
+        <Route
           key={RouteApp.UserPage}
           path={RouteApp.UserPage}
           element={<UserPage />}
-        /> */}
+        />
         <Route
           path="*"
           element={<ErrorMessageScreen message="Страница не найдена" />}
