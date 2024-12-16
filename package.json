@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-client": "react-openapi-client-generator docs/api.swagger.v2.json src/api/scheams/client.ts",
-    "openapi-gen": "npx typegen docs/api.swagger.v2.json > src/api/client.d.ts"
+    "openapi-gen": "npx typegen docs/api.swagger.v2.json > src/api/schemas/client.d.ts"
   },
   "dependencies": {
     "@hcaptcha/react-hcaptcha": "^1.11.0",

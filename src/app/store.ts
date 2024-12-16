@@ -5,6 +5,8 @@ import authReducer from "../features/auth/auth.slice";
 import bookReducer from "../features/book/book.slice";
 import bookListReducer from "../features/book/list-book.slice";
 import ethnicGroupListReducer from "../features/ethnic-group/ethnic-group-list.slice";
+import audioBookListReducer from "../features/book/components/audio-book/audio-book-list.slice";
+
 const store = configureStore({
   reducer: {
     app: appReducer,
@@ -13,6 +15,7 @@ const store = configureStore({
     listBook: bookListReducer,
     ethnicGroupList: ethnicGroupListReducer,
     book: bookReducer,
+    audioBookList: audioBookListReducer,
   },
 });
 

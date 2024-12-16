@@ -18,10 +18,9 @@ import ReactAudioPlayer from "react-audio-player";
 import { toast } from "sonner";
 
 import { ListMusicIcon } from "lucide-react";
-import { Cross2Icon, StarIcon, StarFilledIcon } from "@radix-ui/react-icons";
+import { StarIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
-import apiClient from "@/api/apiClient";
 
 interface PlayListState {
   load: boolean;
@@ -31,6 +30,9 @@ interface PlayListState {
 interface AudioBookPlayerProps {
   title: string;
   audios: Components.Schemas.AudioResponseDto[];
+  onClickRate: (
+    dto: Components.Schemas.AddRatingAudioStoryDto
+  ) => Promise<void>;
   onClose: () => void;
   onClickAuth: () => void;
 }
@@ -44,6 +46,7 @@ interface RateState {
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   title,
   audios,
+  onClickRate,
   onClose,
   onClickAuth,
 }) => {
@@ -68,8 +71,20 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     currentRate: 0,
   });
 
-  const handleOnClickRate = (value: number) => {
-    toast.error("Функция находится в разработке");
+  const handleOnClickRate = async (value: number) => {
+    try {
+      const res = await onClickRate({
+        rating: value + 1,
+        audioId: playListState.currentAudio.id,
+      });
+      setRateState((prevState) => ({
+        ...prevState,
+        currentRate: value,
+        open: false,
+      }));
+    } catch (error) {
+      toast.error(error);
+    }
   };
 
   return (

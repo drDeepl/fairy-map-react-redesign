@@ -1,9 +1,9 @@
 import { StarFilledIcon } from "@radix-ui/react-icons";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RootState, AppDispatch } from "@/app/store";
+import { RootState } from "@/app/store";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
@@ -100,11 +100,15 @@ const StarRating: React.FC<StarRatingProps> = ({
         </div>
       ) : (
         <StarFilledIcon
-          className="size-6 text-orange-500 drop-shadow-2xl cursor-pointer animate-flyin"
+          className="size-6 text-orange-500 drop-shadow-2xl cursor-pointer animate-flyin "
           onClick={() =>
             user
               ? setRatingState((prevState) => ({ ...prevState, open: true }))
               : toast({
+                  style: {
+                    border: "1.5px solid var(--deep-red)",
+                    right: "2rem",
+                  },
                   title:
                     "поставить оценку могу только авторизованные пользователи",
                   action: <Button onClick={() => onClickAuth()}>войти</Button>,

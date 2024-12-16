@@ -27,7 +27,10 @@ import { toast, Toaster, useSonner } from "sonner";
 import { AxiosError } from "axios";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
-import AudioBookPlayer from "../book/components/audio-book/audio-book-player.component";
+import { fetchAudiosByEthnicGroupId } from "../book/components/audio-book/audio-book.actions";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/store";
+import { AudioBookListState } from "../book/components/audio-book/audio-book-list.slice";
 
 interface MapComponentProps {
   features: any;
@@ -36,11 +39,6 @@ interface MapComponentProps {
   onClickAudioBook: (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => void;
-}
-
-interface AudioStoryListState {
-  load: boolean;
-  audios: Components.Schemas.PreviewAudioStoryResponseDto[];
 }
 
 interface ListBookState {
@@ -61,10 +59,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
     books: [],
   });
 
-  const [audioStoryList, setAudioStoryList] = useState<AudioStoryListState>({
-    load: true,
-    audios: [],
-  });
+  const audioBookListState: AudioBookListState = useSelector(
+    (state: RootState) => state.audioBookList
+  );
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const projection = d3
     .geoAlbers()
@@ -136,22 +135,26 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
-      .get(ethnicGroupPoint.ethnicGroupId)
-      .then((result: any) => {
-        console.log(result);
-        setAudioStoryList((prevState) => ({
-          ...prevState,
-          load: false,
-          audios: result.data,
-        }));
-      })
-      .catch((error: AxiosError) => {
-        toast.error(error.message, {
-          className: "toast-map-component",
-        });
-        setAudioStoryList((prevState) => ({ ...prevState, load: false }));
-      });
+    dispatch(
+      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    ).then((result) => console.log(result));
+
+    // apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
+    //   .get(ethnicGroupPoint.ethnicGroupId)
+    //   .then((result: any) => {
+    //     console.log(result);
+    //     setAudioStoryList((prevState) => ({
+    //       ...prevState,
+    //       load: false,
+    //       audios: result.data,
+    //     }));
+    //   })
+    //   .catch((error: AxiosError) => {
+    //     toast.error(error.message, {
+    //       className: "toast-map-component",
+    //     });
+    //     setAudioStoryList((prevState) => ({ ...prevState, load: false }));
+    //   });
   };
 
   const [
@@ -216,7 +219,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                         modal={false}
                         onOpenChange={(open: boolean) => {
                           setListBookState({ load: true, books: [] });
-                          setAudioStoryList({ load: true, audios: [] });
+                          // setAudioStoryList({ load: true, audios: [] });
                           let color = "#82A9FD";
                           if (open) {
                             color = "red";
@@ -288,19 +291,22 @@ const MapComponent: React.FC<MapComponentProps> = ({
                               </DropdownMenuPortal>
                             </DropdownMenuSub>
                           )}
-                          {audioStoryList.load ? (
+                          {audioBookListState.loading ? (
                             <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
                           ) : (
                             <DropdownMenuSub>
                               <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
                                 <BookHeadphones className="stroke-gray-600" />
                                 <span className="text-sm ">аудиокниги</span>
-                                <span>{audioStoryList.audios.length}</span>
+                                <span>
+                                  {audioBookListState.audioStories.length}
+                                </span>
                               </DropdownMenuSubTrigger>
                               <DropdownMenuPortal>
                                 <DropdownMenuSubContent>
-                                  {audioStoryList.audios.length > 0 ? (
-                                    audioStoryList.audios.map(
+                                  {audioBookListState.audioStories.length >
+                                  0 ? (
+                                    audioBookListState.audioStories.map(
                                       (
                                         storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
                                       ) => {

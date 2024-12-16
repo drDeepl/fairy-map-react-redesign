@@ -126,7 +126,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           }}
         >
           <SuccessMessageAlert
-            title={"Вы успешно зарегистрировались"}
+            title={
+              currentTab === Tab.SignIn
+                ? `Добро пожаловать`
+                : "Вы успешно зарегистрировались"
+            }
             open={showDialogSuccessAuth}
             onSubmit={() =>
               navigate(getRoutePageByUserRole(authState.user!.role))
@@ -142,8 +146,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           />
           <DialogTitle>
             <TabsList className="grid w-full grid-cols-2 mb-2">
-              <TabsTrigger value={Tab.SignIn}>Вход</TabsTrigger>
-              <TabsTrigger value={Tab.SignUp}>Регистрация</TabsTrigger>
+              <TabsTrigger
+                value={Tab.SignIn}
+                className="data-[state=active]:border border-blue-300 data-[state=active]:text-slate-800 data-[state=active]:bg-secondary"
+              >
+                Вход
+              </TabsTrigger>
+              <TabsTrigger
+                value={Tab.SignUp}
+                className="data-[state=active]:border border-blue-300 data-[state=active]:text-slate-800 data-[state=active]:bg-secondary"
+              >
+                Регистрация
+              </TabsTrigger>
             </TabsList>
           </DialogTitle>
           <DialogDescription className="flex justify-center">

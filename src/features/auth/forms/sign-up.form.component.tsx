@@ -95,11 +95,11 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
             </FormItem>
           )}
         />
-        <Button disabled={loading} className="w-full" type="submit">
+        <Button disabled={loading} className="w-full " type="submit">
           {loading ? (
             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
           ) : null}
-          войти
+          зарегистрироваться
         </Button>
       </form>
     </Form>
