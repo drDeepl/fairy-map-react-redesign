@@ -205,7 +205,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         className="rounded-t-xl w-44 h-56 object-cover"
                       />
                     ) : (
-                      <div className="size-full">
+                      <div className="w-44 h-56">
                         <NotCoverBook />
                       </div>
                     )}
