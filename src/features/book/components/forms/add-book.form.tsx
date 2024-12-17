@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,12 +17,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -34,6 +41,8 @@ import {
 import { DialogDescription } from "@radix-ui/react-dialog";
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import { Components } from "@/api/schemas/client";
+import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 interface AddBookFormProps {
   open: boolean;
@@ -60,6 +69,8 @@ const AddBookForm: React.FC<AddBookFormProps> = ({
       ethnicGroupId: undefined,
     },
   });
+
+  const [ethnicGroupsOpen, setEthnicGroupsOpen] = useState<boolean>(false);
 
   const handleOnOpenChange = (open: boolean) => {
     if (!open) {
@@ -117,34 +128,65 @@ const AddBookForm: React.FC<AddBookFormProps> = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Этническая группа</FormLabel>
-                  <Select onValueChange={field.onChange}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="выберите этническую группу..." />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {loading ? (
-                        <Skeleton className="w-56 h-8" />
-                      ) : (
-                        ethnicGroups.map(
-                          (
-                            ethnicGroup: Components.Schemas.EthnicGroupLanguageDto
-                          ) => {
-                            return (
-                              <SelectItem
-                                className="cursor-pointer"
-                                key={`ethnic_group_${ethnicGroup.id}`}
-                                value={`${ethnicGroup.id}`}
+                  <Popover open={ethnicGroupsOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          onClick={() => setEthnicGroupsOpen(true)}
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value
+                            ? ethnicGroups.find(
+                                (ethnicGroup) => ethnicGroup.id === field.value
+                              )?.name
+                            : "Выберите этническую группу"}
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Command>
+                        <CommandInput
+                          placeholder="начните поиск..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>
+                            Этнические группы не найдены
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {ethnicGroups.map((ethnicGroup) => (
+                              <CommandItem
+                                value={ethnicGroup.name}
+                                key={ethnicGroup.id}
+                                onSelect={() => {
+                                  setEthnicGroupsOpen(false);
+                                  addBookForm.setValue(
+                                    "ethnicGroupId",
+                                    ethnicGroup.id
+                                  );
+                                }}
                               >
                                 {ethnicGroup.name}
-                              </SelectItem>
-                            );
-                          }
-                        )
-                      )}
-                    </SelectContent>
-                  </Select>
+                                <Check
+                                  className={cn(
+                                    "ml-auto",
+                                    ethnicGroup.id === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}

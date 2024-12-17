@@ -84,11 +84,11 @@ declare namespace Components {
         }
         export interface AddRatingAudioStoryDto {
             /**
-             * номер озвучки из таблицы опубликованных озвучек
+             * оценка
              */
             rating: number;
             /**
-             * номер озвучки
+             * id озвучки
              */
             audioId: number;
         }

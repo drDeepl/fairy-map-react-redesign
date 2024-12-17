@@ -14,6 +14,8 @@ export interface JwtPayload {
   role: string;
   iat: number;
   exp: number;
+  fistName: string;
+  lastName: string;
 }
 
 export interface AuthState extends BaseAppState {
