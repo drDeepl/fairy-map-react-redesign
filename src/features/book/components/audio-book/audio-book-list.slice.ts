@@ -4,6 +4,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   addRatingAudio,
+  fetchAudiosByStoryId,
   fetchAudiosByEthnicGroupId,
 } from "./audio-book.actions";
 
@@ -52,13 +53,6 @@ const audioBookListSlice = createSlice({
           state.audioStories = action.payload;
           state.loading = false;
           state.success = true;
-        }
-      )
-      .addCase(
-        fetchAudiosByEthnicGroupId.rejected,
-        (state, action: PayloadAction<any>) => {
-          state.loading = false;
-          state.error = action.payload as any;
         }
       )
       .addCase(addRatingAudio.pending, (state) => {

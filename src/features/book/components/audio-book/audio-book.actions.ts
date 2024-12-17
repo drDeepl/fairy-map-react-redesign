@@ -38,3 +38,18 @@ export const addRatingAudio = createAsyncThunk(
     }
   }
 );
+
+export const fetchAudiosByStoryId = createAsyncThunk(
+  "audioBookList/fetchAudiosByStoryId",
+  async (storyId: number, thunkApi) => {
+    try {
+      const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
+        storyId,
+      });
+      return res.data;
+    } catch (err) {
+      const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);
+      thunkApi.rejectWithValue(errorResposne);
+    }
+  }
+);
