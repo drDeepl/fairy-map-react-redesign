@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
-import ListAudios from "./audio-book/list-audios.component";
+import ListAudios from "../../audio-book/components/list-audios.component";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
 import LoadSpinner from "@/components/ui/load-spinner";

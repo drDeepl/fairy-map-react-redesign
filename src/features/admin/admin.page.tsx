@@ -24,17 +24,18 @@ const AdminPage: React.FC = () => {
 
   const handleOnClickExit = () => {
     dispatch(userLogOut());
+    navigate(-1);
   };
 
   useEffect(() => {
     if (!authState.user) {
       navigate(-1);
     } else {
+      setLoading(false);
       dispatch(fetchEthnicGroups());
       dispatch(fetchListBooks());
-      setLoading(false);
     }
-  }, [authState.user]);
+  }, [authState]);
 
   if (loading) {
     return <LoadSpinner />;

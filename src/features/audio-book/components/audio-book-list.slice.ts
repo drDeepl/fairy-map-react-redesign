@@ -6,7 +6,7 @@ import {
   addRatingAudio,
   fetchAudiosByStoryId,
   fetchAudiosByEthnicGroupId,
-} from "./audio-book.actions";
+} from "../audio-book.actions";
 
 export interface AudioBookListState extends BaseAppState {
   audioStories: Components.Schemas.PreviewAudioStoryResponseDto[];

@@ -1,6 +1,5 @@
 import "./App.css";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-
 import MapPage from "./features/map/map.page.tsx";
 import { RouteApp } from "./pages/constants/route.enum.ts";
 import { AnimatePresence } from "framer-motion";
@@ -28,11 +27,11 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate(location.pathname);
     const currentUser = checkValidAccessTokenInLocalStorage();
     if (currentUser) {
       dispatch(setUser(currentUser));
     }
+    navigate(location.pathname);
   }, []);
 
   return (
