@@ -14,8 +14,8 @@ import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { setFeatures } from "./map.slice";
 import { Components } from "@/api/schemas/client";
 import { toast } from "sonner";
-import AudioBookPlayer from "../book/components/audio-book/audio-book-player.component";
-import { addRatingAudio } from "../book/components/audio-book/audio-book.actions";
+import AudioBookPlayer from "../audio-book/audio-book-player.component";
+import { addRatingAudio } from "../audio-book/audio-book.actions";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;

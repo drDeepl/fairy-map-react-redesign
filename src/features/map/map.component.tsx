@@ -27,10 +27,10 @@ import { toast, Toaster, useSonner } from "sonner";
 import { AxiosError } from "axios";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
-import { fetchAudiosByEthnicGroupId } from "../book/components/audio-book/audio-book.actions";
+import { fetchAudiosByEthnicGroupId } from "../audio-book/audio-book.actions";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
-import { AudioBookListState } from "../book/components/audio-book/audio-book-list.slice";
+import { AudioBookListState } from "../audio-book/components/audio-book-list.slice";
 
 interface MapComponentProps {
   features: any;

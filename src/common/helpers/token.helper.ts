@@ -8,6 +8,10 @@ export function setTokenLocalStorage(accessToken: string): void {
   localStorage.setItem("accessToken", accessToken);
 }
 
+export function removeTokenLocalStorage() {
+  localStorage.removeItem("accessToken");
+}
+
 export function parsePayloadFromAccessToken(accessToken: string): JwtPayload {
   const arrayToken = accessToken.split(".");
   return JSON.parse(atob(arrayToken[1])) as JwtPayload;
@@ -21,10 +25,7 @@ export function isTokenExpiresValid(exp: number): boolean {
 export function checkValidAccessTokenInLocalStorage(): JwtPayload | null {
   const accessToken: string | null = getTokenLocalStorage();
   if (accessToken) {
-    const payload: JwtPayload = parsePayloadFromAccessToken(accessToken);
-    if (isTokenExpiresValid(payload.exp)) {
-      return payload;
-    }
+    return parsePayloadFromAccessToken(accessToken);
   }
   return null;
 }

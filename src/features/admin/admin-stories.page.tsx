@@ -1,4 +1,4 @@
-import { Components } from "@/api/schemas/client";
+import { Components, Paths } from "@/api/schemas/client";
 import { AppDispatch, RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
@@ -22,11 +22,27 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { addAudio, setBook } from "../book/book.slice";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster, toast } from "sonner";
+import { DotsHorizontalIcon, UploadIcon } from "@radix-ui/react-icons";
+import { AxiosResponse } from "axios";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export interface BookInfoState {
   open: boolean;
@@ -35,6 +51,7 @@ export interface BookInfoState {
 }
 
 interface ListLanguageState {
+  open: boolean;
   load: boolean;
   languages: Components.Schemas.LanguageDto[];
 }
@@ -57,6 +74,7 @@ const AdminStoriesPage: React.FC = () => {
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
+      open: false,
       load: true,
       languages: [],
     }
@@ -81,7 +99,23 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnClickPreviewBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    await dispatch(fetchAudiosByBookId(book.id));
+    // await dispatch(fetchAudiosByBookId(book.id));
+    apiClient.paths["/api/story/{storyId}/audio/all"]
+      .get({
+        storyId: book.id,
+      })
+      .then((result) => {
+        setAudioListState({
+          load: false,
+          audios: result.data,
+        });
+      })
+      .catch((err) => {
+        const msg =
+          err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
+        toast.error(msg);
+      });
+
     dispatch(setBook(book));
   };
 
@@ -92,50 +126,74 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnUploadBookCover = async (
     dto: CoverUploadDto
   ): Promise<Components.Schemas.StoryWithImgResponseDto> => {
-    console.log("handleUploadAudio");
     return dispatch(uploadBookCover(dto)).unwrap();
   };
 
   const handleUploadAudio = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    console.log("handle upload audio");
     if (event.target.files && event.target.files.length > 0) {
       if (bookState.selectedBook && selectedLanguage) {
         const formData = new FormData();
         formData.append("audio", event.target.files[0]);
 
-        apiClient
-          .AdminController_uploadAudioStory(
+        try {
+          const addedAudioResponse: any = await apiClient.AdminController_uploadAudioStory(
             {
               storyId: bookState.selectedBook["id"],
-              languageId: selectedLanguage?.id,
+              languageId: selectedLanguage.id,
             },
             formData
-          )
-          .then((addedAudioResponse: any) => {
-            console.log(addedAudioResponse.data);
-            dispatch(addAudio(addedAudioResponse.data));
-          })
-          .catch((error: any) => {
-            console.error(error);
-          });
+          );
+          console.log(addedAudioResponse.data);
+
+          setAudioListState((prevState) => ({
+            ...prevState,
+            audios: [...prevState.audios, addedAudioResponse.data],
+          }));
+        } catch (error) {
+          console.error(error);
+          toast.error("Ошибка при загрузке аудио");
+        } finally {
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        }
       }
     }
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleOnSelectLanguage = (language: Components.Schemas.LanguageDto) => {
+  const handleOnSelectLanguage = async (
+    language: Components.Schemas.LanguageDto
+  ) => {
     setSelectedLanguage(language);
+    setLanguageListState((prevState) => ({ ...prevState, open: false }));
 
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
+  interface AudioListState {
+    load: boolean;
+    audios: Components.Schemas.AudioStoryResponseDto[];
+  }
+
+  const [audiosListState, setAudioListState] = useState<AudioListState>({
+    load: true,
+    audios: [],
+  });
+
   useEffect(() => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {
-      setLanguageListState({ load: false, languages: result.data });
+      setLanguageListState({
+        open: false,
+        load: false,
+        languages: result.data,
+      });
     });
   }, []);
   return (
@@ -179,39 +237,67 @@ const AdminStoriesPage: React.FC = () => {
       {bookState.selectedBook ? (
         <BookInfoCardComponent
           book={bookState.selectedBook}
+          audios={audiosListState.audios}
           onClose={handleCloseInfoBook}
           onUploadCover={handleOnUploadBookCover}
         >
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>добавить озвучку</DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="h-28 overflow-y-scroll">
-              {languageListState.load ? (
-                <Skeleton className="w-full h-16" />
-              ) : (
-                languageListState.languages.map((language) => (
-                  <DropdownMenuItem
-                    key={`lang_${language.id}`}
-                    onClick={() => handleOnSelectLanguage(language)}
-                  >
-                    {language.name}
-                  </DropdownMenuItem>
-                ))
-              )}
-
-              {!languageListState.load &&
-              languageListState.languages.length === 0 ? (
-                <DropdownMenuItem>языки для озвучки найдены</DropdownMenuItem>
-              ) : null}
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
+          <Popover
+            open={languageListState.open}
+            onOpenChange={(open) => {
+              setLanguageListState((prevState) => ({
+                ...prevState,
+                open,
+              }));
+            }}
+          >
+            <PopoverTrigger
+              asChild
+              onClick={() =>
+                setLanguageListState((prevState) => ({
+                  ...prevState,
+                  open: true,
+                }))
+              }
+            >
+              <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
+            </PopoverTrigger>
+            <PopoverContent>
+              <Command>
+                <p className="self-center font-semibold">
+                  выберите язык для озвучки
+                </p>
+                <CommandInput placeholder="начните поиск..." className="h-9" />
+                <CommandList>
+                  <CommandEmpty>языки для озвучки не найдены</CommandEmpty>
+                  <CommandGroup>
+                    {languageListState.load ? (
+                      <Skeleton className="w-full h-16" />
+                    ) : (
+                      languageListState.languages.map((language) => (
+                        <CommandItem
+                          key={`lang_${language.id}`}
+                          value={language.name}
+                          onSelect={() => handleOnSelectLanguage(language)}
+                        >
+                          {language.name}
+                        </CommandItem>
+                      ))
+                    )}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         </BookInfoCardComponent>
       ) : null}
-      <input
+      <Input
+        id="upload-audio__input"
         type="file"
         ref={fileInputRef}
         className="hidden"
         accept="audio/*"
         onChange={(event) => {
+          console.warn("change input");
           toast.promise(handleUploadAudio(event), {
             loading: "добавляю озвучку",
             success: "озвучка успешно добавлена",
@@ -222,5 +308,3 @@ const AdminStoriesPage: React.FC = () => {
   );
 };
 export default AdminStoriesPage;
-
-// байкал или чехия хочет поехать

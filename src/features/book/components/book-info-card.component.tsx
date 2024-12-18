@@ -16,7 +16,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import { DotsHorizontalIcon, EnterFullScreenIcon } from "@radix-ui/react-icons";
+import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -24,26 +24,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
-import ListAudios from "./audio-book/list-audios.component";
-
+import ListAudios from "../../audio-book/components/list-audios.component";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosError } from "axios";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
+  audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
+
   children?: React.ReactNode;
 }
 
@@ -65,13 +61,9 @@ interface AudioState {
   audio: Components.Schemas.AudioStoryResponseDto | null;
 }
 
-interface AudioListState {
-  load: boolean;
-  audios: Components.Schemas.AudioStoryResponseDto[];
-}
-
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
+  audios,
   onClose,
   onUploadCover,
   children,
@@ -81,10 +73,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     fullScreen: false,
   });
 
-  const [audiosListState, setAudioListState] = useState<AudioListState>({
-    load: true,
-    audios: [],
-  });
   const [audioState, setAudioState] = useState<AudioState>({
     isPlaying: false,
     audio: null,
@@ -123,19 +111,19 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         handleAxiosError(err);
       });
 
-    apiClient
-      .StoryController_getAudiosByStoryId(book.id)
-      .then(
-        (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
-          setAudioListState({
-            load: false,
-            audios: result.data,
-          });
-        }
-      )
-      .catch((err: AxiosError) => {
-        handleAxiosError(err);
-      });
+    // apiClient
+    //   .StoryController_getAudiosByStoryId(book.id)
+    //   .then(
+    //     (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
+    //       setAudioListState({
+    //         load: false,
+    //         audios: result.data,
+    //       });
+    //     }
+    //   )
+    //   .catch((err: AxiosError) => {
+    //     handleAxiosError(err);
+    //   });
   }, []);
 
   const handleShowText = (showText: boolean) => {
@@ -227,26 +215,25 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 <DialogTitle>
                   <div className="flex space-x-2">
                     <span>{infoBookState.book.name}</span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <DotsHorizontalIcon className="size-5 self-center cursor-pointer" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>{children}</DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </DialogTitle>
                 <DialogDescription>
                   {infoBookState.book.ethnicGroup.name}
                 </DialogDescription>
 
-                {audiosListState.load ? (
+                {/* {audiosListState.load ? (
                   <Skeleton className="w-full h-10" />
                 ) : (
+                  
+                )} */}
+                <div className="flex space-x-4">
                   <ListAudios
-                    audios={audiosListState.audios}
+                    audios={audios}
                     onSelectAudio={handleOnSelectAudio}
                   />
-                )}
+                  {children}
+                </div>
+
                 <div className="flex w-full pt-2">
                   {audioState.audio && !audioState.load ? (
                     <AudioPlayer

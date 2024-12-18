@@ -11,6 +11,7 @@ import AdminStoriesPage from "./admin-stories.page";
 import { MenuItemAdmin } from "./constants/sidebar-items";
 import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { userLogOut } from "../auth/auth.slice";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -21,15 +22,20 @@ const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [currentTab, setCurrentTab] = useState<string>(MenuItemAdmin.Story);
 
+  const handleOnClickExit = () => {
+    dispatch(userLogOut());
+    navigate(-1);
+  };
+
   useEffect(() => {
     if (!authState.user) {
       navigate(-1);
     } else {
+      setLoading(false);
       dispatch(fetchEthnicGroups());
       dispatch(fetchListBooks());
-      setLoading(false);
     }
-  }, [authState.user]);
+  }, [authState]);
 
   if (loading) {
     return <LoadSpinner />;
@@ -40,9 +46,12 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <AdminSidebarLayout onClickItemSidebar={handleOnClickItemSidebar}>
-      <Tabs defaultValue={MenuItemAdmin.Story} value={currentTab}>
-        <TabsContent value={MenuItemAdmin.Story}>
+    <AdminSidebarLayout
+      onClickItemSidebar={handleOnClickItemSidebar}
+      onClickExit={handleOnClickExit}
+    >
+      <Tabs defaultValue={MenuItem.Story} value={currentTab}>
+        <TabsContent value={MenuItem.Story}>
           <AdminStoriesPage />
         </TabsContent>
         <TabsContent value={MenuItemAdmin.Request}>
