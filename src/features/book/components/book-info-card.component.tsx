@@ -215,7 +215,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 <DialogTitle>
                   <div className="flex space-x-2">
                     <span>{infoBookState.book.name}</span>
-                    {children}
                   </div>
                 </DialogTitle>
                 <DialogDescription>
@@ -227,10 +226,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 ) : (
                   
                 )} */}
-                <ListAudios
-                  audios={audios}
-                  onSelectAudio={handleOnSelectAudio}
-                />
+                <div className="flex space-x-4">
+                  <ListAudios
+                    audios={audios}
+                    onSelectAudio={handleOnSelectAudio}
+                  />
+                  {children}
+                </div>
+
                 <div className="flex w-full pt-2">
                   {audioState.audio && !audioState.load ? (
                     <AudioPlayer

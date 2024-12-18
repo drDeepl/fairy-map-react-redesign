@@ -39,8 +39,10 @@ import { addAudio, setBook } from "../book/book.slice";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster, toast } from "sonner";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { DotsHorizontalIcon, UploadIcon } from "@radix-ui/react-icons";
 import { AxiosResponse } from "axios";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export interface BookInfoState {
   open: boolean;
@@ -138,25 +140,28 @@ const AdminStoriesPage: React.FC = () => {
         const formData = new FormData();
         formData.append("audio", event.target.files[0]);
 
-        apiClient
-          .AdminController_uploadAudioStory(
+        try {
+          const addedAudioResponse: any = await apiClient.AdminController_uploadAudioStory(
             {
               storyId: bookState.selectedBook["id"],
-              languageId: selectedLanguage?.id,
+              languageId: selectedLanguage.id,
             },
             formData
-          )
-          .then((addedAudioResponse: any) => {
-            console.log(addedAudioResponse.data);
-            setAudioListState((prevState) => ({
-              ...prevState,
-              audios: [...prevState.audios, addedAudioResponse.data],
-            }));
-            // dispatch(addAudio(addedAudioResponse.data));
-          })
-          .catch((error: any) => {
-            console.error(error);
-          });
+          );
+          console.log(addedAudioResponse.data);
+
+          setAudioListState((prevState) => ({
+            ...prevState,
+            audios: [...prevState.audios, addedAudioResponse.data],
+          }));
+        } catch (error) {
+          console.error(error);
+          toast.error("Ошибка при загрузке аудио");
+        } finally {
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+        }
       }
     }
   };
@@ -166,7 +171,6 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnSelectLanguage = async (
     language: Components.Schemas.LanguageDto
   ) => {
-    toast.error("to fix many upload files");
     setSelectedLanguage(language);
     setLanguageListState((prevState) => ({ ...prevState, open: false }));
 
@@ -239,7 +243,15 @@ const AdminStoriesPage: React.FC = () => {
           onClose={handleCloseInfoBook}
           onUploadCover={handleOnUploadBookCover}
         >
-          <Popover open={languageListState.open}>
+          <Popover
+            open={languageListState.open}
+            onOpenChange={(open) => {
+              setLanguageListState((prevState) => ({
+                ...prevState,
+                open,
+              }));
+            }}
+          >
             <PopoverTrigger
               asChild
               onClick={() =>
@@ -249,10 +261,13 @@ const AdminStoriesPage: React.FC = () => {
                 }))
               }
             >
-              <DotsHorizontalIcon className="size-5 self-center cursor-pointer" />
+              <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
             </PopoverTrigger>
             <PopoverContent>
               <Command>
+                <p className="self-center font-semibold">
+                  выберите язык для озвучки
+                </p>
                 <CommandInput placeholder="начните поиск..." className="h-9" />
                 <CommandList>
                   <CommandEmpty>языки для озвучки не найдены</CommandEmpty>
@@ -277,13 +292,14 @@ const AdminStoriesPage: React.FC = () => {
           </Popover>
         </BookInfoCardComponent>
       ) : null}
-      <input
+      <Input
         id="upload-audio__input"
         type="file"
         ref={fileInputRef}
         className="hidden"
         accept="audio/*"
         onChange={(event) => {
+          console.warn("change input");
           toast.promise(handleUploadAudio(event), {
             loading: "добавляю озвучку",
             success: "озвучка успешно добавлена",
@@ -294,5 +310,3 @@ const AdminStoriesPage: React.FC = () => {
   );
 };
 export default AdminStoriesPage;
-
-// байкал или чехия хочет поехать
