@@ -4,6 +4,7 @@ import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import {
   parsePayloadFromAccessToken,
   setTokenLocalStorage,
+  removeTokenLocalStorage,
 } from "@/common/helpers/token.helper";
 import { BaseAppState } from "@/common/interfaces/state.interface";
 import { Components } from "@/api/schemas/client";
@@ -41,20 +42,27 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
 
-    setVerifyedCaptcha(state: AuthState, action: PayloadAction<boolean>) {
+    setVerifyedCaptcha: (state: AuthState, action: PayloadAction<boolean>) => {
       state.verifyedCaptcha = action.payload;
     },
-    setValidDataForm(state: AuthState, action: PayloadAction<boolean>) {
+    setValidDataForm: (state: AuthState, action: PayloadAction<boolean>) => {
       state.dataFormValid = action.payload;
     },
-    setLoad(state: AuthState, action: PayloadAction<boolean>) {
+    setLoad: (state: AuthState, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
-    setError(state: AuthState, action: PayloadAction<ApiErrorResponse | null>) {
+    setError: (
+      state: AuthState,
+      action: PayloadAction<ApiErrorResponse | null>
+    ) => {
       state.error = action.payload as any;
     },
-    setSuccess(state: AuthState, action: PayloadAction<boolean>) {
+    setSuccess: (state: AuthState, action: PayloadAction<boolean>) => {
       state.success = action.payload;
+    },
+    userLogOut: (state: AuthState) => {
+      state.user = null;
+      removeTokenLocalStorage();
     },
   },
   extraReducers: (builder) => {
@@ -120,6 +128,7 @@ export const {
   setLoad,
   setError,
   setSuccess,
+  userLogOut,
 } = authSlice.actions;
 
 export default authSlice.reducer;

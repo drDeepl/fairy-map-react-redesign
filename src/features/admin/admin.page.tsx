@@ -11,6 +11,7 @@ import AdminStoriesPage from "./admin-stories.page";
 import { MenuItem } from "./constants/sidebar-items";
 import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { userLogOut } from "../auth/auth.slice";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +21,10 @@ const AdminPage: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [currentTab, setCurrentTab] = useState<string>(MenuItem.Story);
+
+  const handleOnClickExit = () => {
+    dispatch(userLogOut());
+  };
 
   useEffect(() => {
     if (!authState.user) {
@@ -40,7 +45,10 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <AdminSidebarLayout onClickItemSidebar={handleOnClickItemSidebar}>
+    <AdminSidebarLayout
+      onClickItemSidebar={handleOnClickItemSidebar}
+      onClickExit={handleOnClickExit}
+    >
       <Tabs defaultValue={MenuItem.Story} value={currentTab}>
         <TabsContent value={MenuItem.Story}>
           <AdminStoriesPage />

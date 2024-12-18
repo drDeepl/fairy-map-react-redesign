@@ -8,17 +8,22 @@ import AdminSidebar from "../components/admin-sidebar.component";
 import { ItemSidebar } from "../interfaces/sidebar.interfaces";
 
 interface AdminSidebarLayoutProps {
-  children: React.ReactNode;
   onClickItemSidebar: (item: ItemSidebar) => void;
+  onClickExit: () => void;
+  children: React.ReactNode;
 }
 
 const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
-  children,
   onClickItemSidebar,
+  onClickExit,
+  children,
 }) => {
   return (
     <SidebarProvider>
-      <AdminSidebar onClickItem={onClickItemSidebar} />
+      <AdminSidebar
+        onClickItem={onClickItemSidebar}
+        onClickExit={onClickExit}
+      />
       <SidebarInset className="lg:w-full md:min-w-52">
         <main>
           <SidebarTrigger />

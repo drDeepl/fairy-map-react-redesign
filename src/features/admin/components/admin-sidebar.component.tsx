@@ -15,21 +15,35 @@ import { menuItems } from "../constants/sidebar-items";
 import { MapPinnedIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { RouteApp } from "@/pages/constants/route.enum";
+import { Separator } from "@/components/ui/separator";
+import { ExitIcon } from "@radix-ui/react-icons";
 
 interface AdminSidebarProps {
   onClickItem: (item: ItemSidebar) => void;
+  onClickExit: () => void;
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClickItem }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  onClickItem,
+  onClickExit,
+}) => {
   const navigate = useNavigate();
 
   const handleOnClickMapBtn = () => {
     navigate(RouteApp.MapPage);
   };
+
   return (
     <Sidebar variant="inset">
       <SidebarHeader>
-        <SidebarGroupLabel>Меню</SidebarGroupLabel>
+        {/* <SidebarGroupLabel>Меню</SidebarGroupLabel> */}
+
+        <SidebarMenu>
+          <Button className="size-8" variant="outline" onClick={onClickExit}>
+            <ExitIcon className="text-slate-600" />
+          </Button>
+        </SidebarMenu>
+        <Separator />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
