@@ -1,7 +1,7 @@
 import OpenAPIClientAxios, { AxiosResponse } from "openapi-client-axios";
 import { Client } from "./schemas/client";
 import { getTokenLocalStorage } from "@/common/helpers/token.helper";
-import { InternalAxiosRequestConfig } from "axios";
+import { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 async function initApiClient() {
   const api = new OpenAPIClientAxios({
@@ -26,8 +26,18 @@ async function initApiClient() {
     (response: AxiosResponse) => {
       return response;
     },
-    (error: any) => {
+    (error: AxiosError) => {
+      const accessToken = localStorage.getItem("accessToken");
+      console.log(accessToken);
       console.error("interceptors error", error);
+      console.log(error.status);
+      if (error.status === 401) {
+        apiClient.AuthController_refresh().then((res) => {
+          console.log(res);
+          localStorage.setItem("accessToken", res.data.accessToken);
+        });
+      }
+
       return Promise.reject(error);
     }
   );
