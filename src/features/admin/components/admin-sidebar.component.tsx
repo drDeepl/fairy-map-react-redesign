@@ -10,14 +10,14 @@ import {
   SidebarHeader,
   Sidebar,
 } from "@/components/ui/sidebar";
-import { ItemSidebar } from "../interfaces/sidebar.interfaces";
+import { ItemSidebarAdmin } from "../interfaces/item-sidebar.interfaces";
 import { menuItems } from "../constants/sidebar-items";
 import { MapPinnedIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { RouteApp } from "@/pages/constants/route.enum";
 
 interface AdminSidebarProps {
-  onClickItem: (item: ItemSidebar) => void;
+  onClickItem: (item: ItemSidebarAdmin) => void;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onClickItem }) => {

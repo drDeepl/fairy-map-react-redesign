@@ -5,11 +5,11 @@ import {
 } from "@/components/ui/sidebar";
 import React from "react";
 import AdminSidebar from "../components/admin-sidebar.component";
-import { ItemSidebar } from "../interfaces/sidebar.interfaces";
+import { ItemSidebarAdmin } from "../interfaces/item-sidebar.interfaces";
 
 interface AdminSidebarLayoutProps {
   children: React.ReactNode;
-  onClickItemSidebar: (item: ItemSidebar) => void;
+  onClickItemSidebar: (item: ItemSidebarAdmin) => void;
 }
 
 const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({

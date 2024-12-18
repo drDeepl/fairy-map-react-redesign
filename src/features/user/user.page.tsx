@@ -15,7 +15,16 @@ const UserPage: React.FC = () => {
     }
   }, [user]);
 
-  return <div className="flex flex-col justify-center"></div>;
+  return (
+    <div className="flex flex-col justify-center justify-items-center px-72 py-4 space-y-16">
+      <div className="flex flex-col justify-start">
+        <span className="text-2xl font-semibold">
+          Привет, {user?.firstName}!
+        </span>
+      </div>
+      <div>Some content</div>
+    </div>
+  );
 };
 
 export default UserPage;

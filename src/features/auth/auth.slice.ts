@@ -14,7 +14,7 @@ export interface JwtPayload {
   role: string;
   iat: number;
   exp: number;
-  fistName: string;
+  firstName: string;
   lastName: string;
 }
 

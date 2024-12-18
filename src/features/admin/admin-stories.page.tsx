@@ -52,10 +52,8 @@ const AdminStoriesPage: React.FC = () => {
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 
-  const [
-    selectedLanguage,
-    setSelectedLanguage,
-  ] = useState<Components.Schemas.LanguageDto | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {

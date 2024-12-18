@@ -6,9 +6,9 @@ import { useNavigate } from "react-router-dom";
 import { fetchListBooks } from "../book/book.actions";
 import { fetchEthnicGroups } from "../ethnic-group/ethnic-group-list.actions";
 import AdminSidebarLayout from "./layouts/admin-sidebar.layout";
-import { ItemSidebar } from "./interfaces/sidebar.interfaces";
+import { ItemSidebarAdmin } from "./interfaces/item-sidebar.interfaces";
 import AdminStoriesPage from "./admin-stories.page";
-import { MenuItem } from "./constants/sidebar-items";
+import { MenuItemAdmin } from "./constants/sidebar-items";
 import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 
@@ -19,7 +19,7 @@ const AdminPage: React.FC = () => {
   const authState = useSelector((state: RootState) => state.auth);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentTab, setCurrentTab] = useState<string>(MenuItem.Story);
+  const [currentTab, setCurrentTab] = useState<string>(MenuItemAdmin.Story);
 
   useEffect(() => {
     if (!authState.user) {
@@ -35,17 +35,17 @@ const AdminPage: React.FC = () => {
     return <LoadSpinner />;
   }
 
-  const handleOnClickItemSidebar = (item: ItemSidebar) => {
+  const handleOnClickItemSidebar = (item: ItemSidebarAdmin) => {
     setCurrentTab(item.name);
   };
 
   return (
     <AdminSidebarLayout onClickItemSidebar={handleOnClickItemSidebar}>
-      <Tabs defaultValue={MenuItem.Story} value={currentTab}>
-        <TabsContent value={MenuItem.Story}>
+      <Tabs defaultValue={MenuItemAdmin.Story} value={currentTab}>
+        <TabsContent value={MenuItemAdmin.Story}>
           <AdminStoriesPage />
         </TabsContent>
-        <TabsContent value={MenuItem.Request}>
+        <TabsContent value={MenuItemAdmin.Request}>
           <AdminRequestsPage />
         </TabsContent>
       </Tabs>
