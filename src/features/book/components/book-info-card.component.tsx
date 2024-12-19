@@ -30,11 +30,11 @@ import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
 import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
-  audios: Components.Schemas.AudioStoryResponseDto[];
+  // audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
@@ -61,13 +61,22 @@ interface AudioState {
   audio: Components.Schemas.AudioStoryResponseDto | null;
 }
 
+interface ListAudiosState {
+  load: boolean;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+}
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
-  audios,
+  // audios,
   onClose,
   onUploadCover,
   children,
 }) => {
+  const [listAudioState, setListAudioState] = useState<ListAudiosState>({
+    load: true,
+    audios: [],
+  });
+
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
     fullScreen: false,
@@ -111,19 +120,16 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         handleAxiosError(err);
       });
 
-    // apiClient
-    //   .StoryController_getAudiosByStoryId(book.id)
-    //   .then(
-    //     (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
-    //       setAudioListState({
-    //         load: false,
-    //         audios: result.data,
-    //       });
-    //     }
-    //   )
-    //   .catch((err: AxiosError) => {
-    //     handleAxiosError(err);
-    //   });
+    apiClient
+      .StoryController_getAudiosByStoryId(book.id)
+      .then(
+        (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
+          setListAudioState({ load: false, audios: result.data });
+        }
+      )
+      .catch((err: AxiosError) => {
+        handleAxiosError(err);
+      });
   }, []);
 
   const handleShowText = (showText: boolean) => {
@@ -227,10 +233,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   
                 )} */}
                 <div className="flex space-x-4">
-                  <ListAudios
-                    audios={audios}
-                    onSelectAudio={handleOnSelectAudio}
-                  />
+                  {listAudioState.load ? (
+                    <Skeleton className="w-2/3 h-8" />
+                  ) : (
+                    <ListAudios
+                      audios={listAudioState.audios}
+                      onSelectAudio={handleOnSelectAudio}
+                    />
+                  )}
                   {children}
                 </div>
 

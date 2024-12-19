@@ -29,9 +29,8 @@ const MapPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
+    useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -57,16 +56,12 @@ const MapPage: React.FC = () => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
-    toast.info("on click audio");
-
     setSelectedAudioBook(audio);
   };
 
@@ -76,8 +71,8 @@ const MapPage: React.FC = () => {
 
   const handleOnClickRate = async (
     dto: Components.Schemas.AddRatingAudioStoryDto
-  ) => {
-    dispatch(addRatingAudio(dto));
+  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
+    return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
   useEffect(() => {

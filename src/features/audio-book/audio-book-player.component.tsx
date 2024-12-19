@@ -32,7 +32,7 @@ interface AudioBookPlayerProps {
   audios: Components.Schemas.AudioResponseDto[];
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
-  ) => Promise<void>;
+  ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   onClose: () => void;
   onClickAuth: () => void;
 }
@@ -73,15 +73,19 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
   const handleOnClickRate = async (value: number) => {
     try {
-      const res = await onClickRate({
-        rating: value + 1,
+      const addedRatingDto = await onClickRate({
+        rating: value,
         audioId: playListState.currentAudio.id,
       });
-      setRateState((prevState) => ({
-        ...prevState,
-        currentRate: value,
-        open: false,
-      }));
+      if (addedRatingDto !== undefined) {
+        setRateState((prevState) => ({
+          ...prevState,
+          currentRate: addedRatingDto.ratingAudioStory,
+          open: false,
+        }));
+      } else {
+        toast.error("что-то пошло не так...");
+      }
     } catch (error) {
       toast.error(error);
     }
@@ -111,10 +115,11 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                   onClickRate={handleOnClickRate}
                   onClickAuth={onClickAuth}
                 />
+                <span className="text-md text-orange-500">
+                  {rateState.currentRate > 0 ? rateState.currentRate : null} из
+                  5
+                </span>
               </div>
-              <span className="font-semibold text-orange-500">
-                {rateState.currentRate > 0 ? rateState.currentRate : null}
-              </span>
             </div>
           </div>
           <Separator className="bg-slate-300" />

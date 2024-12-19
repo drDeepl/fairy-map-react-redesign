@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Components } from "@/api/schemas/client";
 import {
   Command,
@@ -29,10 +29,12 @@ export const ListAudios: React.FC<ListAudiosProps> = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [value, setValue] = useState<string>("");
-  const [
-    selectedAudio,
-    setSelectedAudio,
-  ] = useState<Components.Schemas.AudioStoryResponseDto | null>(null);
+  const [selectedAudio, setSelectedAudio] =
+    useState<Components.Schemas.AudioStoryResponseDto | null>(null);
+
+  useEffect(() => {
+    console.log(audios);
+  }, []);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
