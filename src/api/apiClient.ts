@@ -26,16 +26,24 @@ async function initApiClient() {
     (response: AxiosResponse) => {
       return response;
     },
-    (error: AxiosError) => {
+    async (error: AxiosError) => {
+      const originalRequest: InternalAxiosRequestConfig = error.config!;
+
       const accessToken = localStorage.getItem("accessToken");
       console.log(accessToken);
       console.error("interceptors error", error);
       console.log(error.status);
-      if (error.status === 401) {
-        apiClient.AuthController_refresh().then((res) => {
-          console.log(res);
-          localStorage.setItem("accessToken", res.data.accessToken);
-        });
+      if (error.status === 401 && !originalRequest?.headers["X-Retry"]) {
+        originalRequest.headers["X-Retry"] = "true";
+
+        const tokenResponse = await apiClient.AuthController_refresh();
+        localStorage.setItem("accessToken", tokenResponse.data.accessToken);
+
+        originalRequest.headers[
+          "Authorization"
+        ] = `Bearer ${tokenResponse.data.accessToken}`;
+
+        return apiClient(originalRequest);
       }
 
       return Promise.reject(error);
