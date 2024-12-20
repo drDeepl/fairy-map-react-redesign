@@ -1,15 +1,11 @@
-import { Components, Paths } from "@/api/schemas/client";
+import { Components } from "@/api/schemas/client";
 import { AppDispatch, RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
 import { BookPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  createBook,
-  fetchAudiosByBookId,
-  uploadBookCover,
-} from "../book/book.actions";
+import { createBook, uploadBookCover } from "../book/book.actions";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import AddBookForm from "../book/components/forms/add-book.form";
 import ListBookCarousel from "../book/components/list-book-carousel.component";
@@ -69,8 +65,10 @@ const AdminStoriesPage: React.FC = () => {
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {

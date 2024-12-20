@@ -980,10 +980,6 @@ declare namespace Components {
              * access token
              */
             accessToken: string;
-            /**
-             * refresh token
-             */
-            refreshToken: string;
         }
         export interface TransformDto {
             /**
@@ -2033,6 +2029,21 @@ declare namespace Paths {
             }
         }
     }
+    namespace StoryControllerGetStoriesByAuthorAudioStory {
+        namespace Parameters {
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            userId: Parameters.UserId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.StoryWithImgResponseDto[];
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
     namespace StoryControllerGetStoriesByEthnicGroupId {
         namespace Parameters {
             export type EthnicGroupId = number;
@@ -2246,7 +2257,7 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AuthControllerSignIn.Responses.$200>
   /**
-   * AuthController_refresh -  обновление access token
+   * AuthController_refresh - обновление access token
    */
   'AuthController_refresh'(
     parameters?: Parameters<Paths.AuthControllerRefresh.HeaderParameters> | null,
@@ -2487,6 +2498,14 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+  /**
+   * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
+   */
+  'StoryController_getStoriesByAuthorAudioStory'(
+    parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
   /**
    * StoryController_getStoryByName - получение сказок в которых есть подстрока name
    */
@@ -2896,7 +2915,7 @@ export interface PathsDictionary {
   }
   ['/api/auth/refresh']: {
     /**
-     * AuthController_refresh -  обновление access token
+     * AuthController_refresh - обновление access token
      */
     'post'(
       parameters?: Parameters<Paths.AuthControllerRefresh.HeaderParameters> | null,
@@ -3189,6 +3208,16 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+  }
+  ['/api/story/audio/user/{userId}']: {
+    /**
+     * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
   }
   ['/api/story/by-name/{name}']: {
     /**

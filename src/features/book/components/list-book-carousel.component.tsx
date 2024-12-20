@@ -27,7 +27,6 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
   const handleOnClickBook = (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    console.log("on click book", book);
     onClickBook(book);
   };
   return (
@@ -38,6 +37,11 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
         }}
         className="flex flex-col justify-center"
       >
+        <div className="relative self-center my-6">
+          {children}
+          <CarouselNext className="border border-zinc-600" />
+          <CarouselPrevious className="border border-zinc-600" />
+        </div>
         <CarouselContent className="px-2">
           {load
             ? Array.from({ length: 5 }).map((_, idx) => {
@@ -64,11 +68,6 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
                 );
               })}
         </CarouselContent>
-        <div className="relative self-center my-6">
-          {children}
-          <CarouselNext className="border border-zinc-600" />
-          <CarouselPrevious className="border border-zinc-600" />
-        </div>
       </Carousel>
     </div>
   );
