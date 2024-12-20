@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -55,9 +55,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     currentAudio: audios[0],
   });
 
-  const handleOnError = (e: Event) => {
-    console.log(e);
+  useEffect(() => {});
 
+  const handleOnError = (e: Event) => {
     toast.error("произошла ошибка при загрузки аудиозаписи");
   };
 
@@ -68,7 +68,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   const [rateState, setRateState] = useState<RateState>({
     load: true,
     open: false,
-    currentRate: 0,
+    currentRate: audios.length > 0 ? audios[0].moderateScore : 0,
   });
 
   const handleOnClickRate = async (value: number) => {
@@ -87,7 +87,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         toast.error("что-то пошло не так...");
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message);
     }
   };
 
@@ -115,10 +115,11 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                   onClickRate={handleOnClickRate}
                   onClickAuth={onClickAuth}
                 />
-                <span className="text-md text-orange-500">
-                  {rateState.currentRate > 0 ? rateState.currentRate : null} из
-                  5
-                </span>
+                {rateState.currentRate > 0 ? (
+                  <span className="text-md text-orange-500">
+                    {rateState.currentRate} из 5
+                  </span>
+                ) : null}
               </div>
             </div>
           </div>
