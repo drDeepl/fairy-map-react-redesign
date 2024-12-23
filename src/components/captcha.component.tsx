@@ -15,7 +15,7 @@ const CaptchaComponent: React.FC<CaptchaComponentProps> = ({
   const siteKey = import.meta.env.VITE_CAPTCHA_SITE_KEY;
 
   const handleVerificationSuccess = (token: any) => {
-    console.log(token);
+    captchaRef.current?.resetCaptcha();
     captchaRef.current?.removeCaptcha();
     onSuccessVerify();
   };

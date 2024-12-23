@@ -1,11 +1,11 @@
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogHeader,
-} from "@/components/ui/alert-dialog";
 import React from "react";
-
+import {
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { CheckIcon } from "@radix-ui/react-icons";
 import { Button } from "./ui/button";
 
@@ -28,19 +28,22 @@ const SuccessMessageAlert: React.FC<SuccessMessageAlertProps> = ({
   buttonsName,
 }) => {
   return (
-    <AlertDialog open={open}>
-      <AlertDialogContent className="flex flex-col justify-center w-96 h-58">
-        <AlertDialogHeader>
-          <div className="flex items-center justify-center ">
-            <div className="rounded-full bg-green-100 size-14 p-1">
-              <CheckIcon className="size-12 text-green-400" />
+    <Dialog open={open}>
+      <DialogContent className="flex flex-col justify-center w-96 h-58">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="flex items-center justify-center ">
+              <div className="rounded-full bg-green-100 size-14 p-1">
+                <CheckIcon className="size-12 text-green-400" />
+              </div>
             </div>
-          </div>
+          </DialogTitle>
 
-          <AlertDialogDescription className="self-center text-lg text-slate-600 font-semibold">
+          <DialogDescription className="self-center text-lg text-slate-600 font-semibold">
             <p>{title}!</p>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
+
         <div className="flex justify-center space-x-6">
           <Button
             variant="outline"
@@ -57,8 +60,8 @@ const SuccessMessageAlert: React.FC<SuccessMessageAlertProps> = ({
             {buttonsName?.onCancel ? buttonsName.onCancel : "отмена"}
           </Button>
         </div>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
@@ -24,10 +24,12 @@ import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
 import { useNavigate } from "react-router-dom";
 
-import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
-import SuccessMessageAlert from "@/components/success-message-alert.component";
+import toast, { Toaster } from "react-hot-toast";
+import { Progress } from "@/components/ui/progress";
+import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 enum Tab {
   SignIn = "signin",
@@ -36,16 +38,61 @@ enum Tab {
 
 interface AuthFormProps {
   visible: boolean;
+  onSubmit: () => void;
   onClose: () => void;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
+interface NotifyWaitProgressState {
+  timer: any;
+  progress: number;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
   const authState = useSelector((state: RootState) => state.auth);
 
   const [visibleCaptcha, setVisibleCaptcha] = useState<boolean>(false);
+
+  const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
+
+  const notifyAuth = (msg: string) => {
+    toast.custom((t) => {
+      return (
+        <div
+          className={`flex flex-col w-full justify-items-center bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg ${
+            t.visible ? "animate-zoom-in" : "animate-zoom-out"
+          }`}
+        >
+          <p className="text-lg font-semibold flex justify-between">
+            <span>{msg}</span>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={() => {
+                toast.dismiss(t.id);
+                onClose();
+              }}
+            >
+              <Cross1Icon className="" />
+            </Button>
+          </p>
+          <Button
+            variant="outline"
+            className="text-sm self-start"
+            onClick={() => {
+              toast.dismiss(t.id);
+              onClose();
+              navigate(getRoutePageByUserRole(authState.user!.role));
+            }}
+          >
+            личный кабинет
+          </Button>
+        </div>
+      );
+    });
+  };
 
   const hundleSuccessCaptcha = () => {
     dispatch(setVerifyedCaptcha(true));
@@ -90,23 +137,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
     dispatch(setError(null));
   };
 
-  const [showDialogSuccessAuth, setShowDialogSuccessAuth] = useState<boolean>(
-    false
-  );
-
   useEffect(() => {
     if (authState.success) {
+      onSubmit();
+      notifyAuth(
+        currentTab === Tab.SignUp
+          ? "Регистрация прошла успешно!"
+          : "Вход выполнен успешно!"
+      );
       // navigate(getRoutePageByUserRole(authState.user!.role));
-
-      setShowDialogSuccessAuth(true);
+      // setShowDialogSuccessAuth(true);
     }
 
     return () => {
       dispatch(setSuccess(false));
     };
   }, [authState.success]);
-
-  const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
 
   return (
     <Dialog
@@ -118,6 +164,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
       }}
     >
       <DialogContent className="max-w-sm p-9">
+        <Toaster />
         <Tabs
           defaultValue={currentTab}
           onValueChange={(value: string) => {
@@ -125,25 +172,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
             clearForm();
           }}
         >
-          <SuccessMessageAlert
-            title={
-              currentTab === Tab.SignIn
-                ? `Добро пожаловать`
-                : "Вы успешно зарегистрировались"
-            }
-            open={showDialogSuccessAuth}
-            onSubmit={() =>
-              navigate(getRoutePageByUserRole(authState.user!.role))
-            }
-            onCancel={() => {
-              onClose();
-              setShowDialogSuccessAuth(false);
-            }}
-            buttonsName={{
-              onSubmit: "в личный кабинет",
-              onCancel: "остаться на странице",
-            }}
-          />
           <DialogTitle>
             <TabsList className="grid w-full grid-cols-2 mb-2">
               <TabsTrigger
@@ -164,7 +192,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
             {authState.error?.message || authState.error?.validationErrors ? (
               <ErrorsAlertComponent
                 title="ошибка"
-                errors={{ cdjqcndjq: [authState.error?.message] }}
+                errors={{ error: [authState.error?.message] }}
               />
             ) : null}
           </DialogDescription>
@@ -183,12 +211,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onClose }) => {
           <TabsContent value={"success"}>
             <Button>в личный кабинет</Button>
           </TabsContent>
-          {visibleCaptcha ? (
+          <div
+            className={`${
+              visibleCaptcha ? "overflow-hidden" : "overflow-auto"
+            }`}
+          >
             <CaptchaComponent
               onSuccessVerify={hundleSuccessCaptcha}
               onErrorVerify={hundleErrorCaptcha}
             />
-          ) : null}
+          </div>
         </Tabs>
       </DialogContent>
     </Dialog>

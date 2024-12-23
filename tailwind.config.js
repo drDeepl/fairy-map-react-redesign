@@ -8,6 +8,26 @@ export default {
         "cloud-uplaod": "url('./assets/img/cloud-upload.svg')",
       },
       keyframes: {
+        "zoom-in": {
+          "0%": {
+            opacity: "0",
+            transform: "scale(.5)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+        },
+        "zoom-out": {
+          "0%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "scale(.5)",
+          },
+        },
         tada: {
           "0%": {
             transform: "scale3d(1, 1, 1)",
@@ -111,6 +131,8 @@ export default {
         },
       },
       animation: {
+        "zoom-in": "zoom-in 0.3s ease-out",
+        "zoom-out": "zoom-out 0.3s ease-out",
         dropout: "drop-out 0.5s ease-in-out 0.25s 1",
         flyin: "fly-in 0.6s ease-in-out 0.25s 1",
         fadeinleft: "fade-in-left 1s ease-in-out 0.25s 1",

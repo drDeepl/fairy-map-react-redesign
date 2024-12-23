@@ -13,9 +13,9 @@ import { useNavigate } from "react-router-dom";
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { setFeatures } from "./map.slice";
 import { Components } from "@/api/schemas/client";
-import { toast } from "sonner";
 import AudioBookPlayer from "../audio-book/audio-book-player.component";
 import { addRatingAudio } from "../audio-book/audio-book.actions";
+import SuccessMessageAlert from "@/components/success-message-alert.component";
 
 const MapPage: React.FC = () => {
   const width: number = document.documentElement.clientWidth;
@@ -29,8 +29,9 @@ const MapPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -39,7 +40,7 @@ const MapPage: React.FC = () => {
 
   const [authFormVisible, setAuthFormVisible] = useState<boolean>(false);
 
-  const handleCloseAuthForm = () => {
+  const handleOnCloseAuthForm = () => {
     setAuthFormVisible(false);
     dispatch(setVerifyedCaptcha(false));
   };
@@ -56,8 +57,10 @@ const MapPage: React.FC = () => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
@@ -84,6 +87,10 @@ const MapPage: React.FC = () => {
     }
     setLoad(false);
   }, [dispatch]);
+
+  const handleOnSubmitAuth = () => {
+    console.log("handleOnSubmitAuth");
+  };
 
   if (mapState.loading || load) {
     return <LoadSpinner />;
@@ -119,9 +126,25 @@ const MapPage: React.FC = () => {
 
         <AuthForm
           visible={authFormVisible}
-          onClose={() => handleCloseAuthForm()}
+          onSubmit={handleOnSubmitAuth}
+          onClose={() => handleOnCloseAuthForm()}
         />
       </div>
+      {/* <SuccessMessageAlert
+        title=""
+        open={authState.success}
+        onSubmit={() => {
+          handleOnCloseAuthForm();
+          navigate(getRoutePageByUserRole(authState.user!.role));
+        }}
+        onCancel={() => {
+          handleOnCloseAuthForm();
+        }}
+        buttonsName={{
+          onSubmit: "в личный кабинет",
+          onCancel: "остаться на странице",
+        }}
+      /> */}
 
       {mapState.dataMap ? (
         <MapComponent
