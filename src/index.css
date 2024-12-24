@@ -83,3 +83,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+[data-scroll-locked][data-scroll-locked] {
+  overflow: scroll !important;
+}

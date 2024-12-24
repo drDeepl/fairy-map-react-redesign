@@ -1,3 +1,5 @@
+import { transform } from "topojson-client";
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ["class"],
@@ -8,6 +10,22 @@ export default {
         "cloud-uplaod": "url('./assets/img/cloud-upload.svg')",
       },
       keyframes: {
+        rotate180: {
+          from: {
+            transform: "rotate(0deg)",
+          },
+          to: {
+            transform: "rotate(180deg)",
+          },
+        },
+        rotate270: {
+          from: {
+            transform: "rotate(180deg)",
+          },
+          to: {
+            transform: "rotate(0deg)",
+          },
+        },
         "zoom-in": {
           "0%": {
             opacity: "0",
@@ -131,6 +149,8 @@ export default {
         },
       },
       animation: {
+        "rotate-180": "rotate180 0.3s linear forwards",
+        "rotate-270": "rotate270 0.3s linear forwards",
         "zoom-in": "zoom-in 0.3s ease-out",
         "zoom-out": "zoom-out 0.3s ease-out",
         dropout: "drop-out 0.5s ease-in-out 0.25s 1",

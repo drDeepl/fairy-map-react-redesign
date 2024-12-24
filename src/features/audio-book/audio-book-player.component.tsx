@@ -1,10 +1,5 @@
 import { Components } from "@/api/schemas/client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -17,10 +12,9 @@ import {
 import ReactAudioPlayer from "react-audio-player";
 import { toast } from "sonner";
 
-import { ListMusicIcon } from "lucide-react";
-import { StarIcon } from "@radix-ui/react-icons";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
+import AudioBookPlaylist from "./components/audio-book-playlist.component";
 
 interface PlayListState {
   load: boolean;
@@ -122,9 +116,15 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                 ) : null}
               </div>
             </div>
+            <AudioBookPlaylist
+              audios={audios}
+              currentAudio={playListState.currentAudio}
+              onClickAudio={handleOnClickAudio}
+            />
           </div>
           <Separator className="bg-slate-300" />
         </DialogDescription>
+
         {playListState.load ? (
           <Skeleton className="flex self-center w-full h-8 bg-neutral-300" />
         ) : (
@@ -136,42 +136,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               src={playListState.currentAudio.srcAudio}
               onError={handleOnError}
             />
-            <div>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <ListMusicIcon />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="">
-                  {audios.map((audio) => {
-                    return (
-                      <DropdownMenuItem
-                        key={`audio_lang_${audio.id}`}
-                        className="cursor-pointer flex flex-col"
-                        onClick={() => handleOnClickAudio(audio)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <div className="flex flex-col">
-                            <small className="col-span-1 text-slate-500 -mb-1">{`${audio.author.firstName} ${audio.author.lastName}`}</small>
-                            <span className="font-semibold text-md">
-                              {audio.language.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-[3px]">
-                            <StarIcon className="text-orange-500 ml-2 size-4" />
-                            <span className="font-semibold text-orange-500">
-                              {playListState.currentAudio.moderateScore > 0
-                                ? playListState.currentAudio.moderateScore
-                                : null}
-                            </span>
-                          </div>
-                        </div>
-                        <Separator className="bg-slate-300" />
-                      </DropdownMenuItem>
-                    );
-                  })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <div></div>
           </div>
         )}
       </DialogContent>
