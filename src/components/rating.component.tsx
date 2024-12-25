@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { start } from "repl";
 
 interface StarRatingProps {
   commonRating: number;
@@ -32,16 +31,12 @@ const StarRating: React.FC<StarRatingProps> = ({
 
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const [ratingState, setRatingState] = useState<RatingState>({
-    open: false,
-    currentRating: null,
-    load: false,
-  });
+  const [load, setLoad] = useState<boolean>(false);
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
-    const stars = document.getElementsByClassName("stars") as HTMLCollectionOf<
-      SVGAElement
-    >;
+    const stars = document.getElementsByClassName(
+      "stars"
+    ) as HTMLCollectionOf<SVGAElement>;
 
     const className = stars[0].getAttribute("class")?.split(" ");
     if (className) {
@@ -66,6 +61,8 @@ const StarRating: React.FC<StarRatingProps> = ({
   };
 
   const handleOnClickRate = async (value: number) => {
+    loadIcons(true);
+    setLoad(true);
     if (!user) {
       toast({
         style: {
@@ -76,8 +73,8 @@ const StarRating: React.FC<StarRatingProps> = ({
         action: <Button onClick={() => onClickAuth()}>войти</Button>,
       });
     } else {
-      loadIcons(true);
       onClickRate(value + 1).then(() => {
+        setLoad(false);
         loadIcons(false);
       });
     }
@@ -108,10 +105,16 @@ const StarRating: React.FC<StarRatingProps> = ({
                   variant="link"
                   onClick={() => handleOnClickRate(value)}
                   onMouseOver={() => {
-                    replaceFilledIcon("text-slate-50", 4);
-                    replaceFilledIcon("text-orange-500", value);
+                    if (!load) {
+                      replaceFilledIcon("text-slate-50", 4);
+                      replaceFilledIcon("text-orange-500", value);
+                    }
                   }}
-                  onMouseLeave={filledStarsCommonRating}
+                  onMouseLeave={() => {
+                    if (!load) {
+                      filledStarsCommonRating();
+                    }
+                  }}
                 >
                   <StarFilledIcon
                     id={`star-item-${value}`}

@@ -24,7 +24,7 @@ const WelcomePage: React.FC = () => {
         <div className="min-h-screen flex flex-col items-center justify-center backdrop-blur-sm bg-gradient-to-t from-orange-50">
           <div className="flex flex-col items-center">
             <h1 className="text-slate-700 text-3xl font-bold mb-3">{title}</h1>
-            <p className="text-slate-600 text-center text-balance text-balance">
+            <p className="text-slate-600 text-center text-balance">
               {description}
             </p>
           </div>

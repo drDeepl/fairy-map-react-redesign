@@ -9,13 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { ListMusicIcon } from "lucide-react";
 
-export interface AudioBookPLaylistProps {
+export interface AudioBookPlaylistProps {
   audios: Components.Schemas.AudioResponseDto[];
   onClickAudio: (audio: Components.Schemas.AudioResponseDto) => void;
 }
 
-const AudioBookPlaylist: React.FC<AudioBookPLaylistProps> = ({
+const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
   audios,
   onClickAudio: handleOnClickAudio,
 }) => {
@@ -24,20 +25,17 @@ const AudioBookPlaylist: React.FC<AudioBookPLaylistProps> = ({
       onOpenChange={(open) => {
         const caretIcon = document.getElementById("caret__dropdown");
         if (open && caretIcon) {
-          caretIcon.setAttribute(
-            "class",
-            "size-6 animate-rotate-180 cursor-pointer"
-          );
+          caretIcon.setAttribute("class", "size-6 animate-rotate-180");
         } else {
-          caretIcon?.setAttribute(
-            "class",
-            "size-6 animate-rotate-270 cursor-pointer"
-          );
+          caretIcon?.setAttribute("class", "size-6 animate-rotate-270");
         }
       }}
     >
       <DropdownMenuTrigger className="flex drop-shadow-md" asChild>
-        <CaretDownIcon id="caret__dropdown" className={`size-6 `} />
+        <div className="cursor-pointer">
+          <ListMusicIcon />
+          <CaretDownIcon id="caret__dropdown" className={`size-6 `} />
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="">
         <DropdownMenuLabel className="text-center">

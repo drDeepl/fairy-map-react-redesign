@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
 import AudioBookPlaylist from "./components/audio-book-playlist.component";
+import { AudioLinesIcon, ListMusicIcon } from "lucide-react";
+import ListAudios from "./components/list-audios.component";
 
 interface PlayListState {
   load: boolean;
@@ -70,7 +72,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
       } else {
         toast.error("что-то пошло не так...");
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.message);
     }
   };
@@ -87,17 +89,14 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
       <DialogContent>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription className="text-slate-700 text-lg text-center">
-          <div className="flex items-center justify-center space-x-2 space mb-2">
-            <div className="flex flex-col">
-              <small className="col-span-1 text-slate-500 -mb-1">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
+          <div className="flex items-center justify-center space-x-2 space mb-2 animate-zoom-in">
+            <div className="flex flex-col items-center justify-items-center border-r-2">
+              <small className="col-span-1 text-slate-500 -mb-1 self-center">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
+
               <div className="flex justify-center items-center">
                 <span className="font-semibold text-md">
                   {playListState.currentAudio.language.name}
                 </span>
-                <AudioBookPlaylist
-                  audios={audios}
-                  onClickAudio={handleOnClickAudio}
-                />
               </div>
 
               <div className="flex justify-center items-center space-x-[3px] mt-1">
@@ -108,6 +107,11 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                 />
               </div>
             </div>
+
+            <AudioBookPlaylist
+              audios={audios}
+              onClickAudio={handleOnClickAudio}
+            />
           </div>
           <Separator className="bg-slate-300" />
         </DialogDescription>
