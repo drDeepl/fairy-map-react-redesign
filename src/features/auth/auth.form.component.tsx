@@ -27,7 +27,6 @@ import { useNavigate } from "react-router-dom";
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
 import toast, { Toaster } from "react-hot-toast";
-import { Progress } from "@/components/ui/progress";
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
@@ -40,11 +39,6 @@ interface AuthFormProps {
   visible: boolean;
   onSubmit: () => void;
   onClose: () => void;
-}
-
-interface NotifyWaitProgressState {
-  timer: any;
-  progress: number;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {

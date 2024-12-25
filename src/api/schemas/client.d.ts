@@ -8,6 +8,20 @@ import type {
 
 declare namespace Components {
     namespace Schemas {
+        export interface AddAudioStoryApplicationDto {
+            /**
+             *
+             */
+            userAudioId: number;
+            /**
+             * ид пользователя, создавшего заявку
+             */
+            userId: number;
+            /**
+             *
+             */
+            storyId: number;
+        }
         export interface AddAudioStoryDto {
             /**
              *
@@ -21,24 +35,6 @@ declare namespace Components {
              * оценка от проверяющего
              */
             moderateScore: number;
-        }
-        export interface AddAudioStoryRequestDto {
-            /**
-             *
-             */
-            typeId: number;
-            /**
-             *
-             */
-            userAudioId: number;
-            /**
-             * ид пользователя, создавшего заявку
-             */
-            userId: number;
-            /**
-             *
-             */
-            storyId: number;
         }
         export interface AddConstituentDto {
             /**
@@ -152,13 +148,11 @@ declare namespace Components {
              */
             text: string;
         }
-        export interface AddTypeRequestDto {
-            /**
-             *
-             */
-            name: string;
-        }
         export interface AddedRatingAudioStoryDto {
+            /**
+             * ид озвучки
+             */
+            audioId: number;
             /**
              * оценка текущего пользователя
              */
@@ -168,48 +162,27 @@ declare namespace Components {
              */
             ratingAudioStory: number;
         }
-        export interface ApprovedUserAudioDto {
+        export interface AudioApplicationWithUserAudioDto {
             /**
-             * storyAudioId(ид опубликованной озвучки)
+             * ид заявки
              */
             id: number;
             /**
-             * данные озвучки пользователя
+             * данные о озвучки пользователя
              */
             userAudio: {
                 /**
-                 *
-                 */
-                name: string;
-                /**
-                 *
-                 */
-                languageId: number;
-                /**
                  * userAudioId
                  */
-                id: number;
-            };
-            /**
-             * id пользователя(автора)
-             */
-            author: number;
-            /**
-             * storyAudioId(ид опубликованной озвучки)
-             */
-            story: {
+                userAudioId: number;
                 /**
-                 * название истории
+                 * url для прослушивания файла
                  */
-                name: string;
+                srcAudio: string;
                 /**
-                 * id сказки
+                 * информация о языке озвучки
                  */
-                id: number;
-                /**
-                 * id этнической группы
-                 */
-                ethnicGroup: {
+                language: {
                     /**
                      *
                      */
@@ -217,13 +190,21 @@ declare namespace Components {
                     /**
                      *
                      */
-                    languageId: number;
-                    /**
-                     *
-                     */
                     id: number;
                 };
             };
+            /**
+             * ид пользователя
+             */
+            userId: number;
+            /**
+             * статус заявки
+             */
+            status: string;
+            /**
+             *
+             */
+            comment: string;
         }
         export interface AudioResponseDto {
             /**
@@ -274,7 +255,7 @@ declare namespace Components {
             userId: number;
             userAudioId: number;
             status: string;
-            typeId: number;
+            typeRequest: string;
             storyId: number;
             comment: string;
         }
@@ -422,7 +403,7 @@ declare namespace Components {
              */
             comment: string;
         }
-        export interface EditAudioStoryRequestDto {
+        export interface EditAudioStoryApplicaitonDto {
             /**
              *
              */
@@ -465,12 +446,6 @@ declare namespace Components {
              * текст сказки
              */
             text: string;
-        }
-        export interface EditTypeRequestDto {
-            /**
-             *
-             */
-            name: string;
         }
         export interface EthnicGroupDto {
             /**
@@ -999,29 +974,28 @@ declare namespace Components {
              */
             translate: any[][];
         }
-        export interface TypeRequestDto {
-            /**
-             *
-             */
-            name: string;
-            /**
-             *
-             */
-            id: number;
-        }
-        export interface UserAudioDto {
-            /**
-             *
-             */
-            name: string;
-            /**
-             *
-             */
-            languageId: number;
+        export interface UserAudioResponseDto {
             /**
              * userAudioId
              */
-            id: number;
+            userAudioId: number;
+            /**
+             * url для прослушивания файла
+             */
+            srcAudio: string;
+            /**
+             * информация о языке озвучки
+             */
+            language: {
+                /**
+                 *
+                 */
+                name: string;
+                /**
+                 *
+                 */
+                id: number;
+            };
         }
         export interface UserResponseDto {
             /**
@@ -1295,6 +1269,42 @@ declare namespace Paths {
             }
         }
     }
+    namespace AdminControllerDeleteUser {
+        namespace Parameters {
+            export type UserId = number;
+        }
+        export interface PathParameters {
+            userId: Parameters.UserId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.UserResponseDto;
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+            export interface $404 {
+            }
+        }
+    }
+    namespace AdminControllerDeleteUserAudioById {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type UserAudioId = number;
+        }
+        export interface PathParameters {
+            userAudioId: Parameters.UserAudioId;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.BaseUserAudioDto;
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
     namespace AdminControllerEditSotry {
         export interface HeaderParameters {
             authorization?: Parameters.Authorization;
@@ -1383,7 +1393,7 @@ declare namespace Paths {
         namespace Parameters {
             export type Authorization = string;
         }
-        export type RequestBody = Components.Schemas.AddAudioStoryRequestDto;
+        export type RequestBody = Components.Schemas.AddAudioStoryApplicationDto;
         namespace Responses {
             export type $200 = Components.Schemas.AudioStoryRequestEntity;
             export interface $400 {
@@ -1423,7 +1433,7 @@ declare namespace Paths {
         export interface PathParameters {
             audioStoryReqeustId: Parameters.AudioStoryReqeustId;
         }
-        export type RequestBody = Components.Schemas.EditAudioStoryRequestDto;
+        export type RequestBody = Components.Schemas.EditAudioStoryApplicaitonDto;
         namespace Responses {
             export type $200 = Components.Schemas.AudioStoryRequestEntity;
             export interface $400 {
@@ -1459,22 +1469,7 @@ declare namespace Paths {
             export type Authorization = string;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.AudioStoryRequestEntity[];
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace AudioStoryRequestControllerGetAllAudioStoryRequestsCurrentUser {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.AudioStoryRequestEntity[];
+            export type $200 = Components.Schemas.AudioApplicationWithUserAudioDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -1817,72 +1812,7 @@ declare namespace Paths {
             }
         }
     }
-    namespace RequestControllerAddTypeRequest {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-        }
-        export type RequestBody = Components.Schemas.AddTypeRequestDto;
-        namespace Responses {
-            export type $200 = Components.Schemas.TypeRequestDto;
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace RequestControllerDeleteTypeRequestById {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type TypeRequestId = number;
-        }
-        export interface PathParameters {
-            typeRequestId: Parameters.TypeRequestId;
-        }
-        namespace Responses {
-            export interface $200 {
-            }
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace RequestControllerEditTypeRequest {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type TypeRequestId = number;
-        }
-        export interface PathParameters {
-            typeRequestId: Parameters.TypeRequestId;
-        }
-        export type RequestBody = Components.Schemas.EditTypeRequestDto;
-        namespace Responses {
-            export type $200 = Components.Schemas.TypeRequestDto;
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace RequestControllerGetAllRequestTypes {
-        namespace Responses {
-            export type $200 = Components.Schemas.TypeRequestDto[];
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace RequestControllerGetRequestStatuses {
+    namespace RequestControllerGetStatuses {
         namespace Responses {
             export type $200 = string[];
             export interface $400 {
@@ -1891,19 +1821,9 @@ declare namespace Paths {
             }
         }
     }
-    namespace RequestControllerGetTypeRequestById {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type TypeRequestId = number;
-        }
-        export interface PathParameters {
-            typeRequestId: Parameters.TypeRequestId;
-        }
+    namespace RequestControllerGetTypes {
         namespace Responses {
-            export type $200 = Components.Schemas.TypeRequestDto[];
+            export type $200 = string[];
             export interface $400 {
             }
             export interface $401 {
@@ -2102,103 +2022,6 @@ declare namespace Paths {
             }
         }
     }
-    namespace UserAudioControllerDeleteUserAudioById {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type UserAudioId = number;
-        }
-        export interface PathParameters {
-            userAudioId: Parameters.UserAudioId;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.BaseUserAudioDto;
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace UserAudioControllerGetApprovedUserAudiosCurrentUser {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.ApprovedUserAudioDto[];
-            export interface $400 {
-            }
-        }
-    }
-    namespace UserAudioControllerGetCurrentUserAudios {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.UserAudioDto[];
-            export interface $400 {
-            }
-        }
-    }
-    namespace UserAudioControllerGetUserAudioById {
-        namespace Parameters {
-            export type UserAudioId = number;
-        }
-        export interface PathParameters {
-            userAudioId: Parameters.UserAudioId;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.StreamableFile;
-            export interface $400 {
-            }
-        }
-    }
-    namespace UserAudioControllerUploadUserAudio {
-        export interface HeaderParameters {
-            authorization?: Parameters.Authorization;
-        }
-        namespace Parameters {
-            export type Authorization = string;
-            export type LanguageId = number;
-        }
-        export interface PathParameters {
-            languageId: Parameters.LanguageId;
-        }
-        export interface RequestBody {
-            file?: string; // binary
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.UserAudioDto;
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-        }
-    }
-    namespace UserControllerDeleteUser {
-        namespace Parameters {
-            export type UserId = number;
-        }
-        export interface PathParameters {
-            userId: Parameters.UserId;
-        }
-        namespace Responses {
-            export type $200 = Components.Schemas.UserResponseDto;
-            export interface $400 {
-            }
-            export interface $401 {
-            }
-            export interface $404 {
-            }
-        }
-    }
     namespace UserControllerFindUserById {
         export interface HeaderParameters {
             authorization?: Parameters.Authorization;
@@ -2220,6 +2043,34 @@ declare namespace Paths {
             }
         }
     }
+    namespace UserControllerGetAllAudioStoryRequestsCurrentUser {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AudioApplicationWithUserAudioDto[];
+            export interface $400 {
+            }
+            export interface $401 {
+            }
+        }
+    }
+    namespace UserControllerGetApprovedUserAudiosCurrentUser {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.AudioStoryResponseDto[];
+            export interface $400 {
+            }
+        }
+    }
     namespace UserControllerGetCurrentUserInfo {
         export interface HeaderParameters {
             authorization?: Parameters.Authorization;
@@ -2234,6 +2085,30 @@ declare namespace Paths {
             export interface $401 {
             }
             export interface $404 {
+            }
+        }
+    }
+    namespace UserControllerUploadUserAudio {
+        export interface HeaderParameters {
+            authorization?: Parameters.Authorization;
+        }
+        namespace Parameters {
+            export type Authorization = string;
+            export type LanguageId = number;
+            export type StoryId = number;
+        }
+        export interface PathParameters {
+            languageId: Parameters.LanguageId;
+            storyId: Parameters.StoryId;
+        }
+        export interface RequestBody {
+            file?: string; // binary
+        }
+        namespace Responses {
+            export type $200 = Components.Schemas.UserAudioResponseDto;
+            export interface $400 {
+            }
+            export interface $401 {
             }
         }
     }
@@ -2281,6 +2156,14 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UserControllerGetCurrentUserInfo.Responses.$200>
   /**
+   * UserController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
+   */
+  'UserController_getApprovedUserAudiosCurrentUser'(
+    parameters?: Parameters<Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200>
+  /**
    * UserController_findUserById - получение информации о пользователе по его id
    * 
    * необходима роль администратора
@@ -2291,15 +2174,177 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UserControllerFindUserById.Responses.$200>
   /**
-   * UserController_deleteUser - удаленеи пользователя по его id
+   * UserController_uploadUserAudio - загрузка озвучки пользователя
+   * 
+   * файл прикрепляется к полю audio
+   */
+  'UserController_uploadUserAudio'(
+    parameters?: Parameters<Paths.UserControllerUploadUserAudio.PathParameters & Paths.UserControllerUploadUserAudio.HeaderParameters> | null,
+    data?: Paths.UserControllerUploadUserAudio.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UserControllerUploadUserAudio.Responses.$200>
+  /**
+   * UserController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
+   */
+  'UserController_getAllAudioStoryRequestsCurrentUser'(
+    parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
+  /**
+   * StoryController_getAllStories - получение всех сказок
+   */
+  'StoryController_getAllStories'(
+    parameters?: Parameters<UnknownParamsObject> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+  /**
+   * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
+   */
+  'StoryController_getStoriesByAuthorAudioStory'(
+    parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
+  /**
+   * StoryController_getStoryByName - получение сказок в которых есть подстрока name
+   */
+  'StoryController_getStoryByName'(
+    parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>
+  /**
+   * StoryController_getStoryById - получение общей информации о выбранной сказке
+   */
+  'StoryController_getStoryById'(
+    parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
+  /**
+   * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
+   */
+  'StoryController_getAudiosByStoryId'(
+    parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
+  /**
+   * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
+   */
+  'StoryController_getStoriesByEthnicGroupId'(
+    parameters?: Parameters<Paths.StoryControllerGetStoriesByEthnicGroupId.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>
+  /**
+   * StoryController_getTextStoryByStoryId - получение текста сказки
+   */
+  'StoryController_getTextStoryByStoryId'(
+    parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>
+  /**
+   * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
+   * 
+   * возвращает StreamableFile
+   */
+  'StoryController_getAudioStoryById'(
+    parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
+  /**
+   * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
+   */
+  'StoryController_getAudioStoryByEthnicGroup'(
+    parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
+  /**
+   * StoryController_getImgStoryById - получение обложки для сказки по storyId
+   */
+  'StoryController_getImgStoryById'(
+    parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
+  /**
+   * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
+   */
+  'StoryController_getRatingByAudioId'(
+    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>
+  /**
+   * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
+   */
+  'StoryController_getRatingByAudioIdForCurrentUser'(
+    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>
+  /**
+   * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
+   */
+  'StoryController_addRatingForStoryByCurrentUser'(
+    parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
+    data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>
+  /**
+   * AudioStoryRequestController_getAllAudioStoryRequests - получение всех заявок на озвучки
+   * 
+   * необходимы роль модератора
+   */
+  'AudioStoryRequestController_getAllAudioStoryRequests'(
+    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>
+  /**
+   * AudioStoryRequestController_getAllAudioStoryReqeustsByUserId - получение всех заявок на озвучки для выбранного пользователя.
+   * 
+   * Необходима роль модератора
+   */
+  'AudioStoryRequestController_getAllAudioStoryReqeustsByUserId'(
+    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
+  /**
+   * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
+   */
+  'AudioStoryRequestController_createAddAudioRequest'(
+    parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
+    data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>
+  /**
+   * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
+   * 
+   * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
+   */
+  'AudioStoryRequestController_editAudioStoryRequest'(
+    parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
+    data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>
+  /**
+   * AudioStoryRequestController_deleteAudioStoryRequestBydId - удаление заявки на проверку озвучки
    * 
    * необходима роль администратора
    */
-  'UserController_deleteUser'(
-    parameters?: Parameters<Paths.UserControllerDeleteUser.PathParameters> | null,
+  'AudioStoryRequestController_deleteAudioStoryRequestBydId'(
+    parameters?: Parameters<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.PathParameters & Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.HeaderParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserControllerDeleteUser.Responses.$200>
+  ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>
   /**
    * ConstituentsController_addConstituent - добавление субъекта РФ
    * 
@@ -2491,265 +2536,21 @@ export interface OperationMethods {
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>
   /**
-   * StoryController_getAllStories - получение всех сказок
+   * RequestController_getStatuses - получение существующих статусов для заявок
    */
-  'StoryController_getAllStories'(
+  'RequestController_getStatuses'(
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+  ): OperationResponse<Paths.RequestControllerGetStatuses.Responses.$200>
   /**
-   * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
+   * RequestController_getTypes - получение существующих типов заявок
    */
-  'StoryController_getStoriesByAuthorAudioStory'(
-    parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
-  /**
-   * StoryController_getStoryByName - получение сказок в которых есть подстрока name
-   */
-  'StoryController_getStoryByName'(
-    parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>
-  /**
-   * StoryController_getStoryById - получение общей информации о выбранной сказке
-   */
-  'StoryController_getStoryById'(
-    parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
-  /**
-   * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
-   */
-  'StoryController_getAudiosByStoryId'(
-    parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
-  /**
-   * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
-   */
-  'StoryController_getStoriesByEthnicGroupId'(
-    parameters?: Parameters<Paths.StoryControllerGetStoriesByEthnicGroupId.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>
-  /**
-   * StoryController_getTextStoryByStoryId - получение текста сказки
-   */
-  'StoryController_getTextStoryByStoryId'(
-    parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>
-  /**
-   * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
-   * 
-   * возвращает StreamableFile
-   */
-  'StoryController_getAudioStoryById'(
-    parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
-  /**
-   * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
-   */
-  'StoryController_getAudioStoryByEthnicGroup'(
-    parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
-  /**
-   * StoryController_getImgStoryById - получение обложки для сказки по storyId
-   */
-  'StoryController_getImgStoryById'(
-    parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
-  /**
-   * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
-   */
-  'StoryController_getRatingByAudioId'(
-    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>
-  /**
-   * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
-   */
-  'StoryController_getRatingByAudioIdForCurrentUser'(
-    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>
-  /**
-   * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
-   */
-  'StoryController_addRatingForStoryByCurrentUser'(
-    parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
-    data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>
-  /**
-   * UserAudioController_getCurrentUserAudios - получение озвучек текущего пользователя
-   */
-  'UserAudioController_getCurrentUserAudios'(
-    parameters?: Parameters<Paths.UserAudioControllerGetCurrentUserAudios.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserAudioControllerGetCurrentUserAudios.Responses.$200>
-  /**
-   * UserAudioController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
-   */
-  'UserAudioController_getApprovedUserAudiosCurrentUser'(
-    parameters?: Parameters<Paths.UserAudioControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserAudioControllerGetApprovedUserAudiosCurrentUser.Responses.$200>
-  /**
-   * UserAudioController_getUserAudioById - получение файла озвучки пользователя
-   */
-  'UserAudioController_getUserAudioById'(
-    parameters?: Parameters<Paths.UserAudioControllerGetUserAudioById.PathParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserAudioControllerGetUserAudioById.Responses.$200>
-  /**
-   * UserAudioController_uploadUserAudio - загрузка озвучки пользователя для выбранного языка
-   * 
-   * в теле запроса(body) файл прикрепляется к полю file
-   */
-  'UserAudioController_uploadUserAudio'(
-    parameters?: Parameters<Paths.UserAudioControllerUploadUserAudio.PathParameters & Paths.UserAudioControllerUploadUserAudio.HeaderParameters> | null,
-    data?: Paths.UserAudioControllerUploadUserAudio.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserAudioControllerUploadUserAudio.Responses.$200>
-  /**
-   * UserAudioController_deleteUserAudioById - удаление озвучки пользователя
-   * 
-   * необходима роль администратора
-   */
-  'UserAudioController_deleteUserAudioById'(
-    parameters?: Parameters<Paths.UserAudioControllerDeleteUserAudioById.PathParameters & Paths.UserAudioControllerDeleteUserAudioById.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.UserAudioControllerDeleteUserAudioById.Responses.$200>
-  /**
-   * AudioStoryRequestController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
-   */
-  'AudioStoryRequestController_getAllAudioStoryRequestsCurrentUser'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
-  /**
-   * AudioStoryRequestController_getAllAudioStoryRequests - получение всех заявок на озвучки
-   * 
-   * необходимы роль модератора
-   */
-  'AudioStoryRequestController_getAllAudioStoryRequests'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>
-  /**
-   * AudioStoryRequestController_getAllAudioStoryReqeustsByUserId - получение всех заявок на озвучки для выбранного пользователя.
-   * 
-   * Необходима роль модератора
-   */
-  'AudioStoryRequestController_getAllAudioStoryReqeustsByUserId'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
-  /**
-   * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
-   */
-  'AudioStoryRequestController_createAddAudioRequest'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
-    data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>
-  /**
-   * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
-   * 
-   * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
-   */
-  'AudioStoryRequestController_editAudioStoryRequest'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
-    data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>
-  /**
-   * AudioStoryRequestController_deleteAudioStoryRequestBydId - удаление заявки на проверку озвучки
-   * 
-   * необходима роль администратора
-   */
-  'AudioStoryRequestController_deleteAudioStoryRequestBydId'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.PathParameters & Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>
-  /**
-   * RequestController_getAllRequestTypes - получение списка всех типов заявок
-   */
-  'RequestController_getAllRequestTypes'(
+  'RequestController_getTypes'(
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerGetAllRequestTypes.Responses.$200>
-  /**
-   * RequestController_getTypeRequestById - получение типа заявки по id
-   */
-  'RequestController_getTypeRequestById'(
-    parameters?: Parameters<Paths.RequestControllerGetTypeRequestById.PathParameters & Paths.RequestControllerGetTypeRequestById.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerGetTypeRequestById.Responses.$200>
-  /**
-   * RequestController_addTypeRequest - добавление типа заявки
-   * 
-   * необходима роль администратора
-   */
-  'RequestController_addTypeRequest'(
-    parameters?: Parameters<Paths.RequestControllerAddTypeRequest.HeaderParameters> | null,
-    data?: Paths.RequestControllerAddTypeRequest.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerAddTypeRequest.Responses.$200>
-  /**
-   * RequestController_editTypeRequest - редактирование типа заявки
-   * 
-   * необходима роль администратора
-   */
-  'RequestController_editTypeRequest'(
-    parameters?: Parameters<Paths.RequestControllerEditTypeRequest.PathParameters & Paths.RequestControllerEditTypeRequest.HeaderParameters> | null,
-    data?: Paths.RequestControllerEditTypeRequest.RequestBody,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerEditTypeRequest.Responses.$200>
-  /**
-   * RequestController_deleteTypeRequestById - удаление типа заявки
-   * 
-   * необходима роль администратора
-   */
-  'RequestController_deleteTypeRequestById'(
-    parameters?: Parameters<Paths.RequestControllerDeleteTypeRequestById.PathParameters & Paths.RequestControllerDeleteTypeRequestById.HeaderParameters> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerDeleteTypeRequestById.Responses.$200>
-  /**
-   * RequestController_getRequestStatuses - получение существующих статусов для заявок
-   */
-  'RequestController_getRequestStatuses'(
-    parameters?: Parameters<UnknownParamsObject> | null,
-    data?: any,
-    config?: AxiosRequestConfig  
-  ): OperationResponse<Paths.RequestControllerGetRequestStatuses.Responses.$200>
+  ): OperationResponse<Paths.RequestControllerGetTypes.Responses.$200>
   /**
    * AddStoryRequestController_getAddStoryRequestAll - получение всех заявок на добавление сказки
    * 
@@ -2890,6 +2691,26 @@ export interface OperationMethods {
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
+  /**
+   * AdminController_deleteUserAudioById - удаление озвучки пользователя
+   * 
+   * необходима роль администратора
+   */
+  'AdminController_deleteUserAudioById'(
+    parameters?: Parameters<Paths.AdminControllerDeleteUserAudioById.PathParameters & Paths.AdminControllerDeleteUserAudioById.HeaderParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteUserAudioById.Responses.$200>
+  /**
+   * AdminController_deleteUser - удаление пользователя по его id
+   * 
+   * необходима роль администратора
+   */
+  'AdminController_deleteUser'(
+    parameters?: Parameters<Paths.AdminControllerDeleteUser.PathParameters> | null,
+    data?: any,
+    config?: AxiosRequestConfig  
+  ): OperationResponse<Paths.AdminControllerDeleteUser.Responses.$200>
 }
 
 export interface PathsDictionary {
@@ -2943,6 +2764,16 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UserControllerGetCurrentUserInfo.Responses.$200>
   }
+  ['/api/user/audio/approved/my']: {
+    /**
+     * UserController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
+     */
+    'get'(
+      parameters?: Parameters<Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200>
+  }
   ['/api/user/{userId}']: {
     /**
      * UserController_findUserById - получение информации о пользователе по его id
@@ -2955,17 +2786,217 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UserControllerFindUserById.Responses.$200>
   }
-  ['/api/user/delete/{userId}']: {
+  ['/api/user/story/{storyId}/language/{languageId}/audio/upload']: {
     /**
-     * UserController_deleteUser - удаленеи пользователя по его id
+     * UserController_uploadUserAudio - загрузка озвучки пользователя
+     * 
+     * файл прикрепляется к полю audio
+     */
+    'post'(
+      parameters?: Parameters<Paths.UserControllerUploadUserAudio.PathParameters & Paths.UserControllerUploadUserAudio.HeaderParameters> | null,
+      data?: Paths.UserControllerUploadUserAudio.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UserControllerUploadUserAudio.Responses.$200>
+  }
+  ['/api/user/story/audio/request/my']: {
+    /**
+     * UserController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
+     */
+    'get'(
+      parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
+  }
+  ['/api/story/all']: {
+    /**
+     * StoryController_getAllStories - получение всех сказок
+     */
+    'get'(
+      parameters?: Parameters<UnknownParamsObject> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+  }
+  ['/api/story/audio/user/{userId}']: {
+    /**
+     * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
+  }
+  ['/api/story/by-name/{name}']: {
+    /**
+     * StoryController_getStoryByName - получение сказок в которых есть подстрока name
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>
+  }
+  ['/api/story/{storyId}']: {
+    /**
+     * StoryController_getStoryById - получение общей информации о выбранной сказке
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
+  }
+  ['/api/story/{storyId}/audio/all']: {
+    /**
+     * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
+  }
+  ['/api/story/ethnic-group/{ethnicGroupId}']: {
+    /**
+     * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetStoriesByEthnicGroupId.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>
+  }
+  ['/api/story/text/{storyId}']: {
+    /**
+     * StoryController_getTextStoryByStoryId - получение текста сказки
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>
+  }
+  ['/api/story/audio/{storyAudioId}']: {
+    /**
+     * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
+     * 
+     * возвращает StreamableFile
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
+  }
+  ['/api/story/audio/ethnic-group/{ethnicGroupId}']: {
+    /**
+     * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
+  }
+  ['/api/story/{storyId}/image/{filename}']: {
+    /**
+     * StoryController_getImgStoryById - получение обложки для сказки по storyId
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
+  }
+  ['/api/story/rating/{audioId}']: {
+    /**
+     * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>
+  }
+  ['/api/story/rating/my/{userAudioId}']: {
+    /**
+     * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
+     */
+    'get'(
+      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>
+  }
+  ['/api/story/rating/add']: {
+    /**
+     * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
+     */
+    'post'(
+      parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
+      data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>
+  }
+  ['/api/audio-story-request/all']: {
+    /**
+     * AudioStoryRequestController_getAllAudioStoryRequests - получение всех заявок на озвучки
+     * 
+     * необходимы роль модератора
+     */
+    'get'(
+      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>
+  }
+  ['/api/audio-story-request/by-user/{userId}']: {
+    /**
+     * AudioStoryRequestController_getAllAudioStoryReqeustsByUserId - получение всех заявок на озвучки для выбранного пользователя.
+     * 
+     * Необходима роль модератора
+     */
+    'get'(
+      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
+  }
+  ['/api/audio-story-request/add']: {
+    /**
+     * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
+     */
+    'post'(
+      parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
+      data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>
+  }
+  ['/api/audio-story-request/edit/{audioStoryReqeustId}']: {
+    /**
+     * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
+     * 
+     * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
+     */
+    'put'(
+      parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
+      data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>
+  }
+  ['/api/audio-story-request/delete/{audioStoryRequestId}']: {
+    /**
+     * AudioStoryRequestController_deleteAudioStoryRequestBydId - удаление заявки на проверку озвучки
      * 
      * необходима роль администратора
      */
     'delete'(
-      parameters?: Parameters<Paths.UserControllerDeleteUser.PathParameters> | null,
+      parameters?: Parameters<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.PathParameters & Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.HeaderParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserControllerDeleteUser.Responses.$200>
+    ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>
   }
   ['/api/constituent/add']: {
     /**
@@ -3199,325 +3230,25 @@ export interface PathsDictionary {
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>
   }
-  ['/api/story/all']: {
+  ['/api/request/status']: {
     /**
-     * StoryController_getAllStories - получение всех сказок
+     * RequestController_getStatuses - получение существующих статусов для заявок
      */
     'get'(
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>
+    ): OperationResponse<Paths.RequestControllerGetStatuses.Responses.$200>
   }
-  ['/api/story/audio/user/{userId}']: {
+  ['/api/request/type']: {
     /**
-     * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>
-  }
-  ['/api/story/by-name/{name}']: {
-    /**
-     * StoryController_getStoryByName - получение сказок в которых есть подстрока name
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>
-  }
-  ['/api/story/{storyId}']: {
-    /**
-     * StoryController_getStoryById - получение общей информации о выбранной сказке
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>
-  }
-  ['/api/story/{storyId}/audio/all']: {
-    /**
-     * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>
-  }
-  ['/api/story/ethnic-group/{ethnicGroupId}']: {
-    /**
-     * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetStoriesByEthnicGroupId.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>
-  }
-  ['/api/story/text/{storyId}']: {
-    /**
-     * StoryController_getTextStoryByStoryId - получение текста сказки
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>
-  }
-  ['/api/story/audio/{storyAudioId}']: {
-    /**
-     * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
-     * 
-     * возвращает StreamableFile
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>
-  }
-  ['/api/story/audio/ethnic-group/{ethnicGroupId}']: {
-    /**
-     * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>
-  }
-  ['/api/story/{storyId}/image/{filename}']: {
-    /**
-     * StoryController_getImgStoryById - получение обложки для сказки по storyId
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>
-  }
-  ['/api/story/rating/{audioId}']: {
-    /**
-     * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>
-  }
-  ['/api/story/rating/my/{userAudioId}']: {
-    /**
-     * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
-     */
-    'get'(
-      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>
-  }
-  ['/api/story/rating/add']: {
-    /**
-     * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
-     */
-    'post'(
-      parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
-      data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>
-  }
-  ['/api/user-audio/my-audios']: {
-    /**
-     * UserAudioController_getCurrentUserAudios - получение озвучек текущего пользователя
-     */
-    'get'(
-      parameters?: Parameters<Paths.UserAudioControllerGetCurrentUserAudios.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserAudioControllerGetCurrentUserAudios.Responses.$200>
-  }
-  ['/api/user-audio/my-audios/approved']: {
-    /**
-     * UserAudioController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
-     */
-    'get'(
-      parameters?: Parameters<Paths.UserAudioControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserAudioControllerGetApprovedUserAudiosCurrentUser.Responses.$200>
-  }
-  ['/api/user-audio/{userAudioId}']: {
-    /**
-     * UserAudioController_getUserAudioById - получение файла озвучки пользователя
-     */
-    'get'(
-      parameters?: Parameters<Paths.UserAudioControllerGetUserAudioById.PathParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserAudioControllerGetUserAudioById.Responses.$200>
-  }
-  ['/api/user-audio/upload/{languageId}']: {
-    /**
-     * UserAudioController_uploadUserAudio - загрузка озвучки пользователя для выбранного языка
-     * 
-     * в теле запроса(body) файл прикрепляется к полю file
-     */
-    'put'(
-      parameters?: Parameters<Paths.UserAudioControllerUploadUserAudio.PathParameters & Paths.UserAudioControllerUploadUserAudio.HeaderParameters> | null,
-      data?: Paths.UserAudioControllerUploadUserAudio.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserAudioControllerUploadUserAudio.Responses.$200>
-  }
-  ['/api/user-audio/delete/{userAudioId}']: {
-    /**
-     * UserAudioController_deleteUserAudioById - удаление озвучки пользователя
-     * 
-     * необходима роль администратора
-     */
-    'delete'(
-      parameters?: Parameters<Paths.UserAudioControllerDeleteUserAudioById.PathParameters & Paths.UserAudioControllerDeleteUserAudioById.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.UserAudioControllerDeleteUserAudioById.Responses.$200>
-  }
-  ['/api/audio-story-request/my-requests']: {
-    /**
-     * AudioStoryRequestController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
-     */
-    'get'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
-  }
-  ['/api/audio-story-request/all']: {
-    /**
-     * AudioStoryRequestController_getAllAudioStoryRequests - получение всех заявок на озвучки
-     * 
-     * необходимы роль модератора
-     */
-    'get'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>
-  }
-  ['/api/audio-story-request/by-user/{userId}']: {
-    /**
-     * AudioStoryRequestController_getAllAudioStoryReqeustsByUserId - получение всех заявок на озвучки для выбранного пользователя.
-     * 
-     * Необходима роль модератора
-     */
-    'get'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
-  }
-  ['/api/audio-story-request/add']: {
-    /**
-     * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
-     */
-    'post'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
-      data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>
-  }
-  ['/api/audio-story-request/edit/{audioStoryReqeustId}']: {
-    /**
-     * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
-     * 
-     * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
-     */
-    'put'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
-      data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>
-  }
-  ['/api/audio-story-request/delete/{audioStoryRequestId}']: {
-    /**
-     * AudioStoryRequestController_deleteAudioStoryRequestBydId - удаление заявки на проверку озвучки
-     * 
-     * необходима роль администратора
-     */
-    'delete'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.PathParameters & Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>
-  }
-  ['/api/request/type/all']: {
-    /**
-     * RequestController_getAllRequestTypes - получение списка всех типов заявок
+     * RequestController_getTypes - получение существующих типов заявок
      */
     'get'(
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerGetAllRequestTypes.Responses.$200>
-  }
-  ['/api/request/type/{typeRequestId}']: {
-    /**
-     * RequestController_getTypeRequestById - получение типа заявки по id
-     */
-    'get'(
-      parameters?: Parameters<Paths.RequestControllerGetTypeRequestById.PathParameters & Paths.RequestControllerGetTypeRequestById.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerGetTypeRequestById.Responses.$200>
-  }
-  ['/api/request/type/add']: {
-    /**
-     * RequestController_addTypeRequest - добавление типа заявки
-     * 
-     * необходима роль администратора
-     */
-    'post'(
-      parameters?: Parameters<Paths.RequestControllerAddTypeRequest.HeaderParameters> | null,
-      data?: Paths.RequestControllerAddTypeRequest.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerAddTypeRequest.Responses.$200>
-  }
-  ['/api/request/type/edit/{typeRequestId}']: {
-    /**
-     * RequestController_editTypeRequest - редактирование типа заявки
-     * 
-     * необходима роль администратора
-     */
-    'put'(
-      parameters?: Parameters<Paths.RequestControllerEditTypeRequest.PathParameters & Paths.RequestControllerEditTypeRequest.HeaderParameters> | null,
-      data?: Paths.RequestControllerEditTypeRequest.RequestBody,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerEditTypeRequest.Responses.$200>
-  }
-  ['/api/request/type/delete/{typeRequestId}']: {
-    /**
-     * RequestController_deleteTypeRequestById - удаление типа заявки
-     * 
-     * необходима роль администратора
-     */
-    'delete'(
-      parameters?: Parameters<Paths.RequestControllerDeleteTypeRequestById.PathParameters & Paths.RequestControllerDeleteTypeRequestById.HeaderParameters> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerDeleteTypeRequestById.Responses.$200>
-  }
-  ['/api/request/status/all']: {
-    /**
-     * RequestController_getRequestStatuses - получение существующих статусов для заявок
-     */
-    'get'(
-      parameters?: Parameters<UnknownParamsObject> | null,
-      data?: any,
-      config?: AxiosRequestConfig  
-    ): OperationResponse<Paths.RequestControllerGetRequestStatuses.Responses.$200>
+    ): OperationResponse<Paths.RequestControllerGetTypes.Responses.$200>
   }
   ['/api/add-story-request/all']: {
     /**
@@ -3690,6 +3421,30 @@ export interface PathsDictionary {
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>
+  }
+  ['/api/admin/audio//delete/{userAudioId}']: {
+    /**
+     * AdminController_deleteUserAudioById - удаление озвучки пользователя
+     * 
+     * необходима роль администратора
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteUserAudioById.PathParameters & Paths.AdminControllerDeleteUserAudioById.HeaderParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteUserAudioById.Responses.$200>
+  }
+  ['/api/admin/user/delete/{userId}']: {
+    /**
+     * AdminController_deleteUser - удаление пользователя по его id
+     * 
+     * необходима роль администратора
+     */
+    'delete'(
+      parameters?: Parameters<Paths.AdminControllerDeleteUser.PathParameters> | null,
+      data?: any,
+      config?: AxiosRequestConfig  
+    ): OperationResponse<Paths.AdminControllerDeleteUser.Responses.$200>
   }
 }
 

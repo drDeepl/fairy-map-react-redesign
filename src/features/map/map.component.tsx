@@ -135,9 +135,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
-      (result) => console.log(result)
-    );
+    dispatch(
+      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    ).then((result) => console.log(result));
 
     // apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
     //   .get(ethnicGroupPoint.ethnicGroupId)
@@ -157,8 +157,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
     //   });
   };
 
-  const [selectedBook, setSelectedBook] =
-    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -217,7 +219,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                         modal={false}
                         onOpenChange={(open: boolean) => {
                           setListBookState({ load: true, books: [] });
-                          // setAudioStoryList({ load: true, audios: [] });
+
                           let color = "#82A9FD";
                           if (open) {
                             color = "red";

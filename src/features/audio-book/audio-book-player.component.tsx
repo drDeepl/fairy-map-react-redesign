@@ -31,12 +31,6 @@ interface AudioBookPlayerProps {
   onClickAuth: () => void;
 }
 
-interface RateState {
-  load: boolean;
-  open: boolean;
-  currentRate: number;
-}
-
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   title,
   audios,
@@ -59,12 +53,6 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     setPlayListState((prevState) => ({ ...prevState, currentAudio: audio }));
   };
 
-  const [rateState, setRateState] = useState<RateState>({
-    load: true,
-    open: false,
-    currentRate: audios.length > 0 ? audios[0].moderateScore : 0,
-  });
-
   const handleOnClickRate = async (value: number) => {
     try {
       const addedRatingDto = await onClickRate({
@@ -72,10 +60,12 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         audioId: playListState.currentAudio.id,
       });
       if (addedRatingDto !== undefined) {
-        setRateState((prevState) => ({
+        setPlayListState((prevState) => ({
           ...prevState,
-          currentRate: addedRatingDto.ratingAudioStory,
-          open: false,
+          currentAudio: {
+            ...prevState.currentAudio,
+            moderateScore: addedRatingDto.ratingAudioStory,
+          },
         }));
       } else {
         toast.error("что-то пошло не так...");
@@ -100,27 +90,24 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
           <div className="flex items-center justify-center space-x-2 space mb-2">
             <div className="flex flex-col">
               <small className="col-span-1 text-slate-500 -mb-1">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
-              <span className="font-semibold text-md">
-                {playListState.currentAudio.language.name}
-              </span>
+              <div className="flex justify-center items-center">
+                <span className="font-semibold text-md">
+                  {playListState.currentAudio.language.name}
+                </span>
+                <AudioBookPlaylist
+                  audios={audios}
+                  onClickAudio={handleOnClickAudio}
+                />
+              </div>
 
-              <div className="flex justify-center items-center space-x-[3px]">
+              <div className="flex justify-center items-center space-x-[3px] mt-1">
                 <StarRating
+                  commonRating={playListState.currentAudio.moderateScore}
                   onClickRate={handleOnClickRate}
                   onClickAuth={onClickAuth}
                 />
-                {rateState.currentRate > 0 ? (
-                  <span className="text-md text-orange-500">
-                    {rateState.currentRate} из 5
-                  </span>
-                ) : null}
               </div>
             </div>
-            <AudioBookPlaylist
-              audios={audios}
-              currentAudio={playListState.currentAudio}
-              onClickAudio={handleOnClickAudio}
-            />
           </div>
           <Separator className="bg-slate-300" />
         </DialogDescription>

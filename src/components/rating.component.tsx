@@ -1,5 +1,5 @@
 import { StarFilledIcon } from "@radix-ui/react-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RootState } from "@/app/store";
 
@@ -7,20 +7,24 @@ import { useSelector } from "react-redux";
 
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { start } from "repl";
 
 interface StarRatingProps {
-  onClickRate: (value: number) => void;
+  commonRating: number;
+  onClickRate: (value: number) => Promise<void>;
   onClickAuth: () => void;
 }
 
 interface RatingState {
   open: boolean;
   currentRating: number | null;
+  load: boolean;
 }
 
 const filledColorClass = "text-orange-500";
 
 const StarRating: React.FC<StarRatingProps> = ({
+  commonRating,
   onClickRate,
   onClickAuth,
 }) => {
@@ -31,6 +35,7 @@ const StarRating: React.FC<StarRatingProps> = ({
   const [ratingState, setRatingState] = useState<RatingState>({
     open: false,
     currentRating: null,
+    load: false,
   });
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
@@ -47,75 +52,90 @@ const StarRating: React.FC<StarRatingProps> = ({
     }
   };
 
-  const handleOnClickRate = (value: number) => {
-    if (ratingState.currentRating === value) {
-      replaceFilledIcon("text-slate-50", 4);
-      setRatingState({ open: false, currentRating: null });
-      onClickRate(0);
-    } else {
-      setRatingState({ open: false, currentRating: value });
-      replaceFilledIcon("text-slate-50", 4);
-      replaceFilledIcon("text-orange-500", value);
+  const loadIcons = () => {
+    for (let i = 0; i < 5; i++) {
+      document
+        .getElementById(`star-item-${i}`)
+        ?.setAttribute(
+          "class",
+          "text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500 animate-pulse"
+        );
     }
-    onClickRate(value + 1);
+    // for (let i = 0; i < stars.length; i++) {
+    //   stars
+    //     .item(i)
+    //     ?.setAttribute(
+    //       "class",
+    //       "text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500 animate-pulse"
+    //     );
+    // }
   };
+
+  const handleOnClickRate = async (value: number) => {
+    loadIcons();
+    if (!user) {
+      toast({
+        style: {
+          border: "1.5px solid var(--deep-red)",
+          right: "2rem",
+        },
+        title: "поставить оценку могу только авторизованные пользователи",
+        action: <Button onClick={() => onClickAuth()}>войти</Button>,
+      });
+    } else {
+      // if (ratingState.currentRating === value) {
+      //   replaceFilledIcon("text-slate-50", 4);
+      //   setRatingState({ open: false, currentRating: null });
+      //   onClickRate(0);
+      // } else {
+      //   setRatingState({ open: false, currentRating: value });
+      //   replaceFilledIcon("text-slate-50", 4);
+      //   replaceFilledIcon("text-orange-500", value);
+      // }
+      onClickRate(value + 1).then((result) => {});
+    }
+  };
+
+  const filledStarsCommonRating = () => {
+    // commonRating % 3
+    replaceFilledIcon("text-slate-50", 4);
+    replaceFilledIcon(filledColorClass, commonRating - 1);
+  };
+
+  useEffect(() => {
+    filledStarsCommonRating();
+  }, [commonRating]);
 
   return (
     <div className="flex justify-center space-x-1">
       <Toaster />
-      {ratingState.open ? (
-        <div className="flex justify-center space-x-1 animate-flyin">
-          {Array(5)
-            .fill(1)
-            .map((_, value: number) => {
-              return (
-                <div
-                  id="stars__container"
-                  key={value}
-                  className="cursor-pointer"
+      <div
+        id="stars__wrapper"
+        className="flex justify-center space-x-1 animate-flyin"
+      >
+        {Array(5)
+          .fill(1)
+          .map((_, value: number) => {
+            return (
+              <div id="stars__container" key={value} className="cursor-pointer">
+                <Button
+                  variant="link"
+                  onClick={() => handleOnClickRate(value)}
+                  onMouseOver={() => {
+                    replaceFilledIcon("text-slate-50", 4);
+                    replaceFilledIcon("text-orange-500", value);
+                  }}
+                  onMouseLeave={filledStarsCommonRating}
                 >
-                  <Button
-                    variant="link"
-                    onClick={() => handleOnClickRate(value)}
-                    onMouseOver={() =>
-                      replaceFilledIcon("text-orange-500", value)
-                    }
-                    onMouseLeave={() => {
-                      if (ratingState.currentRating != null) {
-                        replaceFilledIcon("text-slate-50", 4);
-                        replaceFilledIcon(
-                          filledColorClass,
-                          ratingState.currentRating
-                        );
-                      } else {
-                        replaceFilledIcon("text-slate-50", 4);
-                      }
-                    }}
-                  >
-                    <StarFilledIcon className="text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500" />
-                  </Button>
-                </div>
-              );
-            })}
-        </div>
-      ) : (
-        <StarFilledIcon
-          className="size-6 text-orange-500 drop-shadow-2xl cursor-pointer animate-flyin "
-          onClick={() =>
-            user
-              ? setRatingState((prevState) => ({ ...prevState, open: true }))
-              : toast({
-                  style: {
-                    border: "1.5px solid var(--deep-red)",
-                    right: "2rem",
-                  },
-                  title:
-                    "поставить оценку могу только авторизованные пользователи",
-                  action: <Button onClick={() => onClickAuth()}>войти</Button>,
-                })
-          }
-        />
-      )}
+                  <StarFilledIcon
+                    id={`star-item-${value}`}
+                    className="text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500"
+                  />
+                </Button>
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 };
