@@ -31,6 +31,7 @@ import { fetchAudiosByEthnicGroupId } from "../audio-book/audio-book.actions";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { AudioBookListState } from "../audio-book/components/audio-book-list.slice";
+import { Separator } from "@/components/ui/separator";
 
 interface MapComponentProps {
   features: any;
@@ -138,23 +139,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     dispatch(
       fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
     ).then((result) => console.log(result));
-
-    // apiClient.paths["/api/story/audio/ethnic-group/{ethnicGroupId}"]
-    //   .get(ethnicGroupPoint.ethnicGroupId)
-    //   .then((result: any) => {
-    //     console.log(result);
-    //     setAudioStoryList((prevState) => ({
-    //       ...prevState,
-    //       load: false,
-    //       audios: result.data,
-    //     }));
-    //   })
-    //   .catch((error: AxiosError) => {
-    //     toast.error(error.message, {
-    //       className: "toast-map-component",
-    //     });
-    //     setAudioStoryList((prevState) => ({ ...prevState, load: false }));
-    //   });
   };
 
   const [
@@ -259,7 +243,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                             <Skeleton className="flex self-center w-48 h-8 bg-neutral-300" />
                           ) : (
                             <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2">
+                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
                                 <LibraryBig className="stroke-gray-600" />
                                 <span className="text-sm">книги</span>
                                 <span className="">
@@ -270,16 +254,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                 <DropdownMenuSubContent>
                                   {listBookState.books.length > 0 ? (
                                     listBookState.books.map((book) => (
-                                      <DropdownMenuItem key={book.id}>
-                                        <Button
-                                          className="w-full"
-                                          variant="ghost"
-                                          onClick={() =>
-                                            handleOnClickBook(book)
-                                          }
-                                        >
+                                      <DropdownMenuItem
+                                        key={book.id}
+                                        className="flex flex-col hover:bg-slate-100"
+                                        onClick={() => handleOnClickBook(book)}
+                                      >
+                                        <Separator />
+                                        <span className="font-semibold p-2 cursor-pointer">
                                           {book.name}
-                                        </Button>
+                                        </span>
                                       </DropdownMenuItem>
                                     ))
                                   ) : (
@@ -295,7 +278,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                             <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
                           ) : (
                             <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 ">
+                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
                                 <BookHeadphones className="stroke-gray-600" />
                                 <span className="text-sm ">аудиокниги</span>
                                 <span>
@@ -312,12 +295,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                       ) => {
                                         return (
                                           <DropdownMenuItem
+                                            className="flex flex-col items-center hover:bg-slate-100"
                                             key={storyAudio.id}
                                             onClick={() =>
                                               onClickAudioBook(storyAudio)
                                             }
                                           >
-                                            {storyAudio.name}
+                                            <Separator />
+                                            <span className="font-semibold p-2 cursor-pointer">
+                                              {storyAudio.name}
+                                            </span>
                                           </DropdownMenuItem>
                                         );
                                       }

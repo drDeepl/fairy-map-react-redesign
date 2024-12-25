@@ -31,6 +31,7 @@ import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
 import { AxiosError, AxiosResponse } from "axios";
+import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playlist.component";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -236,9 +237,16 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   {listAudioState.load ? (
                     <Skeleton className="w-2/3 h-8" />
                   ) : (
-                    <ListAudios
+                    // <ListAudios
+                    //   audios={listAudioState.audios}
+                    //   onSelectAudio={handleOnSelectAudio}
+                    // />
+
+                    <AudioBookPlaylist
                       audios={listAudioState.audios}
-                      onSelectAudio={handleOnSelectAudio}
+                      onClickAudio={() => {
+                        console.log("click audio");
+                      }}
                     />
                   )}
                   {children}

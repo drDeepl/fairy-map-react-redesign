@@ -52,27 +52,20 @@ const StarRating: React.FC<StarRatingProps> = ({
     }
   };
 
-  const loadIcons = () => {
+  const loadIcons = (load: boolean) => {
     for (let i = 0; i < 5; i++) {
       document
         .getElementById(`star-item-${i}`)
         ?.setAttribute(
           "class",
-          "text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500 animate-pulse"
+          `text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500 ${
+            load ? "animate-pulse" : ""
+          }`
         );
     }
-    // for (let i = 0; i < stars.length; i++) {
-    //   stars
-    //     .item(i)
-    //     ?.setAttribute(
-    //       "class",
-    //       "text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500 animate-pulse"
-    //     );
-    // }
   };
 
   const handleOnClickRate = async (value: number) => {
-    loadIcons();
     if (!user) {
       toast({
         style: {
@@ -83,21 +76,14 @@ const StarRating: React.FC<StarRatingProps> = ({
         action: <Button onClick={() => onClickAuth()}>войти</Button>,
       });
     } else {
-      // if (ratingState.currentRating === value) {
-      //   replaceFilledIcon("text-slate-50", 4);
-      //   setRatingState({ open: false, currentRating: null });
-      //   onClickRate(0);
-      // } else {
-      //   setRatingState({ open: false, currentRating: value });
-      //   replaceFilledIcon("text-slate-50", 4);
-      //   replaceFilledIcon("text-orange-500", value);
-      // }
-      onClickRate(value + 1).then((result) => {});
+      loadIcons(true);
+      onClickRate(value + 1).then(() => {
+        loadIcons(false);
+      });
     }
   };
 
   const filledStarsCommonRating = () => {
-    // commonRating % 3
     replaceFilledIcon("text-slate-50", 4);
     replaceFilledIcon(filledColorClass, commonRating - 1);
   };
@@ -111,7 +97,7 @@ const StarRating: React.FC<StarRatingProps> = ({
       <Toaster />
       <div
         id="stars__wrapper"
-        className="flex justify-center space-x-1 animate-flyin"
+        className="flex justify-center items-center animate-flyin "
       >
         {Array(5)
           .fill(1)
