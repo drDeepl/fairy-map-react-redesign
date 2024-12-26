@@ -16,7 +16,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+import { Cross1Icon, EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -24,7 +24,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { CoverUploadDto } from "../interfaces/cover-upload.dto";
-import ListAudios from "../../audio-book/components/list-audios.component";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
 import LoadSpinner from "@/components/ui/load-spinner";
@@ -35,7 +42,6 @@ import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playl
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
-  // audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
@@ -68,7 +74,6 @@ interface ListAudiosState {
 }
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
-  // audios,
   onClose,
   onUploadCover,
   children,
@@ -167,164 +172,157 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     setAudioState((prevState) => ({ ...prevState, load: false, audio: audio }));
   };
 
-  const [openDialog, setOpenDialog] = useState<boolean>(true);
-
   return (
-    <Dialog
-      open={openDialog}
-      onOpenChange={(open) => {
-        if (!open) {
-          onClose();
-          setOpenDialog(open);
-        }
-      }}
-    >
-      <DialogContent className="">
-        <DialogHeader>
-          {textAction.fullScreen ? null : (
-            <div className="w-full flex my-4 animate-out gap-4">
-              <div className="w-44 h-56 flex justify-items-center justify-center">
-                {infoBookState.loadCover ? (
-                  <div>
-                    <LoadSpinner />
-                  </div>
-                ) : (
-                  <Label
-                    htmlFor="picture"
-                    className={`${onUploadCover ? "cursor-pointer" : ""}`}
-                  >
-                    {infoBookState.book.srcImg ? (
-                      <img
-                        src={infoBookState.book.srcImg}
-                        alt={infoBookState.book.name}
-                        className="rounded-t-xl w-44 h-56 object-cover"
-                      />
-                    ) : (
-                      <div className="w-44 h-56">
-                        <NotCoverBook />
-                      </div>
-                    )}
-                  </Label>
-                )}
+    <Card className="w-full">
+      <CardHeader className="pt-0 mt-0">
+        {textAction.fullScreen ? null : (
+          <div className="w-full flex my-4 animate-out gap-4">
+            <div className="w-44 h-56 flex justify-items-center justify-center">
+              {infoBookState.loadCover ? (
+                <div>
+                  <LoadSpinner />
+                </div>
+              ) : (
+                <Label
+                  htmlFor="picture"
+                  className={`${onUploadCover ? "cursor-pointer" : ""}`}
+                >
+                  {infoBookState.book.srcImg ? (
+                    <img
+                      src={infoBookState.book.srcImg}
+                      alt={infoBookState.book.name}
+                      className="rounded-t-xl w-44 h-56 object-cover"
+                    />
+                  ) : (
+                    <div className="w-44 h-56">
+                      <NotCoverBook />
+                    </div>
+                  )}
+                </Label>
+              )}
 
-                {onUploadCover ? (
-                  <Input
-                    className="hidden"
-                    id="picture"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUploadFile}
-                  />
-                ) : null}
-              </div>
+              {onUploadCover ? (
+                <Input
+                  className="hidden"
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadFile}
+                />
+              ) : null}
+            </div>
 
-              <div className="w-2/3">
-                <DialogTitle>
-                  <div className="flex space-x-2">
-                    <span>{infoBookState.book.name}</span>
-                  </div>
-                </DialogTitle>
-                <DialogDescription>
-                  {infoBookState.book.ethnicGroup.name}
-                </DialogDescription>
+            <div className="w-2/3">
+              <CardTitle className="flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <span>{infoBookState.book.name}</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={onClose}>
+                  <Cross1Icon />
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                {infoBookState.book.ethnicGroup.name}
+              </CardDescription>
 
-                {/* {audiosListState.load ? (
+              {/* {audiosListState.load ? (
                   <Skeleton className="w-full h-10" />
                 ) : (
                   
                 )} */}
-                <div className="flex space-x-4">
-                  {listAudioState.load ? (
-                    <Skeleton className="w-2/3 h-8" />
-                  ) : (
-                    // <ListAudios
-                    //   audios={listAudioState.audios}
-                    //   onSelectAudio={handleOnSelectAudio}
-                    // />
+              <div className="flex space-x-4">
+                {listAudioState.load ? (
+                  <Skeleton className="w-2/3 h-8" />
+                ) : (
+                  // <ListAudios
+                  //   audios={listAudioState.audios}
+                  //   onSelectAudio={handleOnSelectAudio}
+                  // />
 
-                    <AudioBookPlaylist
-                      audios={listAudioState.audios}
-                      onClickAudio={() => {
-                        console.log("click audio");
-                      }}
-                    />
-                  )}
-                  {children}
-                </div>
+                  <AudioBookPlaylist
+                    audios={listAudioState.audios}
+                    onClickAudio={() => {
+                      console.log("click audio");
+                    }}
+                  />
+                )}
+                {children}
+              </div>
 
-                <div className="flex w-full pt-2">
-                  {audioState.audio && !audioState.load ? (
-                    <AudioPlayer
-                      playList={[{ id: 1, src: audioState.audio?.srcAudio }]}
-                      activeUI={{
-                        playButton: true,
-                        progress: "bar",
-                        volume: true,
-                        volumeSlider: true,
-                        trackTime: true,
-                      }}
-                      placement={{
-                        interface: {
-                          templateArea: {
-                            trackTimeDuration: "row1-6",
-                            progress: "row1-4",
-                            playButton: "row1-1",
-                            volume: "row2-1",
-                          },
-                        } as InterfacePlacement,
-                      }}
-                    />
-                  ) : null}
-                  {audioState.load ? (
-                    <Skeleton className="w-full h-10 mt-2" />
-                  ) : null}
-                </div>
+              <div className="flex w-full pt-2">
+                {audioState.audio && !audioState.load ? (
+                  <AudioPlayer
+                    playList={[{ id: 1, src: audioState.audio?.srcAudio }]}
+                    activeUI={{
+                      playButton: true,
+                      progress: "bar",
+                      volume: true,
+                      volumeSlider: true,
+                      trackTime: true,
+                    }}
+                    placement={{
+                      interface: {
+                        templateArea: {
+                          trackTimeDuration: "row1-6",
+                          progress: "row1-4",
+                          playButton: "row1-1",
+                          volume: "row2-1",
+                        },
+                      } as InterfacePlacement,
+                    }}
+                  />
+                ) : null}
+                {audioState.load ? (
+                  <Skeleton className="w-full h-10 mt-2" />
+                ) : null}
               </div>
             </div>
-          )}
-        </DialogHeader>
-        <DialogFooter className="-mt-11">
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="story-text">
-              <AccordionTrigger
-                className="text-base outline-none justify-start space-x-2"
-                onClick={() => {
-                  handleShowText(!textAction.show);
-                }}
-              >
+          </div>
+        )}
+      </CardHeader>
+      <CardContent className="-mt-14">
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="story-text">
+            <AccordionTrigger
+              className="text-base outline-none justify-start space-x-2"
+              onClick={() => {
+                handleShowText(!textAction.show);
+              }}
+            >
+              {textAction.fullScreen ? null : (
                 <div className="flex justify-between">
                   <span className="animate-in text-md">
                     {!textAction.show ? "показать текст" : "скрыть текст"}
                   </span>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="max-h-72 rounded-md border overflow-auto">
-                {infoBookState.loadText ? (
-                  <LoadSpinner />
-                ) : (
-                  <div className="text-base">
-                    <p className="row-span-1 flex justify-center">
-                      {infoBookState.text}
-                    </p>
-                    <div className="fixed -right-[5rem] bottom-7 w-1/3">
-                      <Button
-                        variant="secondary"
-                        className="size-8 animate-out border border-slate-800"
-                        onClick={() => {
-                          handleFullScreen(!textAction.fullScreen);
-                        }}
-                      >
-                        <EnterFullScreenIcon className=" text-slate-800" />
-                      </Button>
-                    </div>
+              )}
+            </AccordionTrigger>
+            <AccordionContent className="max-h-72 rounded-md border overflow-auto">
+              {infoBookState.loadText ? (
+                <LoadSpinner />
+              ) : (
+                <div className="text-base">
+                  <p className="row-span-1 flex justify-center">
+                    {infoBookState.text}
+                  </p>
+                  <div className="fixed -right-[5rem] bottom-7 w-1/3">
+                    <Button
+                      variant="secondary"
+                      className="size-8 animate-out border border-slate-800"
+                      onClick={() => {
+                        handleFullScreen(!textAction.fullScreen);
+                      }}
+                    >
+                      <EnterFullScreenIcon className=" text-slate-800" />
+                    </Button>
                   </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </CardContent>
+    </Card>
   );
 };
 

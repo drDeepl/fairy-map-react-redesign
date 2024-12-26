@@ -38,6 +38,10 @@ interface MapComponentProps {
   onClickAudioBook: (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => void;
+
+  onClickBook: (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => Promise<void>;
 }
 
 interface ListBookState {
@@ -50,6 +54,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   width,
   height,
   onClickAudioBook,
+  onClickBook,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -137,17 +142,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     dispatch(
       fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
     ).then((result) => console.log(result));
-  };
-
-  const [
-    selectedBook,
-    setSelectedBook,
-  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
-
-  const handleOnClickBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => {
-    setSelectedBook(book);
   };
 
   useEffect(() => {
@@ -255,7 +249,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                                       <DropdownMenuItem
                                         key={book.id}
                                         className="flex flex-col hover:bg-slate-100"
-                                        onClick={() => handleOnClickBook(book)}
+                                        onClick={() => onClickBook(book)}
                                       >
                                         <Separator />
                                         <span className="font-semibold p-2 cursor-pointer">
@@ -326,12 +320,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
           })}
         </g>
       </svg>
-      {selectedBook ? (
-        <BookInfoCardComponent
-          book={selectedBook}
-          onClose={() => setSelectedBook(null)}
-        />
-      ) : null}
     </div>
   );
 };

@@ -2,12 +2,6 @@ import { Components } from "@/api/schemas/client";
 
 import React, { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
 
 import ReactAudioPlayer from "react-audio-player";
 import { toast } from "sonner";
@@ -15,6 +9,16 @@ import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
 import AudioBookPlaylist from "./components/audio-book-playlist.component";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Button } from "@/components/ui/button";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 interface PlayListState {
   load: boolean;
@@ -22,7 +26,6 @@ interface PlayListState {
 }
 
 interface AudioBookPlayerProps {
-  open: boolean;
   audioBook: Components.Schemas.PreviewAudioStoryResponseDto;
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
@@ -32,7 +35,6 @@ interface AudioBookPlayerProps {
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
-  open,
   audioBook,
   onClickRate,
   onClose,
@@ -74,17 +76,16 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(open: boolean) => {
-        if (!open) {
-          onClose();
-        }
-      }}
-    >
-      <DialogContent>
-        <DialogTitle>{audioBook.name}</DialogTitle>
-        <DialogDescription className="text-slate-700 text-lg text-center">
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex justify-between items-center">
+          <div>{audioBook.name}</div>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <Cross1Icon />
+          </Button>
+        </CardTitle>
+
+        <CardDescription className="text-slate-700 text-lg text-center">
           <div className="flex items-center justify-center space-x-2 space mb-2 animate-zoom-in">
             <div className="flex flex-col items-center justify-items-center border-r-2">
               <small className="col-span-1 text-slate-500 -mb-1 self-center">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
@@ -110,8 +111,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
             />
           </div>
           <Separator className="bg-slate-300" />
-        </DialogDescription>
-
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         {playListState.load ? (
           <Skeleton className="flex self-center w-full h-8 bg-neutral-300" />
         ) : (
@@ -126,8 +128,8 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
             <div></div>
           </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </CardContent>
+    </Card>
   );
 };
 
