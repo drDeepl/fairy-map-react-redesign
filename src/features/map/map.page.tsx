@@ -15,12 +15,15 @@ import { setFeatures } from "./map.slice";
 import { Components } from "@/api/schemas/client";
 import AudioBookPlayer from "../audio-book/audio-book-player.component";
 import { addRatingAudio } from "../audio-book/audio-book.actions";
-import SuccessMessageAlert from "@/components/success-message-alert.component";
 
-const MapPage: React.FC = () => {
-  const width: number = document.documentElement.clientWidth;
-  const height: number = document.documentElement.clientHeight;
+import { Report } from "notiflix/build/notiflix-report-aio";
 
+interface MapPageProps {
+  width: number;
+  height: number;
+}
+
+const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
 
@@ -40,7 +43,7 @@ const MapPage: React.FC = () => {
 
   const [authFormVisible, setAuthFormVisible] = useState<boolean>(false);
 
-  const handleOnCloseAuthForm = () => {
+  const handleOnCloseAuthForm = async () => {
     setAuthFormVisible(false);
     dispatch(setVerifyedCaptcha(false));
   };
@@ -78,6 +81,32 @@ const MapPage: React.FC = () => {
     return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
+  const handleOnSubmitAuth = async (msg: string) => {
+    handleOnCloseAuthForm().then((result) => {
+      Report.success(
+        msg,
+        "* чтобы остаться на странице щелкните по зеленому фону",
+        "личный кабинет",
+        () => (
+          <Button
+            onClick={() =>
+              navigate(getRoutePageByUserRole(authState.user!.role))
+            }
+          ></Button>
+        ),
+        {
+          backOverlayClickToClose: true,
+          borderRadius: "0.5rem",
+
+          success: {
+            titleColor: "#334155",
+            messageColor: "#94a3b8",
+          },
+        }
+      );
+    });
+  };
+
   useEffect(() => {
     const features: string | null = localStorage.getItem("features");
     if (!features) {
@@ -87,10 +116,6 @@ const MapPage: React.FC = () => {
     }
     setLoad(false);
   }, [dispatch]);
-
-  const handleOnSubmitAuth = () => {
-    console.log("handleOnSubmitAuth");
-  };
 
   if (mapState.loading || load) {
     return <LoadSpinner />;

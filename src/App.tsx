@@ -9,7 +9,7 @@ import AdminPage from "./features/admin/admin.page.tsx";
 import UserPage from "./features/user/user.page.tsx";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "./app/store.ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { setUser } from "./features/auth/auth.slice.ts";
 
@@ -21,24 +21,52 @@ export interface LocationParams {
   key: string;
 }
 
+interface ScreenSizeState {
+  width: number;
+  height: number;
+}
+
 function App() {
   const location: LocationParams = useLocation();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  const [screenSize, setScreenSize] = useState<ScreenSizeState>({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+  });
+
   useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        width: document.documentElement.clientWidth,
+        height: document.documentElement.clientHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
     const currentUser = checkValidAccessTokenInLocalStorage();
     if (currentUser) {
       dispatch(setUser(currentUser));
     }
     navigate(location.pathname);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location}>
         <Route path={RouteApp.HomePage} element={<WelcomePage />} />
-        <Route path={RouteApp.MapPage} element={<MapPage />} />
+        <Route
+          path={RouteApp.MapPage}
+          element={
+            <MapPage width={screenSize.width} height={screenSize.height} />
+          }
+        />
         <Route path={RouteApp.AdminPage} element={<AdminPage />} />
         <Route path={RouteApp.UserPage} element={<UserPage />} />
         <Route

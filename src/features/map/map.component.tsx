@@ -21,8 +21,6 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { Button } from "@/components/ui/button";
-
 import { toast, Toaster, useSonner } from "sonner";
 import { AxiosError } from "axios";
 

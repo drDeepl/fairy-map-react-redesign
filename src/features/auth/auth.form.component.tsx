@@ -12,11 +12,14 @@ import {
 } from "./auth.slice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent, Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
 import SignInForm from "./forms/sign-in.form.component";
 
@@ -26,8 +29,8 @@ import { useNavigate } from "react-router-dom";
 
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
-import toast, { Toaster } from "react-hot-toast";
-import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
 enum Tab {
@@ -37,7 +40,7 @@ enum Tab {
 
 interface AuthFormProps {
   visible: boolean;
-  onSubmit: () => void;
+  onSubmit: (msg: string) => void;
   onClose: () => void;
 }
 
@@ -51,42 +54,67 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
 
   const [currentTab, setCurrentTab] = useState<string>(Tab.SignIn);
 
-  const notifyAuth = (msg: string) => {
-    toast.custom((t) => {
-      return (
-        <div
-          className={`flex flex-col w-full justify-items-center bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg ${
-            t.visible ? "animate-zoom-in" : "animate-zoom-out"
-          }`}
-        >
-          <p className="text-lg font-semibold flex justify-between">
-            <span>{msg}</span>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => {
-                toast.dismiss(t.id);
-                onClose();
-              }}
-            >
-              <Cross1Icon className="" />
-            </Button>
-          </p>
-          <Button
-            variant="outline"
-            className="text-sm self-start"
-            onClick={() => {
-              toast.dismiss(t.id);
-              onClose();
-              navigate(getRoutePageByUserRole(authState.user!.role));
-            }}
-          >
-            личный кабинет
-          </Button>
-        </div>
-      );
-    });
-  };
+  // const notifyAuth = (msg: string) => {
+  //   toast.custom((t) => {
+  //     return (
+  //       <div
+  //         className={`flex flex-col w-full justify-items-center bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg ${
+  //           t.visible ? "animate-zoom-in" : "animate-zoom-out"
+  //         }`}
+  //       >
+  //         <p className="text-lg font-semibold flex justify-between">
+  //           <span>{msg}</span>
+  //           <Button
+  //             size="icon"
+  //             variant="ghost"
+  //             onClick={() => {
+  //               toast.dismiss(t.id);
+  //               onClose();
+  //             }}
+  //           >
+  //             <Cross1Icon className="" />
+  //           </Button>
+  //         </p>
+  //         <Button
+  //           variant="outline"
+  //           className="text-sm self-start"
+  //           onClick={() => {
+  //             toast.dismiss(t.id);
+  //             onClose();
+  //             navigate(getRoutePageByUserRole(authState.user!.role));
+  //           }}
+  //         >
+  //           личный кабинет
+  //         </Button>
+  //       </div>
+  //     );
+  //   });
+  // };
+
+  // const notifyAuth = (msg: string) => {
+  // toast({
+  //   style: {
+  //     border: "1.5px solid #43A047",
+  //     right: "0.5rem",
+  //     backgroundColor: "#E8F5E9",
+  //     position: "absolute",
+  //     top: "1rem",
+  //   },
+  //   title: msg,
+  //   action: (
+  //     <Button
+  //       variant="outline"
+  //       className="text-sm self-start"
+  //       onClick={() => {
+  //         onClose();
+  //         navigate(getRoutePageByUserRole(authState.user!.role));
+  //       }}
+  //     >
+  //       личный кабинет
+  //     </Button>
+  //   ),
+  // });
+  // };
 
   const hundleSuccessCaptcha = () => {
     dispatch(setVerifyedCaptcha(true));
@@ -133,8 +161,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
 
   useEffect(() => {
     if (authState.success) {
-      onSubmit();
-      notifyAuth(
+      onSubmit(
         currentTab === Tab.SignUp
           ? "Регистрация прошла успешно!"
           : "Вход выполнен успешно!"
@@ -158,7 +185,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
       }}
     >
       <DialogContent className="max-w-sm p-9">
-        <Toaster />
         <Tabs
           defaultValue={currentTab}
           onValueChange={(value: string) => {
