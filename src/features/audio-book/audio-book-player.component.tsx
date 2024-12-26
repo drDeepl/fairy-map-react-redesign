@@ -1,6 +1,6 @@
 import { Components } from "@/api/schemas/client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
@@ -15,8 +15,6 @@ import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
 import AudioBookPlaylist from "./components/audio-book-playlist.component";
-import { AudioLinesIcon, ListMusicIcon } from "lucide-react";
-import ListAudios from "./components/list-audios.component";
 
 interface PlayListState {
   load: boolean;
@@ -24,8 +22,8 @@ interface PlayListState {
 }
 
 interface AudioBookPlayerProps {
-  title: string;
-  audios: Components.Schemas.AudioResponseDto[];
+  open: boolean;
+  audioBook: Components.Schemas.PreviewAudioStoryResponseDto;
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
@@ -34,18 +32,16 @@ interface AudioBookPlayerProps {
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
-  title,
-  audios,
+  open,
+  audioBook,
   onClickRate,
   onClose,
   onClickAuth,
 }) => {
   const [playListState, setPlayListState] = useState<PlayListState>({
     load: false,
-    currentAudio: audios[0],
+    currentAudio: audioBook.audios[0],
   });
-
-  useEffect(() => {});
 
   const handleOnError = (e: Event) => {
     toast.error("произошла ошибка при загрузки аудиозаписи");
@@ -72,14 +68,14 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
       } else {
         toast.error("что-то пошло не так...");
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.error(error.message);
     }
   };
 
   return (
     <Dialog
-      open={true}
+      open={open}
       onOpenChange={(open: boolean) => {
         if (!open) {
           onClose();
@@ -87,7 +83,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
       }}
     >
       <DialogContent>
-        <DialogTitle>{title}</DialogTitle>
+        <DialogTitle>{audioBook.name}</DialogTitle>
         <DialogDescription className="text-slate-700 text-lg text-center">
           <div className="flex items-center justify-center space-x-2 space mb-2 animate-zoom-in">
             <div className="flex flex-col items-center justify-items-center border-r-2">
@@ -109,7 +105,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
             </div>
 
             <AudioBookPlaylist
-              audios={audios}
+              audios={audioBook.audios}
               onClickAudio={handleOnClickAudio}
             />
           </div>

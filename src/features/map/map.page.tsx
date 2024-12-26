@@ -23,6 +23,11 @@ interface MapPageProps {
   height: number;
 }
 
+interface SelectedAudioBookState {
+  open: boolean;
+  audioBook: Components.Schemas.PreviewAudioStoryResponseDto | null;
+}
+
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const mapState = useSelector((state: RootState) => state.map);
   const authState: AuthState = useSelector((state: RootState) => state.auth);
@@ -60,19 +65,23 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBookState, setSelectedAudioBookState] = useState<
+    SelectedAudioBookState
+  >({
+    open: false,
+    audioBook: null,
+  });
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
-    setSelectedAudioBook(audio);
+    console.log("handleOnClickAudioBook");
+    console.log(audio);
+    setSelectedAudioBookState({ open: true, audioBook: audio });
   };
 
   const handleOnCloseAudioBook = () => {
-    setSelectedAudioBook(null);
+    setSelectedAudioBookState((prevState) => ({ ...prevState, open: false }));
   };
 
   const handleOnClickRate = async (
@@ -155,21 +164,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           onClose={() => handleOnCloseAuthForm()}
         />
       </div>
-      {/* <SuccessMessageAlert
-        title=""
-        open={authState.success}
-        onSubmit={() => {
-          handleOnCloseAuthForm();
-          navigate(getRoutePageByUserRole(authState.user!.role));
-        }}
-        onCancel={() => {
-          handleOnCloseAuthForm();
-        }}
-        buttonsName={{
-          onSubmit: "в личный кабинет",
-          onCancel: "остаться на странице",
-        }}
-      /> */}
 
       {mapState.dataMap ? (
         <MapComponent
@@ -181,10 +175,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       ) : (
         ""
       )}
-      {selectedAudioBook ? (
+
+      {selectedAudioBookState.audioBook ? (
         <AudioBookPlayer
-          title={selectedAudioBook.name}
-          audios={selectedAudioBook.audios}
+          open={selectedAudioBookState.open}
+          audioBook={selectedAudioBookState.audioBook}
           onClickRate={handleOnClickRate}
           onClose={handleOnCloseAudioBook}
           onClickAuth={handleOnClickAvatar}
