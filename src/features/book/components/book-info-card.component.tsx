@@ -33,12 +33,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import AudioPlayer, { InterfacePlacement } from "react-modern-audio-player";
+
 import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
 import { AxiosError, AxiosResponse } from "axios";
-import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playlist.component";
+
 import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 
 interface BookInfoCardProps {
@@ -186,7 +186,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full border-none">
       <CardHeader className="pt-0 mt-0">
         {textAction.fullScreen ? null : (
           <div className="w-full flex my-4 animate-out gap-4">
@@ -238,40 +238,32 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 {infoBookState.book.ethnicGroup.name}
               </CardDescription>
 
-              {/* {audiosListState.load ? (
-                  <Skeleton className="w-full h-10" />
-                ) : (
-                  
-                )} */}
               <div className="flex space-x-4 mt-2">
-                {listAudioState.load ? (
-                  <Skeleton className="w-2/3 h-8" />
-                ) : (
-                  // <ListAudios
-                  //   audios={listAudioState.audios}
-                  //   onSelectAudio={handleOnSelectAudio}
-                  // />
-
-                  <AudioBookPlayer
-                    audioBook={
-                      {
-                        ...book,
-                        audios: listAudioState.audios,
-                      } as Components.Schemas.PreviewAudioStoryResponseDto
-                    }
-                    onClickRate={onClickRate}
-                    onClickAuth={onClickAuth}
-                    onClose={() => {}}
-                    hideHeader={true}
-                  />
-                )}
+                <div>
+                  {listAudioState.load ? (
+                    <Skeleton className="w-2/3 h-8" />
+                  ) : (
+                    <AudioBookPlayer
+                      audioBook={
+                        {
+                          ...book,
+                          audios: listAudioState.audios,
+                        } as Components.Schemas.PreviewAudioStoryResponseDto
+                      }
+                      onClickRate={onClickRate}
+                      onClickAuth={onClickAuth}
+                      onClose={() => {}}
+                      hideHeader={true}
+                    />
+                  )}
+                </div>
                 {children}
               </div>
             </div>
           </div>
         )}
       </CardHeader>
-      {/* <CardContent></CardContent> */}
+
       <CardFooter className="-mt-14">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">

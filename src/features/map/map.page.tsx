@@ -26,7 +26,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DialogClose } from "@radix-ui/react-dialog";
+
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 interface MapPageProps {
@@ -43,9 +43,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
+    useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -71,10 +70,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -122,10 +119,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     });
   };
 
-  const [
-    selectedBook,
-    setSelectedBook,
-  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [selectedBook, setSelectedBook] =
+    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -209,6 +204,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               onClickRate={handleOnClickRate}
               onClose={handleOnCloseAudioBook}
               onClickAuth={handleOnClickAvatar}
+              hideHeader={false}
             />
           ) : null}
 
@@ -218,7 +214,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               onClickRate={handleOnClickRate}
               onClickAuth={handleOnClickAvatar}
               onClose={() => handleOnCloseBook}
-            />
+            ></BookInfoCardComponent>
           ) : null}
         </DialogContent>
       </Dialog>

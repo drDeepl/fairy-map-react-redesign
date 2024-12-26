@@ -21,10 +21,9 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { toast, Toaster, useSonner } from "sonner";
+import { toast, Toaster } from "sonner";
 import { AxiosError } from "axios";
 
-import BookInfoCardComponent from "../book/components/book-info-card.component";
 import { fetchAudiosByEthnicGroupId } from "../audio-book/audio-book.actions";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
@@ -139,9 +138,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(
-      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
-    ).then((result) => console.log(result));
+    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
+      (result) => console.log(result)
+    );
   };
 
   useEffect(() => {

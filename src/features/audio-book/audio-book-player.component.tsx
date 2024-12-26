@@ -18,12 +18,9 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
-import { LanguagesIcon } from "lucide-react";
-import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
-interface PlayListState {
+interface PlaylistState {
   open: boolean;
   load: boolean;
   currentAudio: Components.Schemas.AudioResponseDto;
@@ -44,9 +41,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickRate,
   onClose,
   onClickAuth,
-  hideHeader = false,
+  hideHeader,
 }) => {
-  const [playListState, setPlayListState] = useState<PlayListState>({
+  const [playListState, setPlayListState] = useState<PlaylistState>({
     open: false,
     load: false,
     currentAudio: audioBook.audios[0],
@@ -99,10 +96,10 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
           </CardTitle>
         )}
 
-        <AudioBookPlaylist
+        {/* <AudioBookPlaylist
           audios={audioBook.audios}
           onClickAudio={handleOnClickAudio}
-        />
+        /> */}
 
         <Separator />
 

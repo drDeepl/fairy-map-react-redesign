@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { LanguagesIcon, ListMusicIcon } from "lucide-react";
+import { LanguagesIcon } from "lucide-react";
 
 export interface AudioBookPlaylistProps {
   audios: Components.Schemas.AudioResponseDto[];
@@ -38,11 +38,13 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
           className=" cursor-pointer flex drop-shadow-md space-x-1"
           asChild
         >
-          <LanguagesIcon />
-          <DropdownMenuLabel className="text-center">
-            {currentLang === null ? "Выберите язык" : currentLang}
-          </DropdownMenuLabel>
-          <CaretDownIcon id="caret__dropdown" className={`size-6`} />
+          <div>
+            <LanguagesIcon />
+            <DropdownMenuLabel className="text-center">
+              {currentLang === null ? "Выберите язык" : currentLang}
+            </DropdownMenuLabel>
+            <CaretDownIcon id="caret__dropdown" className={`size-6`} />
+          </div>
         </DropdownMenuTrigger>
 
         <DropdownMenuContent className="">
