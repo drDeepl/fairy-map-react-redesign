@@ -41,7 +41,7 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
           <div>
             <LanguagesIcon />
             <DropdownMenuLabel className="text-center">
-              {currentLang === null ? "Выберите язык" : currentLang}
+              {currentLang === null ? "Выберите язык" : `${currentLang} язык`}
             </DropdownMenuLabel>
             <CaretDownIcon id="caret__dropdown" className={`size-6`} />
           </div>

@@ -96,11 +96,10 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
           </CardTitle>
         )}
 
-        {/* <AudioBookPlaylist
+        <AudioBookPlaylist
           audios={audioBook.audios}
           onClickAudio={handleOnClickAudio}
-        /> */}
-
+        />
         <Separator />
 
         <CardDescription className="text-slate-700 text-lg text-center">
