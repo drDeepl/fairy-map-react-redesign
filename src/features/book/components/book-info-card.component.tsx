@@ -39,10 +39,15 @@ import apiClient from "@/api/apiClient";
 import { toast } from "sonner";
 import { AxiosError, AxiosResponse } from "axios";
 import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playlist.component";
+import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
   onClose: () => void;
+  onClickRate: (
+    dto: Components.Schemas.AddRatingAudioStoryDto
+  ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
+  onClickAuth: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
@@ -74,6 +79,8 @@ interface ListAudiosState {
 }
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
+  onClickAuth,
+  onClickRate,
   onClose,
   onUploadCover,
   children,
@@ -108,6 +115,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   useEffect(() => {
+    console.log(book);
+
     setInfoBookState((prevState) => ({ ...prevState, loadText: true }));
     apiClient
       .StoryController_getTextStoryByStoryId(book.id)
@@ -126,16 +135,20 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         handleAxiosError(err);
       });
 
-    apiClient
-      .StoryController_getAudiosByStoryId(book.id)
+    apiClient.paths["/api/story/{storyId}/audio/all"]
+      .get({ storyId: book.id })
       .then(
         (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
+          console.log(result);
           setListAudioState({ load: false, audios: result.data });
         }
       )
       .catch((err: AxiosError) => {
         handleAxiosError(err);
       });
+
+    // apiClient
+    //   .StoryController_getAudiosByStoryId(book.id)
   }, []);
 
   const handleShowText = (showText: boolean) => {
@@ -221,7 +234,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   <Cross1Icon />
                 </Button>
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="-mt-1">
                 {infoBookState.book.ethnicGroup.name}
               </CardDescription>
 
@@ -230,7 +243,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 ) : (
                   
                 )} */}
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 mt-2">
                 {listAudioState.load ? (
                   <Skeleton className="w-2/3 h-8" />
                 ) : (
@@ -239,48 +252,27 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   //   onSelectAudio={handleOnSelectAudio}
                   // />
 
-                  <AudioBookPlaylist
-                    audios={listAudioState.audios}
-                    onClickAudio={() => {
-                      console.log("click audio");
-                    }}
+                  <AudioBookPlayer
+                    audioBook={
+                      {
+                        ...book,
+                        audios: listAudioState.audios,
+                      } as Components.Schemas.PreviewAudioStoryResponseDto
+                    }
+                    onClickRate={onClickRate}
+                    onClickAuth={onClickAuth}
+                    onClose={() => {}}
+                    hideHeader={true}
                   />
                 )}
                 {children}
-              </div>
-
-              <div className="flex w-full pt-2">
-                {audioState.audio && !audioState.load ? (
-                  <AudioPlayer
-                    playList={[{ id: 1, src: audioState.audio?.srcAudio }]}
-                    activeUI={{
-                      playButton: true,
-                      progress: "bar",
-                      volume: true,
-                      volumeSlider: true,
-                      trackTime: true,
-                    }}
-                    placement={{
-                      interface: {
-                        templateArea: {
-                          trackTimeDuration: "row1-6",
-                          progress: "row1-4",
-                          playButton: "row1-1",
-                          volume: "row2-1",
-                        },
-                      } as InterfacePlacement,
-                    }}
-                  />
-                ) : null}
-                {audioState.load ? (
-                  <Skeleton className="w-full h-10 mt-2" />
-                ) : null}
               </div>
             </div>
           </div>
         )}
       </CardHeader>
-      <CardContent className="-mt-14">
+      {/* <CardContent></CardContent> */}
+      <CardFooter className="-mt-14">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">
             <AccordionTrigger
@@ -321,7 +313,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      </CardContent>
+      </CardFooter>
     </Card>
   );
 };

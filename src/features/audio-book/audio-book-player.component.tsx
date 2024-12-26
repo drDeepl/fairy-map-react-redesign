@@ -18,9 +18,13 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
+import { LanguagesIcon } from "lucide-react";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PlayListState {
+  open: boolean;
   load: boolean;
   currentAudio: Components.Schemas.AudioResponseDto;
 }
@@ -30,8 +34,9 @@ interface AudioBookPlayerProps {
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
-  onClose: () => void;
   onClickAuth: () => void;
+  onClose: () => void;
+  hideHeader: boolean;
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
@@ -39,14 +44,21 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickRate,
   onClose,
   onClickAuth,
+  hideHeader = false,
 }) => {
   const [playListState, setPlayListState] = useState<PlayListState>({
+    open: false,
     load: false,
     currentAudio: audioBook.audios[0],
   });
 
   const handleOnError = (e: Event) => {
     toast.error("произошла ошибка при загрузки аудиозаписи");
+  };
+
+  const handleOnClickPlayer = () => {
+    console.log("handleOnClickPlayer");
+    setPlayListState((prevState) => ({ ...prevState, open: !prevState.open }));
   };
 
   const handleOnClickAudio = (audio: Components.Schemas.AudioResponseDto) => {
@@ -76,18 +88,27 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <div>{audioBook.name}</div>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <Cross1Icon />
-          </Button>
-        </CardTitle>
+    <Card className="w-full border-none">
+      <CardHeader className="">
+        {hideHeader ? null : (
+          <CardTitle className="flex justify-between items-center">
+            <div>{audioBook.name}</div>
+            <Button variant="ghost" size="icon" onClick={onClose}>
+              <Cross1Icon />
+            </Button>
+          </CardTitle>
+        )}
+
+        <AudioBookPlaylist
+          audios={audioBook.audios}
+          onClickAudio={handleOnClickAudio}
+        />
+
+        <Separator />
 
         <CardDescription className="text-slate-700 text-lg text-center">
           <div className="flex items-center justify-center space-x-2 space mb-2 animate-zoom-in">
-            <div className="flex flex-col items-center justify-items-center border-r-2">
+            <div className="flex flex-col items-center justify-items-center">
               <small className="col-span-1 text-slate-500 -mb-1 self-center">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
 
               <div className="flex justify-center items-center">
@@ -104,13 +125,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                 />
               </div>
             </div>
-
-            <AudioBookPlaylist
-              audios={audioBook.audios}
-              onClickAudio={handleOnClickAudio}
-            />
           </div>
-          <Separator className="bg-slate-300" />
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -125,7 +140,6 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               src={playListState.currentAudio.srcAudio}
               onError={handleOnError}
             />
-            <div></div>
           </div>
         )}
       </CardContent>

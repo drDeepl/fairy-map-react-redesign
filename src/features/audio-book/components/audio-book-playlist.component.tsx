@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Components } from "@/api/schemas/client";
 import { CaretDownIcon, StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
 import {
@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import { ListMusicIcon } from "lucide-react";
+import { LanguagesIcon, ListMusicIcon } from "lucide-react";
 
 export interface AudioBookPlaylistProps {
   audios: Components.Schemas.AudioResponseDto[];
@@ -20,6 +20,8 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
   audios,
   onClickAudio: handleOnClickAudio,
 }) => {
+  const [currentLang, setCurrenLang] = useState<string | null>(null);
+
   return (
     <div>
       <DropdownMenu
@@ -32,16 +34,18 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
           }
         }}
       >
-        <DropdownMenuTrigger className="flex drop-shadow-md" asChild>
-          <div className="cursor-pointer">
-            <ListMusicIcon />
-            <CaretDownIcon id="caret__dropdown" className={`size-6 `} />
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="">
+        <DropdownMenuTrigger
+          className=" cursor-pointer flex drop-shadow-md space-x-1"
+          asChild
+        >
+          <LanguagesIcon />
           <DropdownMenuLabel className="text-center">
-            Доступные озвучки
+            {currentLang === null ? "Выберите язык" : currentLang}
           </DropdownMenuLabel>
+          <CaretDownIcon id="caret__dropdown" className={`size-6`} />
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="">
           <Separator className="mb-1" />
 
           {audios.map((audio) => {
@@ -49,7 +53,10 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
               <DropdownMenuItem
                 key={`audio_lang_${audio.id}`}
                 className="cursor-pointer flex flex-col  p-0"
-                onClick={() => handleOnClickAudio(audio)}
+                onClick={() => {
+                  handleOnClickAudio(audio);
+                  setCurrenLang(audio.language.name);
+                }}
               >
                 <Separator className="bg-slate-300" />
                 <div className="grid grid-cols-2 self-start w-full items-center p-1.5 hover:bg-slate-100">

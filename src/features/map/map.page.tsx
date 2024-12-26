@@ -202,6 +202,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         )}
 
         <DialogContent className="p-0 m-0 [&>button]:hidden">
+          <DialogTitle></DialogTitle>
           {selectedAudioBook ? (
             <AudioBookPlayer
               audioBook={selectedAudioBook}
@@ -214,6 +215,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           {selectedBook ? (
             <BookInfoCardComponent
               book={selectedBook}
+              onClickRate={handleOnClickRate}
+              onClickAuth={handleOnClickAvatar}
               onClose={() => handleOnCloseBook}
             />
           ) : null}
