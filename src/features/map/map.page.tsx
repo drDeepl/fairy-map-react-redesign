@@ -43,8 +43,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -70,8 +71,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
@@ -119,17 +122,19 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     });
   };
 
-  const [selectedBook, setSelectedBook] =
-    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
     setSelectedBook(book);
-    setDialogOpen(true);
   };
 
   const handleOnCloseBook = async () => {
+    console.log("handleOnCloseBook");
     setDialogOpen(false);
     setSelectedBook(null);
   };
@@ -154,51 +159,47 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   return (
     <div className="map-pag__content">
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <div className="fixed flex items-center justify-between p-4 w-full">
-          <Input
-            className="min-h-11 max-w-fit bg-slate-50 self-center"
-            type="text"
-            placeholder="введите название этнической группы"
-            value={ethnicGroupInputValue}
-            onChange={handleInputChange}
-          />
+      <div className="fixed flex items-center justify-between p-4 w-full">
+        <Input
+          className="min-h-11 max-w-fit bg-slate-50 self-center"
+          type="text"
+          placeholder="введите название этнической группы"
+          value={ethnicGroupInputValue}
+          onChange={handleInputChange}
+        />
 
-          <Button
-            className="rounded-full bg-slate-50 self-center size-11"
-            variant="ghost"
-            size="icon"
-            onClick={() => handleOnClickAvatar()}
-          >
-            <span className="text-black">
-              {authState.user
-                ? authState.user.email.split("@")[0][0].toUpperCase()
-                : "?"}
-            </span>
-          </Button>
+        <Button
+          className="rounded-full bg-slate-50 self-center size-11"
+          variant="ghost"
+          size="icon"
+          onClick={() => handleOnClickAvatar()}
+        >
+          <span className="text-black">
+            {authState.user
+              ? authState.user.email.split("@")[0][0].toUpperCase()
+              : "?"}
+          </span>
+        </Button>
 
-          <AuthForm
-            visible={authFormVisible}
-            onSubmit={handleOnSubmitAuth}
-            onClose={() => handleOnCloseAuthForm()}
-          />
-        </div>
+        <AuthForm
+          visible={authFormVisible}
+          onSubmit={handleOnSubmitAuth}
+          onClose={() => handleOnCloseAuthForm()}
+        />
+      </div>
 
-        {mapState.dataMap ? (
-          <MapComponent
-            features={mapState.dataMap.features}
-            width={width}
-            height={height}
-            onClickAudioBook={handleOnClickAudioBook}
-            onClickBook={handleOnClickBook}
-          />
-        ) : (
-          ""
-        )}
+      {mapState.dataMap ? (
+        <MapComponent
+          features={mapState.dataMap.features}
+          width={width}
+          height={height}
+          onClickAudioBook={handleOnClickAudioBook}
+          onClickBook={handleOnClickBook}
+        />
+      ) : null}
 
-        <DialogContent className="p-0 m-0 [&>button]:hidden">
-          <DialogTitle></DialogTitle>
-          {selectedAudioBook ? (
+      {/* <DialogContent className="p-0 m-0 [&>button]:hidden"> */}
+      {/* {selectedAudioBook ? (
             <AudioBookPlayer
               audioBook={selectedAudioBook}
               onClickRate={handleOnClickRate}
@@ -206,18 +207,16 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               onClickAuth={handleOnClickAvatar}
               hideHeader={false}
             />
-          ) : null}
+          ) : null} */}
 
-          {selectedBook ? (
-            <BookInfoCardComponent
-              book={selectedBook}
-              onClickRate={handleOnClickRate}
-              onClickAuth={handleOnClickAvatar}
-              onClose={() => handleOnCloseBook}
-            ></BookInfoCardComponent>
-          ) : null}
-        </DialogContent>
-      </Dialog>
+      {selectedBook ? (
+        <BookInfoCardComponent
+          book={selectedBook}
+          onClickRate={handleOnClickRate}
+          onClickAuth={handleOnClickAvatar}
+          onClose={() => handleOnCloseBook}
+        ></BookInfoCardComponent>
+      ) : null}
     </div>
   );
 };

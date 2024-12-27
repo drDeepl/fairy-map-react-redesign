@@ -90,11 +90,11 @@ const StarRating: React.FC<StarRatingProps> = ({
   }, [commonRating]);
 
   return (
-    <div className="flex justify-center space-x-1">
+    <div className="flex items-center">
       <Toaster />
       <div
         id="stars__wrapper"
-        className="flex justify-center items-center animate-flyin "
+        className="flex justify-center items-center animate-flyin space-x-4"
       >
         {Array(5)
           .fill(1)
@@ -103,6 +103,7 @@ const StarRating: React.FC<StarRatingProps> = ({
               <div id="stars__container" key={value} className="cursor-pointer">
                 <Button
                   variant="link"
+                  className="p-1"
                   onClick={() => handleOnClickRate(value)}
                   onMouseOver={() => {
                     if (!load) {
@@ -118,13 +119,16 @@ const StarRating: React.FC<StarRatingProps> = ({
                 >
                   <StarFilledIcon
                     id={`star-item-${value}`}
-                    className="text-slate-50 size-6 stroke-orange-500 stars hover:text-orange-500"
+                    className="text-slate-50 size-4 stroke-orange-500 stars hover:text-orange-500"
                   />
                 </Button>
               </div>
             );
           })}
       </div>
+      <span className="italic text-orange-500 ml-1 cursor-default text-sm">
+        ( {Math.round((commonRating + Number.EPSILON) * 100) / 100} )
+      </span>
     </div>
   );
 };

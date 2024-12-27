@@ -18,7 +18,8 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { LanguagesIcon } from "lucide-react";
 
 interface PlaylistState {
   open: boolean;
@@ -27,7 +28,7 @@ interface PlaylistState {
 }
 
 interface AudioBookPlayerProps {
-  audioBook: Components.Schemas.PreviewAudioStoryResponseDto;
+  audios: Components.Schemas.AudioResponseDto[];
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
@@ -37,16 +38,16 @@ interface AudioBookPlayerProps {
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
-  audioBook,
+  audios,
   onClickRate,
   onClose,
   onClickAuth,
   hideHeader,
 }) => {
-  const [playListState, setPlayListState] = useState<PlaylistState>({
+  const [playlistState, setPlaylistState] = useState<PlaylistState>({
     open: false,
     load: false,
-    currentAudio: audioBook.audios[0],
+    currentAudio: audios[0],
   });
 
   const handleOnError = (e: Event) => {
@@ -55,21 +56,21 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
   const handleOnClickPlayer = () => {
     console.log("handleOnClickPlayer");
-    setPlayListState((prevState) => ({ ...prevState, open: !prevState.open }));
+    setPlaylistState((prevState) => ({ ...prevState, open: !prevState.open }));
   };
 
   const handleOnClickAudio = (audio: Components.Schemas.AudioResponseDto) => {
-    setPlayListState((prevState) => ({ ...prevState, currentAudio: audio }));
+    setPlaylistState((prevState) => ({ ...prevState, currentAudio: audio }));
   };
 
   const handleOnClickRate = async (value: number) => {
     try {
       const addedRatingDto = await onClickRate({
         rating: value,
-        audioId: playListState.currentAudio.id,
+        audioId: playlistState.currentAudio.id,
       });
       if (addedRatingDto !== undefined) {
-        setPlayListState((prevState) => ({
+        setPlaylistState((prevState) => ({
           ...prevState,
           currentAudio: {
             ...prevState.currentAudio,
@@ -85,60 +86,62 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   };
 
   return (
-    <Card className="w-full border-none">
-      <CardHeader className="">
+    <Card className="w-full border-none shadow-none">
+      <CardHeader className="p-0">
         {hideHeader ? null : (
-          <CardTitle className="flex justify-between items-center">
-            <div>{audioBook.name}</div>
+          <CardTitle className="flex justify-between">
+            <div>{playlistState.currentAudio.language.name}</div>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <Cross1Icon />
             </Button>
           </CardTitle>
         )}
+        <AudioBookPlaylist audios={audios} onClickAudio={handleOnClickAudio}>
+          <Button
+            className="flex drop-shadow-md space-x-1 border-ghost text-balance h-12 w-full py-1"
+            variant="outline"
+          >
+            <p>{playlistState.currentAudio.language.name} язык</p>
+            <div className="flex ">
+              <LanguagesIcon />
+              <CaretDownIcon id="caret__dropdown" className={`size-6`} />
+            </div>
+          </Button>
+        </AudioBookPlaylist>
 
-        <AudioBookPlaylist
-          audios={audioBook.audios}
-          onClickAudio={handleOnClickAudio}
-        />
-        <Separator />
+        <Separator className="my-2" />
 
         <CardDescription className="text-slate-700 text-lg text-center">
-          <div className="flex items-center justify-center space-x-2 space mb-2 animate-zoom-in">
-            <div className="flex flex-col items-center justify-items-center">
-              <small className="col-span-1 text-slate-500 -mb-1 self-center">{`${playListState.currentAudio.author.firstName} ${playListState.currentAudio.author.lastName}`}</small>
+          <div className="flex flex-col justify-center items-center space-y-1 mb-2 animate-zoom-in">
+            <div>
+              <small className="text-slate-500 mr-1">озвучил:</small>
+              <small className="text-slate-500">{`${playlistState.currentAudio.author.firstName} ${playlistState.currentAudio.author.lastName}`}</small>
+            </div>
 
-              <div className="flex justify-center items-center">
-                <span className="font-semibold text-md">
-                  {playListState.currentAudio.language.name}
-                </span>
-              </div>
-
-              <div className="flex justify-center items-center space-x-[3px] mt-1">
-                <StarRating
-                  commonRating={playListState.currentAudio.moderateScore}
-                  onClickRate={handleOnClickRate}
-                  onClickAuth={onClickAuth}
+            <StarRating
+              commonRating={playlistState.currentAudio.moderateScore}
+              onClickRate={handleOnClickRate}
+              onClickAuth={onClickAuth}
+            />
+          </div>
+          <Separator className="my-2" />
+          <div className="">
+            {playlistState.load ? (
+              <Skeleton className="flex self-center w-full h-8 bg-neutral-300" />
+            ) : (
+              <div className="">
+                <ReactAudioPlayer
+                  className="w-full"
+                  controls
+                  controlsList="nodownload noplaybackrate foobar"
+                  src={playlistState.currentAudio.srcAudio}
+                  onError={handleOnError}
                 />
               </div>
-            </div>
+            )}
           </div>
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        {playListState.load ? (
-          <Skeleton className="flex self-center w-full h-8 bg-neutral-300" />
-        ) : (
-          <div className="flex items-center">
-            <ReactAudioPlayer
-              className="w-full"
-              controls
-              controlsList="nodownload noplaybackrate foobar"
-              src={playListState.currentAudio.srcAudio}
-              onError={handleOnError}
-            />
-          </div>
-        )}
-      </CardContent>
     </Card>
   );
 };
