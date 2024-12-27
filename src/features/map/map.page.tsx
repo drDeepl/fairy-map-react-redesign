@@ -17,15 +17,6 @@ import AudioBookPlayer from "../audio-book/audio-book-player.component";
 import { addRatingAudio } from "../audio-book/audio-book.actions";
 
 import { Report } from "notiflix/build/notiflix-report-aio";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
@@ -214,7 +205,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           book={selectedBook}
           onClickRate={handleOnClickRate}
           onClickAuth={handleOnClickAvatar}
-          onClose={() => handleOnCloseBook}
+          onClose={() => handleOnCloseBook()}
         ></BookInfoCardComponent>
       ) : null}
     </div>

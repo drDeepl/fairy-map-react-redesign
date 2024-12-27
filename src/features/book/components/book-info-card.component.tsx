@@ -211,10 +211,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                       <img
                         src={infoBookState.book.srcImg}
                         alt={infoBookState.book.name}
-                        className="rounded-t-xl w-44 h-56 object-cover"
+                        className="rounded-t-xl w-44 h-60 object-cover"
                       />
                     ) : (
-                      <div className="w-44 h-56">
+                      <div className="w-44 h-60">
                         <NotCoverBook />
                       </div>
                     )}
@@ -233,18 +233,18 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               </div>
 
               <div className="w-2/3">
-                <DialogTitle className="flex justify-between items-start">
-                  <div className="flex space-x-2">
+                <DialogTitle className="">
+                  <div className="flex justify-between items-center space-x-2 mb-6">
                     <span>{infoBookState.book.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className=""
+                      onClick={() => onClose()}
+                    >
+                      <Cross1Icon />
+                    </Button>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={onClose}
-                    className="items-start"
-                  >
-                    <Cross1Icon />
-                  </Button>
                 </DialogTitle>
                 <DialogDescription className="-mt-2">
                   {listAudioState.load ? (
@@ -264,7 +264,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
           )}
         </DialogHeader>
-        <DialogFooter className={`${textAction.fullScreen ? "" : "-mt-14"}`}>
+        <DialogFooter className={`${textAction.fullScreen ? "" : "-mt-16"}`}>
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="story-text">
               <AccordionTrigger
