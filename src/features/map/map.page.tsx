@@ -19,10 +19,16 @@ import { addRatingAudio } from "../audio-book/audio-book.actions";
 import { Report } from "notiflix/build/notiflix-report-aio";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
+import { Dialog, DialogPortal } from "@/components/ui/dialog";
 
 interface MapPageProps {
   width: number;
   height: number;
+}
+
+interface AuthFormState {
+  open: boolean;
+  notifySuccess: boolean;
 }
 
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
@@ -43,10 +49,13 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     console.log(event.target.value); // Логирование значения в консоль
   };
 
-  const [authFormVisible, setAuthFormVisible] = useState<boolean>(false);
+  const [authFormState, setAuthFormState] = useState<AuthFormState>({
+    open: false,
+    notifySuccess: false,
+  });
 
   const handleOnCloseAuthForm = async () => {
-    setAuthFormVisible(false);
+    setAuthFormState((prevState) => ({ ...prevState, open: false }));
     dispatch(setVerifyedCaptcha(false));
   };
 
@@ -58,7 +67,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
       navigate(routeUserPersonalPage);
     } else {
-      setAuthFormVisible(true);
+      setAuthFormState({ open: true, notifySuccess: true });
     }
   };
 
@@ -67,7 +76,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     setSelectedAudioBook,
   ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
@@ -77,7 +86,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
 
   const handleOnCloseAudioBook = async () => {
-    setDialogOpen(false);
+    setOpenDialog(false);
     setSelectedAudioBook(null);
   };
 
@@ -88,7 +97,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
 
   const handleOnSubmitAuth = async (msg: string) => {
-    handleOnCloseAuthForm().then((result) => {
+    await handleOnCloseAuthForm();
+    if (authFormState.notifySuccess) {
       Report.success(
         msg,
         "* чтобы остаться на странице щелкните по зеленому фону",
@@ -101,7 +111,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           ></Button>
         ),
         {
-          zindex: 99999999,
           backOverlayClickToClose: true,
           borderRadius: "0.5rem",
 
@@ -111,7 +120,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           },
         }
       );
-    });
+    }
   };
 
   const [
@@ -123,11 +132,12 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
     setSelectedBook(book);
+    setOpenDialog(true);
   };
 
   const handleOnCloseBook = async () => {
     console.log("handleOnCloseBook");
-    setDialogOpen(false);
+    setOpenDialog(false);
     setSelectedBook(null);
   };
 
@@ -151,47 +161,48 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   return (
     <div className="map-pag__content">
-      <div className="fixed flex items-center justify-between p-4 w-full">
-        <Input
-          className="min-h-11 max-w-fit bg-slate-50 self-center"
-          type="text"
-          placeholder="введите название этнической группы"
-          value={ethnicGroupInputValue}
-          onChange={handleInputChange}
-        />
+      <Dialog open={openDialog}>
+        <div className="fixed flex items-center justify-between p-4 w-full">
+          <Input
+            className="min-h-11 max-w-fit bg-slate-50 self-center"
+            type="text"
+            placeholder="введите название этнической группы"
+            value={ethnicGroupInputValue}
+            onChange={handleInputChange}
+          />
 
-        <Button
-          className="rounded-full bg-slate-50 self-center size-11"
-          variant="ghost"
-          size="icon"
-          onClick={() => handleOnClickAvatar()}
-        >
-          <span className="text-black">
-            {authState.user
-              ? authState.user.email.split("@")[0][0].toUpperCase()
-              : "?"}
-          </span>
-        </Button>
+          <Button
+            className="rounded-full bg-slate-50 self-center size-11"
+            variant="ghost"
+            size="icon"
+            onClick={() => handleOnClickAvatar()}
+          >
+            <span className="text-black">
+              {authState.user
+                ? authState.user.email.split("@")[0][0].toUpperCase()
+                : "?"}
+            </span>
+          </Button>
 
-        <AuthForm
-          visible={authFormVisible}
-          onSubmit={handleOnSubmitAuth}
-          onClose={() => handleOnCloseAuthForm()}
-        />
-      </div>
+          <AuthForm
+            visible={authFormState.open}
+            onSubmit={handleOnSubmitAuth}
+            onClose={() => handleOnCloseAuthForm()}
+          />
+        </div>
 
-      {mapState.dataMap ? (
-        <MapComponent
-          features={mapState.dataMap.features}
-          width={width}
-          height={height}
-          onClickAudioBook={handleOnClickAudioBook}
-          onClickBook={handleOnClickBook}
-        />
-      ) : null}
+        {mapState.dataMap ? (
+          <MapComponent
+            features={mapState.dataMap.features}
+            width={width}
+            height={height}
+            onClickAudioBook={handleOnClickAudioBook}
+            onClickBook={handleOnClickBook}
+          />
+        ) : null}
 
-      {/* <DialogContent className="p-0 m-0 [&>button]:hidden"> */}
-      {/* {selectedAudioBook ? (
+        {/* <DialogContent className="p-0 m-0 [&>button]:hidden"> */}
+        {/* {selectedAudioBook ? (
             <AudioBookPlayer
               audioBook={selectedAudioBook}
               onClickRate={handleOnClickRate}
@@ -201,14 +212,17 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             />
           ) : null} */}
 
-      {selectedBook ? (
-        <BookInfoCardComponent
-          book={selectedBook}
-          onClickRate={handleOnClickRate}
-          onClickAuth={handleOnClickAvatar}
-          onClose={() => handleOnCloseBook()}
-        ></BookInfoCardComponent>
-      ) : null}
+        {selectedBook ? (
+          <BookInfoCardComponent
+            book={selectedBook}
+            onClickRate={handleOnClickRate}
+            onClickAuth={() => {
+              setAuthFormState({ open: true, notifySuccess: false });
+            }}
+            onClose={() => handleOnCloseBook()}
+          ></BookInfoCardComponent>
+        ) : null}
+      </Dialog>
     </div>
   );
 };

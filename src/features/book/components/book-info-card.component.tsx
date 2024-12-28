@@ -194,7 +194,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   return (
-    <Dialog open={true}>
+    <DialogPortal>
       <DialogContent className="[&>button]:hidden m-0 py-0 animate-zoom-in">
         <DialogHeader className="">
           {textAction.fullScreen ? null : (
@@ -307,7 +307,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
           </Accordion>
         </DialogFooter>
       </DialogContent>
-    </Dialog>
+    </DialogPortal>
   );
 };
 
