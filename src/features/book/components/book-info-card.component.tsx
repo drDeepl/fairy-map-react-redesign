@@ -181,133 +181,119 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  const [
-    selectedAudio,
-    setSelectedAudio,
-  ] = useState<Components.Schemas.AudioResponseDto | null>(null);
-
-  const handleOnClickRate = (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ) => {
-    console.log("ON CLICK RATE");
-    onClickRate(dto);
-  };
-
   return (
-    <DialogPortal>
-      <DialogContent className="[&>button]:hidden m-0 py-0 animate-zoom-in">
-        <DialogHeader className="">
-          {textAction.fullScreen ? null : (
-            <div className="w-full flex my-4 animate-out gap-4">
-              <div className="w-44 h-56 flex justify-items-center justify-center">
-                {infoBookState.loadCover ? (
-                  <div>
-                    <LoadSpinner />
-                  </div>
-                ) : (
-                  <Label
-                    htmlFor="picture"
-                    className={`${onUploadCover ? "cursor-pointer" : ""}`}
+    <DialogContent className="[&>button]:hidden m-0 py-0 animate-zoom-in">
+      <DialogHeader className="">
+        {textAction.fullScreen ? null : (
+          <div className="w-full flex my-4 animate-out gap-4">
+            <div className="w-44 h-56 flex justify-items-center justify-center">
+              {infoBookState.loadCover ? (
+                <div>
+                  <LoadSpinner />
+                </div>
+              ) : (
+                <Label
+                  htmlFor="picture"
+                  className={`${onUploadCover ? "cursor-pointer" : ""}`}
+                >
+                  {infoBookState.book.srcImg ? (
+                    <img
+                      src={infoBookState.book.srcImg}
+                      alt={infoBookState.book.name}
+                      className="rounded-t-xl w-44 h-60 object-cover"
+                    />
+                  ) : (
+                    <div className="w-44 h-60">
+                      <NotCoverBook />
+                    </div>
+                  )}
+                </Label>
+              )}
+
+              {onUploadCover ? (
+                <Input
+                  className="hidden"
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadFile}
+                />
+              ) : null}
+            </div>
+
+            <div className="w-2/3">
+              <DialogTitle className="">
+                <div className="flex justify-between items-center space-x-2 mb-6">
+                  <span>{infoBookState.book.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className=""
+                    onClick={() => onClose()}
                   >
-                    {infoBookState.book.srcImg ? (
-                      <img
-                        src={infoBookState.book.srcImg}
-                        alt={infoBookState.book.name}
-                        className="rounded-t-xl w-44 h-60 object-cover"
-                      />
-                    ) : (
-                      <div className="w-44 h-60">
-                        <NotCoverBook />
-                      </div>
-                    )}
-                  </Label>
-                )}
-
-                {onUploadCover ? (
-                  <Input
-                    className="hidden"
-                    id="picture"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUploadFile}
+                    <Cross1Icon />
+                  </Button>
+                </div>
+              </DialogTitle>
+              <DialogDescription className="-mt-2">
+                {listAudioState.load ? (
+                  <Skeleton className="h-24" />
+                ) : (
+                  <AudioBookPlayer
+                    audios={listAudioState.audios}
+                    onClickAuth={onClickAuth}
+                    onClickRate={onClickRate}
+                    onClose={() => console.log("close")}
+                    hideHeader={true}
                   />
-                ) : null}
+                )}
+                <div className="flex space-x-4 mt-2">{children}</div>
+              </DialogDescription>
+            </div>
+          </div>
+        )}
+      </DialogHeader>
+      <DialogFooter className={`${textAction.fullScreen ? "" : "-mt-16"}`}>
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="story-text">
+            <AccordionTrigger
+              className="text-base outline-none justify-between max-w-44"
+              onClick={() => {
+                handleShowText(!textAction.show);
+              }}
+            >
+              <div className="flex justify-between">
+                <span className="animate-in text-md">
+                  {!textAction.show ? "показать текст" : "скрыть текст"}
+                </span>
               </div>
-
-              <div className="w-2/3">
-                <DialogTitle className="">
-                  <div className="flex justify-between items-center space-x-2 mb-6">
-                    <span>{infoBookState.book.name}</span>
+            </AccordionTrigger>
+            <AccordionContent className="max-h-72 rounded-md overflow-auto mt-2">
+              {infoBookState.loadText ? (
+                <LoadSpinner />
+              ) : (
+                <div className="text-base">
+                  <p className="row-span-1 flex justify-center">
+                    {infoBookState.text}
+                  </p>
+                  <div className="fixed -right-[5rem] bottom-7 w-1/3">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className=""
-                      onClick={() => onClose()}
+                      variant="secondary"
+                      className="size-8 border border-slate-800"
+                      onClick={() => {
+                        handleFullScreen(!textAction.fullScreen);
+                      }}
                     >
-                      <Cross1Icon />
+                      <EnterFullScreenIcon className=" text-slate-800" />
                     </Button>
                   </div>
-                </DialogTitle>
-                <DialogDescription className="-mt-2">
-                  {listAudioState.load ? (
-                    <Skeleton className="h-24" />
-                  ) : (
-                    <AudioBookPlayer
-                      audios={listAudioState.audios}
-                      onClickAuth={onClickAuth}
-                      onClickRate={onClickRate}
-                      onClose={() => console.log("close")}
-                      hideHeader={true}
-                    />
-                  )}
-                  <div className="flex space-x-4 mt-2">{children}</div>
-                </DialogDescription>
-              </div>
-            </div>
-          )}
-        </DialogHeader>
-        <DialogFooter className={`${textAction.fullScreen ? "" : "-mt-16"}`}>
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="story-text">
-              <AccordionTrigger
-                className="text-base outline-none justify-between max-w-44"
-                onClick={() => {
-                  handleShowText(!textAction.show);
-                }}
-              >
-                <div className="flex justify-between">
-                  <span className="animate-in text-md">
-                    {!textAction.show ? "показать текст" : "скрыть текст"}
-                  </span>
                 </div>
-              </AccordionTrigger>
-              <AccordionContent className="max-h-72 rounded-md overflow-auto mt-2">
-                {infoBookState.loadText ? (
-                  <LoadSpinner />
-                ) : (
-                  <div className="text-base">
-                    <p className="row-span-1 flex justify-center">
-                      {infoBookState.text}
-                    </p>
-                    <div className="fixed -right-[5rem] bottom-7 w-1/3">
-                      <Button
-                        variant="secondary"
-                        className="size-8 border border-slate-800"
-                        onClick={() => {
-                          handleFullScreen(!textAction.fullScreen);
-                        }}
-                      >
-                        <EnterFullScreenIcon className=" text-slate-800" />
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </DialogFooter>
-      </DialogContent>
-    </DialogPortal>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </DialogFooter>
+    </DialogContent>
   );
 };
 
