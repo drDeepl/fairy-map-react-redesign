@@ -1,10 +1,8 @@
 import {
-  Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -17,13 +15,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import {
-  CaretDownIcon,
-  Cross1Icon,
-  EnterFullScreenIcon,
-  StarFilledIcon,
-  StarIcon,
-} from "@radix-ui/react-icons";
+import { Cross1Icon, EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -36,27 +28,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import LoadSpinner from "@/components/ui/load-spinner";
 import apiClient from "@/api/apiClient";
-import { toast } from "sonner";
+
 import { AxiosError, AxiosResponse } from "axios";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
-import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playlist.component";
-import { LanguagesIcon } from "lucide-react";
-import StarRating from "@/components/rating.component";
-import { AlertDialogPortal } from "@/components/ui/alert-dialog";
+
+import { RootState } from "@/app/store";
+import { useToast } from "@/hooks/use-toast";
+import { useSelector } from "react-redux";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -68,7 +47,7 @@ interface BookInfoCardProps {
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
-
+  onClickAddAudio: () => void;
   children?: React.ReactNode;
 }
 
@@ -88,14 +67,19 @@ interface ListAudiosState {
   load: boolean;
   audios: Components.Schemas.AudioStoryResponseDto[];
 }
+
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
   onClickAuth,
   onClickRate,
   onClose,
   onUploadCover,
+  onClickAddAudio,
   children,
 }) => {
+  const { toast } = useToast();
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const [listAudioState, setListAudioState] = useState<ListAudiosState>({
     load: true,
     audios: [],
@@ -181,6 +165,22 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
+  const handleOnClickAddAudio = () => {
+    if (!user) {
+      toast({
+        style: {
+          border: "1.5px solid var(--deep-red)",
+          right: "2rem",
+        },
+        title:
+          "подать заявку на добавление озвучки могут только авторизованные пользователи",
+        action: <Button onClick={() => onClickAuth()}>войти</Button>,
+      });
+    } else {
+      onClickAddAudio();
+    }
+  };
+
   return (
     <DialogContent className="[&>button]:hidden m-0 py-0 animate-zoom-in">
       <DialogHeader className="">
@@ -244,6 +244,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     onClickAuth={onClickAuth}
                     onClickRate={onClickRate}
                     onClose={() => console.log("close")}
+                    onClickAddAudio={handleOnClickAddAudio}
                     hideHeader={true}
                   />
                 )}

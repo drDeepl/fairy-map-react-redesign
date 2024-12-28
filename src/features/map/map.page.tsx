@@ -19,7 +19,9 @@ import { addRatingAudio } from "../audio-book/audio-book.actions";
 import { Report } from "notiflix/build/notiflix-report-aio";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
-import { Dialog, DialogPortal } from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
+
+import { Notify } from "notiflix/build/notiflix-notify-aio";
 
 interface MapPageProps {
   width: number;
@@ -151,6 +153,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     setLoad(false);
   }, [dispatch]);
 
+  const handleOnClickAddAudio = () => {
+    console.log("hnadleOnClickAddAudio");
+    Notify.info("TODO hnadleOnClickAddAudio");
+  };
+
   if (mapState.loading || load) {
     return <LoadSpinner />;
   }
@@ -220,6 +227,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               setAuthFormState({ open: true, notifySuccess: false });
             }}
             onClose={() => handleOnCloseBook()}
+            onClickAddAudio={handleOnClickAddAudio}
           ></BookInfoCardComponent>
         ) : null}
       </Dialog>

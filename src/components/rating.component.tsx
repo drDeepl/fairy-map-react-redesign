@@ -14,12 +14,6 @@ interface StarRatingProps {
   onClickAuth: () => void;
 }
 
-interface RatingState {
-  open: boolean;
-  currentRating: number | null;
-  load: boolean;
-}
-
 const filledColorClass = "text-orange-500";
 
 const StarRating: React.FC<StarRatingProps> = ({
@@ -28,7 +22,6 @@ const StarRating: React.FC<StarRatingProps> = ({
   onClickAuth,
 }) => {
   const { toast } = useToast();
-
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [load, setLoad] = useState<boolean>(false);

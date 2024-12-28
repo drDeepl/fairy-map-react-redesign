@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
-import { LanguagesIcon } from "lucide-react";
+import { CaretDownIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
+import { BookHeadphonesIcon, FileAudio, LanguagesIcon } from "lucide-react";
 
 interface PlaylistState {
   open: boolean;
@@ -34,6 +34,7 @@ interface AudioBookPlayerProps {
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   onClickAuth: () => void;
   onClose: () => void;
+  onClickAddAudio: () => void;
   hideHeader: boolean;
 }
 
@@ -42,6 +43,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickRate,
   onClose,
   onClickAuth,
+  onClickAddAudio,
   hideHeader,
 }) => {
   const [playlistState, setPlaylistState] = useState<PlaylistState>({
@@ -91,18 +93,27 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
             </Button>
           </CardTitle>
         )}
-        <AudioBookPlaylist audios={audios} onClickAudio={handleOnClickAudio}>
-          <Button
-            className="flex drop-shadow-md space-x-1 border-ghost text-balance h-12 w-full py-1"
-            variant="outline"
-          >
-            <p>{playlistState.currentAudio.language.name} язык</p>
-            <div className="flex ">
-              <LanguagesIcon />
-              <CaretDownIcon id="caret__dropdown" className={`size-6`} />
-            </div>
-          </Button>
-        </AudioBookPlaylist>
+        <div className="flex justify-between items-center">
+          <AudioBookPlaylist audios={audios} onClickAudio={handleOnClickAudio}>
+            <Button
+              className="flex drop-shadow-md space-x-1 border-ghost text-balance h-12 w-full py-1"
+              variant="outline"
+            >
+              <p>{playlistState.currentAudio.language.name} язык</p>
+              <div className="flex ">
+                <LanguagesIcon />
+                <CaretDownIcon id="caret__dropdown" className={`size-6`} />
+              </div>
+            </Button>
+          </AudioBookPlaylist>
+
+          <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2">
+            <FileAudio
+              className="size-9 text-slate-700 p-2"
+              onClick={onClickAddAudio}
+            />
+          </div>
+        </div>
 
         <Separator className="my-2" />
 
