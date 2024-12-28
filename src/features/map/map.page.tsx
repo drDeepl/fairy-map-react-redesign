@@ -101,6 +101,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           ></Button>
         ),
         {
+          zindex: 99999999,
           backOverlayClickToClose: true,
           borderRadius: "0.5rem",
 

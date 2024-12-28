@@ -4,6 +4,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
@@ -55,6 +56,7 @@ import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 import AudioBookPlaylist from "@/features/audio-book/components/audio-book-playlist.component";
 import { LanguagesIcon } from "lucide-react";
 import StarRating from "@/components/rating.component";
+import { AlertDialogPortal } from "@/components/ui/alert-dialog";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -290,7 +292,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <div className="fixed -right-[5rem] bottom-7 w-1/3">
                       <Button
                         variant="secondary"
-                        className="size-8 animate-out border border-slate-800"
+                        className="size-8 border border-slate-800"
                         onClick={() => {
                           handleFullScreen(!textAction.fullScreen);
                         }}

@@ -49,10 +49,10 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
       >
         {children}
       </PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent className="p-0">
         <Command>
           <CommandInput placeholder="введите название озвучки..." />
-          <CommandList>
+          <CommandList className="h-56">
             <CommandEmpty>озвучки не найдены</CommandEmpty>
             <CommandGroup>
               {audios.map((audio) => {

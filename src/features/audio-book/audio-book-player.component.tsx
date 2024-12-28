@@ -54,11 +54,6 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     toast.error("произошла ошибка при загрузки аудиозаписи");
   };
 
-  const handleOnClickPlayer = () => {
-    console.log("handleOnClickPlayer");
-    setPlaylistState((prevState) => ({ ...prevState, open: !prevState.open }));
-  };
-
   const handleOnClickAudio = (audio: Components.Schemas.AudioResponseDto) => {
     setPlaylistState((prevState) => ({ ...prevState, currentAudio: audio }));
   };
