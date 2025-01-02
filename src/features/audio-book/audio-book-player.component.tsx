@@ -11,15 +11,14 @@ import StarRating from "@/components/rating.component";
 import AudioBookPlaylist from "./components/audio-book-playlist.component";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { CaretDownIcon, Cross1Icon, PlusIcon } from "@radix-ui/react-icons";
-import { BookHeadphonesIcon, FileAudio, LanguagesIcon } from "lucide-react";
+import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { LanguagesIcon } from "lucide-react";
 
 interface PlaylistState {
   open: boolean;
@@ -43,7 +42,6 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickRate,
   onClose,
   onClickAuth,
-  onClickAddAudio,
   hideHeader,
 }) => {
   const [playlistState, setPlaylistState] = useState<PlaylistState>({
@@ -106,13 +104,6 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               </div>
             </Button>
           </AudioBookPlaylist>
-
-          <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2">
-            <FileAudio
-              className="size-9 text-slate-700 p-2"
-              onClick={onClickAddAudio}
-            />
-          </div>
         </div>
 
         <Separator className="my-2" />

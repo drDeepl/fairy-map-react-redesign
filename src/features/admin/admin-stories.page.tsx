@@ -39,6 +39,8 @@ import { DotsHorizontalIcon, UploadIcon } from "@radix-ui/react-icons";
 import { AxiosResponse } from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog } from "@/components/ui/dialog";
+import { DialogContent } from "@radix-ui/react-dialog";
 
 export interface BookInfoState {
   open: boolean;
@@ -64,6 +66,7 @@ const AdminStoriesPage: React.FC = () => {
   const bookState = useSelector((state: RootState) => state.book);
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
 
   const [selectedLanguage, setSelectedLanguage] =
     useState<Components.Schemas.LanguageDto | null>(null);
@@ -113,10 +116,12 @@ const AdminStoriesPage: React.FC = () => {
       });
 
     dispatch(setBook(book));
+    setOpenDialog(true);
   };
 
   const handleCloseInfoBook = () => {
     dispatch(setBook(null));
+    setOpenDialog(false);
   };
 
   const handleOnUploadBookCover = async (
@@ -193,113 +198,119 @@ const AdminStoriesPage: React.FC = () => {
     });
   }, []);
   return (
-    <div>
-      <section className="mx-8">
-        <ListBookCarousel
-          load={listBookState.loading}
-          books={listBookState.books}
-          onClickBook={handleOnClickPreviewBook}
-        >
-          <Button
-            variant="outline"
-            onClick={handleOnClickAddBook}
-            className="w-42 border border-ghost text-md"
+    <Dialog open={openDialog}>
+      <div>
+        <section className="mx-8">
+          <ListBookCarousel
+            load={listBookState.loading}
+            books={listBookState.books}
+            onClickBook={handleOnClickPreviewBook}
           >
-            <span className="">добавить сказку</span>
-            <BookPlus />
-          </Button>
-        </ListBookCarousel>
-        {openAddBookForm ? (
-          <AddBookForm
-            open={openAddBookForm}
-            errors={null}
-            ethnicGroups={ethnicGroupListState.ethnicGroups}
-            loading={listBookState.loading}
-            onSubmit={(values) => {
-              toast.promise(handleOnSubmitAddBook(values), {
-                loading: "добавляю сказку",
-                success: "сказка успешно добавлена",
+            <Button
+              variant="outline"
+              onClick={handleOnClickAddBook}
+              className="w-42 border border-ghost text-md"
+            >
+              <span className="">добавить сказку</span>
+              <BookPlus />
+            </Button>
+          </ListBookCarousel>
+          {openAddBookForm ? (
+            <AddBookForm
+              open={openAddBookForm}
+              errors={null}
+              ethnicGroups={ethnicGroupListState.ethnicGroups}
+              loading={listBookState.loading}
+              onSubmit={(values) => {
+                toast.promise(handleOnSubmitAddBook(values), {
+                  loading: "добавляю сказку",
+                  success: "сказка успешно добавлена",
+                });
+              }}
+              onCancel={handleOnCloseAddBookForm}
+            />
+          ) : null}
+        </section>
+        <Toaster
+          position="top-center"
+          richColors
+          toastOptions={{ className: "toast-admin-page" }}
+        />
+        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in">
+          {bookState.selectedBook ? (
+            <BookInfoCardComponent
+              book={bookState.selectedBook}
+              onClose={handleCloseInfoBook}
+              onUploadCover={handleOnUploadBookCover}
+            >
+              <Popover
+                open={languageListState.open}
+                onOpenChange={(open) => {
+                  setLanguageListState((prevState) => ({
+                    ...prevState,
+                    open,
+                  }));
+                }}
+              >
+                <PopoverTrigger
+                  asChild
+                  onClick={() =>
+                    setLanguageListState((prevState) => ({
+                      ...prevState,
+                      open: true,
+                    }))
+                  }
+                >
+                  <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <Command>
+                    <p className="self-center font-semibold">
+                      выберите язык для озвучки
+                    </p>
+                    <CommandInput
+                      placeholder="начните поиск..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>языки для озвучки не найдены</CommandEmpty>
+                      <CommandGroup>
+                        {languageListState.load ? (
+                          <Skeleton className="w-full h-16" />
+                        ) : (
+                          languageListState.languages.map((language) => (
+                            <CommandItem
+                              key={`lang_${language.id}`}
+                              value={language.name}
+                              onSelect={() => handleOnSelectLanguage(language)}
+                            >
+                              {language.name}
+                            </CommandItem>
+                          ))
+                        )}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </BookInfoCardComponent>
+          ) : null}
+          <Input
+            id="upload-audio__input"
+            type="file"
+            ref={fileInputRef}
+            className="hidden"
+            accept="audio/*"
+            onChange={(event) => {
+              toast.promise(handleUploadAudio(event), {
+                loading: "добавляю озвучку",
+                success: "озвучка успешно добавлена",
               });
             }}
-            onCancel={handleOnCloseAddBookForm}
           />
-        ) : null}
-      </section>
-      <Toaster
-        position="top-center"
-        richColors
-        toastOptions={{ className: "toast-admin-page" }}
-      />
-      {bookState.selectedBook ? (
-        <BookInfoCardComponent
-          book={bookState.selectedBook}
-          audios={audiosListState.audios}
-          onClose={handleCloseInfoBook}
-          onUploadCover={handleOnUploadBookCover}
-        >
-          <Popover
-            open={languageListState.open}
-            onOpenChange={(open) => {
-              setLanguageListState((prevState) => ({
-                ...prevState,
-                open,
-              }));
-            }}
-          >
-            <PopoverTrigger
-              asChild
-              onClick={() =>
-                setLanguageListState((prevState) => ({
-                  ...prevState,
-                  open: true,
-                }))
-              }
-            >
-              <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
-            </PopoverTrigger>
-            <PopoverContent>
-              <Command>
-                <p className="self-center font-semibold">
-                  выберите язык для озвучки
-                </p>
-                <CommandInput placeholder="начните поиск..." className="h-9" />
-                <CommandList>
-                  <CommandEmpty>языки для озвучки не найдены</CommandEmpty>
-                  <CommandGroup>
-                    {languageListState.load ? (
-                      <Skeleton className="w-full h-16" />
-                    ) : (
-                      languageListState.languages.map((language) => (
-                        <CommandItem
-                          key={`lang_${language.id}`}
-                          value={language.name}
-                          onSelect={() => handleOnSelectLanguage(language)}
-                        >
-                          {language.name}
-                        </CommandItem>
-                      ))
-                    )}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </BookInfoCardComponent>
-      ) : null}
-      <Input
-        id="upload-audio__input"
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept="audio/*"
-        onChange={(event) => {
-          toast.promise(handleUploadAudio(event), {
-            loading: "добавляю озвучку",
-            success: "озвучка успешно добавлена",
-          });
-        }}
-      />
-    </div>
+        </DialogContent>
+      </div>
+    </Dialog>
   );
 };
 export default AdminStoriesPage;

@@ -50,8 +50,8 @@ const AdminPage: React.FC = () => {
       onClickItemSidebar={handleOnClickItemSidebar}
       onClickExit={handleOnClickExit}
     >
-      <Tabs defaultValue={MenuItem.Story} value={currentTab}>
-        <TabsContent value={MenuItem.Story}>
+      <Tabs defaultValue={MenuItemAdmin.Story} value={currentTab}>
+        <TabsContent value={MenuItemAdmin.Story}>
           <AdminStoriesPage />
         </TabsContent>
         <TabsContent value={MenuItemAdmin.Request}>

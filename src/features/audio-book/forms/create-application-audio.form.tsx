@@ -78,15 +78,20 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const setOverlayLoad = (load: boolean) => {
+    load
+      ? Block.dots(".add-audio-form__container", { cssAnimationDuration: 5000 })
+      : Block.remove(".add-audio-form__container");
+  };
   useEffect(() => {
     form.reset();
+    setOverlayLoad(false);
   }, []);
 
   const handleSumbitForm = async (
     data: z.infer<typeof createApplicationFormSchema>
   ) => {
-    // setLoad(true);
-    Block.dots(".add-audio-form__container", { cssAnimationDuration: 5000 });
+    setOverlayLoad(true);
     if (fileInputRef.current && fileInputRef.current.files) {
       const formData = new FormData();
       formData.append("audio", fileInputRef.current.files[0]);
@@ -141,8 +146,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
           ),
         });
       } finally {
-        // setLoad(false);
-        Block.remove(".add-audio-form__container");
+        setOverlayLoad(false);
       }
     }
   };
@@ -154,9 +158,6 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
         <CardTitle className="flex justify-between items-center space-x-2">
           <span>Создание заявки на добавление озвучки</span>
         </CardTitle>
-        <CardDescription>
-          TODO: Уведомление об ошибки или успехе
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -274,11 +275,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
                 <span>назад</span>
               </Button>
               <Button type="submit" disabled={load} className="w-32">
-                {load ? (
-                  <ReloadIcon className="animate-spin" />
-                ) : (
-                  <span>отправить</span>
-                )}
+                отправить
                 <PaperPlaneIcon className="-rotate-45" />
               </Button>
             </div>

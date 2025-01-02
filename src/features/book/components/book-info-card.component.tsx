@@ -36,6 +36,7 @@ import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 import { RootState } from "@/app/store";
 import { useToast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
+import { FileAudio } from "lucide-react";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -43,10 +44,10 @@ interface BookInfoCardProps {
   onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
-  onClickAuth: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
+  onClickAuth: () => void;
   onClickAddAudio: () => void;
   children?: React.ReactNode;
 }
@@ -235,21 +236,30 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   </Button>
                 </div>
               </CardTitle>
-              <CardDescription className="-mt-2">
+              <CardDescription className="-mt-2 flex">
                 {listAudioState.load ? (
                   <div>
                     <Skeleton className="h-24" />
                   </div>
                 ) : (
-                  <AudioBookPlayer
-                    audios={listAudioState.audios}
-                    onClickAuth={onClickAuth}
-                    onClickRate={onClickRate}
-                    onClose={() => console.log("close")}
-                    onClickAddAudio={handleOnClickAddAudio}
-                    hideHeader={true}
-                  />
+                  <div className="flex">
+                    <AudioBookPlayer
+                      audios={listAudioState.audios}
+                      onClickAuth={onClickAuth}
+                      onClickRate={onClickRate}
+                      onClose={() => console.log("close")}
+                      onClickAddAudio={handleOnClickAddAudio}
+                      hideHeader={true}
+                    />
+                    <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
+                      <FileAudio
+                        className="size-9 text-slate-700 p-2"
+                        onClick={onClickAddAudio}
+                      />
+                    </div>
+                  </div>
                 )}
+
                 <div className="flex space-x-4 mt-2">{children}</div>
               </CardDescription>
             </div>

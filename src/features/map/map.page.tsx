@@ -24,7 +24,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import apiClient from "@/api/apiClient";
 
 import { AxiosResponse, OperationResponse } from "openapi-client-axios";
-import { Notify } from "notiflix";
+import { Block, Notify } from "notiflix";
 import CreateApplicationAudioForm from "../audio-book/forms/create-application-audio.form";
 import { CreateApplicationAudioDataForm } from "../audio-book/interfaces/application-audio.interfaces";
 import { LanguageListState } from "../language/language-list.slice";
@@ -33,12 +33,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
 
 interface MapPageProps {
@@ -200,7 +195,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const handleOnClickAddAudio = () => {
     setCurrentTab(BookInfoTabs.AddApplicationAudio.toString());
-    console.log("on click add audio");
+
     setApplicationAudioFormState((prevState) => ({ ...prevState, open: true }));
   };
 
@@ -254,19 +249,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           />
         ) : null}
 
-        {/* <DialogContent className="p-0 m-0 [&>button]:hidden"> */}
-        {/* {selectedAudioBook ? (
-            <AudioBookPlayer
-              audioBook={selectedAudioBook}
-              onClickRate={handleOnClickRate}
-              onClose={handleOnCloseAudioBook}
-              onClickAuth={handleOnClickAvatar}
-              hideHeader={false}
-            />
-          ) : null} */}
-        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in">
-          {/* <DialogTitle className="m-0 p-0"></DialogTitle> */}
-          {/* <DialogDescription className="m-0 p-0"></DialogDescription> */}
+        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
           <Tabs
             defaultValue={currentTab}
             value={currentTab}
