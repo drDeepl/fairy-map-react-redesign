@@ -39,8 +39,7 @@ import { DotsHorizontalIcon, UploadIcon } from "@radix-ui/react-icons";
 import { AxiosResponse } from "axios";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog } from "@/components/ui/dialog";
-import { DialogContent } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export interface BookInfoState {
   open: boolean;
@@ -242,6 +241,9 @@ const AdminStoriesPage: React.FC = () => {
               book={bookState.selectedBook}
               onClose={handleCloseInfoBook}
               onUploadCover={handleOnUploadBookCover}
+              onClickAddAudio={() => console.log("onClickAddAudio")}
+              onClickAuth={() => {}}
+              onClickRate={(dto) => console.log("onClickRate")}
             >
               <Popover
                 open={languageListState.open}

@@ -242,32 +242,41 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <Skeleton className="h-24" />
                   </div>
                 ) : (
-                  <div className="flex">
-                    <AudioBookPlayer
-                      audios={listAudioState.audios}
-                      onClickAuth={onClickAuth}
-                      onClickRate={onClickRate}
-                      onClose={() => console.log("close")}
-                      onClickAddAudio={handleOnClickAddAudio}
-                      hideHeader={true}
-                    />
-                    <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
-                      <FileAudio
-                        className="size-9 text-slate-700 p-2"
-                        onClick={onClickAddAudio}
+                  <div className="flex -mb-12">
+                    {listAudioState.audios.length > 0 ? (
+                      <AudioBookPlayer
+                        audios={listAudioState.audios}
+                        onClickAuth={onClickAuth}
+                        onClickRate={onClickRate}
+                        onClose={() => console.log("close")}
+                        onClickAddAudio={handleOnClickAddAudio}
+                        hideHeader={true}
                       />
-                    </div>
+                    ) : (
+                      <p className="self-center">аудиокниги не найдены</p>
+                    )}
+                    {children ? (
+                      <div className="flex items-center cursor-pointer ml-2 mt-1 size-10">
+                        {children}
+                      </div>
+                    ) : (
+                      <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
+                        <FileAudio
+                          className="size-9 text-slate-700 p-2"
+                          onClick={onClickAddAudio}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
-
-                <div className="flex space-x-4 mt-2">{children}</div>
               </CardDescription>
             </div>
           </div>
         )}
       </CardHeader>
 
-      <CardFooter className={`${textAction.fullScreen ? "" : "-mt-12"}`}>
+      <CardFooter>
+        {/* {className={`${textAction.fullScreen ? "" : "-mt-10"}`}} */}
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">
             <AccordionTrigger
