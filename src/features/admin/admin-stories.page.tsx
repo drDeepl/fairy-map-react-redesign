@@ -65,10 +65,8 @@ const AdminStoriesPage: React.FC = () => {
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
 
-  const [
-    selectedLanguage,
-    setSelectedLanguage,
-  ] = useState<Components.Schemas.LanguageDto | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -130,20 +128,20 @@ const AdminStoriesPage: React.FC = () => {
   const handleUploadAudio = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    console.log("handle upload audio");
     if (event.target.files && event.target.files.length > 0) {
       if (bookState.selectedBook && selectedLanguage) {
         const formData = new FormData();
         formData.append("audio", event.target.files[0]);
 
         try {
-          const addedAudioResponse: any = await apiClient.AdminController_uploadAudioStory(
-            {
-              storyId: bookState.selectedBook["id"],
-              languageId: selectedLanguage.id,
-            },
-            formData
-          );
+          const addedAudioResponse: any =
+            await apiClient.AdminController_uploadAudioStory(
+              {
+                storyId: bookState.selectedBook["id"],
+                languageId: selectedLanguage.id,
+              },
+              formData
+            );
           console.log(addedAudioResponse.data);
 
           setAudioListState((prevState) => ({
@@ -295,7 +293,6 @@ const AdminStoriesPage: React.FC = () => {
         className="hidden"
         accept="audio/*"
         onChange={(event) => {
-          console.warn("change input");
           toast.promise(handleUploadAudio(event), {
             loading: "добавляю озвучку",
             success: "озвучка успешно добавлена",

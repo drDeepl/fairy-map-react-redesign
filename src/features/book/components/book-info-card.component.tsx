@@ -1,10 +1,10 @@
 import {
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
@@ -182,8 +182,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   return (
-    <DialogContent className="[&>button]:hidden m-0 py-0 animate-zoom-in">
-      <DialogHeader className="">
+    <Card className="border-none">
+      <CardHeader className="m-0 py-0 w-full">
         {textAction.fullScreen ? null : (
           <div className="w-full flex my-4 animate-out gap-4">
             <div className="w-44 h-56 flex justify-items-center justify-center">
@@ -222,7 +222,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
 
             <div className="w-2/3">
-              <DialogTitle className="">
+              <CardTitle className="">
                 <div className="flex justify-between items-center space-x-2 mb-6">
                   <span>{infoBookState.book.name}</span>
                   <Button
@@ -234,10 +234,12 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <Cross1Icon />
                   </Button>
                 </div>
-              </DialogTitle>
-              <DialogDescription className="-mt-2">
+              </CardTitle>
+              <CardDescription className="-mt-2">
                 {listAudioState.load ? (
-                  <Skeleton className="h-24" />
+                  <div>
+                    <Skeleton className="h-24" />
+                  </div>
                 ) : (
                   <AudioBookPlayer
                     audios={listAudioState.audios}
@@ -249,12 +251,13 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   />
                 )}
                 <div className="flex space-x-4 mt-2">{children}</div>
-              </DialogDescription>
+              </CardDescription>
             </div>
           </div>
         )}
-      </DialogHeader>
-      <DialogFooter className={`${textAction.fullScreen ? "" : "-mt-16"}`}>
+      </CardHeader>
+
+      <CardFooter className={`${textAction.fullScreen ? "" : "-mt-12"}`}>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">
             <AccordionTrigger
@@ -293,8 +296,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      </DialogFooter>
-    </DialogContent>
+      </CardFooter>
+    </Card>
   );
 };
 
