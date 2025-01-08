@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/app/store";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MapComponent from "./map.component";
 import { fetchMapData } from "./map.actions";
@@ -18,15 +18,8 @@ import { Report } from "notiflix/build/notiflix-report-aio";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
-import { PaperPlaneIcon } from "@radix-ui/react-icons";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import apiClient from "@/api/apiClient";
+import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
 
-import { AxiosResponse, OperationResponse } from "openapi-client-axios";
-import { Block, Notify } from "notiflix";
-import CreateApplicationAudioForm from "../audio-book/forms/create-application-audio.form";
-import { CreateApplicationAudioDataForm } from "../audio-book/interfaces/application-audio.interfaces";
 import { LanguageListState } from "../language/language-list.slice";
 import { fetchLanguages } from "../language/language.actions";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -44,13 +37,6 @@ interface MapPageProps {
 interface AuthFormState {
   open: boolean;
   notifySuccess: boolean;
-}
-
-interface ApplicationAudioFormState {
-  open: boolean;
-  useTermsApply: boolean;
-  storyId: number | null;
-  languageId: number | null;
 }
 
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
@@ -74,7 +60,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
-    console.log(event.target.value); // Логирование значения в консоль
   };
 
   const [authFormState, setAuthFormState] = useState<AuthFormState>({
@@ -104,31 +89,17 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [applicationAudioFormState, setApplicationAudioFormState] =
-    useState<ApplicationAudioFormState>({
-      open: false,
-      useTermsApply: false,
-      storyId: null,
-      languageId: null,
-    });
-
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
     setSelectedAudioBook(audio);
+    console.log(selectedAudioBook);
   };
 
-  const handleOnCloseAudioBook = async () => {
-    setOpenDialog(false);
-    setSelectedAudioBook(null);
-  };
-
-  // const onSubmit
-  const onSubmitApplicationAudioFormState = async (
-    data: CreateApplicationAudioDataForm
-  ) => {
-    console.warn(data);
-  };
+  // const handleOnCloseAudioBook = async () => {
+  //   setOpenDialog(false);
+  //   setSelectedAudioBook(null);
+  // };
 
   const handleOnClickRate = async (
     dto: Components.Schemas.AddRatingAudioStoryDto
@@ -153,7 +124,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         {
           backOverlayClickToClose: true,
           borderRadius: "0.5rem",
-
           success: {
             titleColor: "#334155",
             messageColor: "#94a3b8",
@@ -174,7 +144,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
 
   const handleOnCloseBook = async () => {
-    console.log("handleOnCloseBook");
     setOpenDialog(false);
     setSelectedBook(null);
   };
@@ -195,8 +164,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const handleOnClickAddAudio = () => {
     setCurrentTab(BookInfoTabs.AddApplicationAudio.toString());
-
-    setApplicationAudioFormState((prevState) => ({ ...prevState, open: true }));
   };
 
   if (mapState.loading || load) {

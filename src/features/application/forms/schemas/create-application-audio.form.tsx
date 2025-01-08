@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import createApplicationFormSchema from "./schemas/create-application-audio.schema";
+import createApplicationFormSchema from "../../../audio-book/forms/schemas/create-application-audio.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -34,22 +34,13 @@ import {
   CheckCircledIcon,
   CrossCircledIcon,
   PaperPlaneIcon,
-  ReloadIcon,
 } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import apiClient from "@/api/apiClient";
 import { Block } from "notiflix/build/notiflix-block-aio";
-import { Report } from "notiflix/build/notiflix-report-aio";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
-import { Alert } from "@/components/ui/alert";
 
 interface CreateApplicationAudioFormProps {
   storyId: number;
@@ -74,7 +65,6 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   });
 
   const [openLanguages, setOpenLanguages] = useState<boolean>(false);
-  const [load, setLoad] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -104,12 +94,15 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
             storyId: data.storyId,
             languageId: data.languageId,
           },
-          formData
+          formData as any,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
         console.log(addedAudioResponse.data);
-        const createdApplication = await apiClient.paths[
-          "/api/audio-story-request/add"
-        ].post(null, {
+        await apiClient.paths["/api/audio-story-request/add"].post(null, {
           userAudioId: addedAudioResponse.data.userAudioId, // 24
           userId: userId, // 1
           storyId: data.storyId,
@@ -130,8 +123,6 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
         fileInputRef.current.value = "";
         form.reset();
       } catch (error) {
-        console.error(error);
-
         toast({
           className: cn(
             "top-8 right-20 flex fixed w-2/3 border border-red-500 bg-red-50"
@@ -274,7 +265,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
                 <ArrowLeftIcon />
                 <span>назад</span>
               </Button>
-              <Button type="submit" disabled={load} className="w-32">
+              <Button type="submit" className="w-32">
                 отправить
                 <PaperPlaneIcon className="-rotate-45" />
               </Button>

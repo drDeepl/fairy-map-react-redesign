@@ -12,12 +12,7 @@ import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
 import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
-import {
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import {
   Command,
   CommandEmpty,
@@ -31,14 +26,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { addAudio, setBook } from "../book/book.slice";
+import { setBook } from "../book/book.slice";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster, toast } from "sonner";
-import { DotsHorizontalIcon, UploadIcon } from "@radix-ui/react-icons";
-import { AxiosResponse } from "axios";
+import { UploadIcon } from "@radix-ui/react-icons";
+
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export interface BookInfoState {
@@ -97,22 +91,23 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnClickPreviewBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    // await dispatch(fetchAudiosByBookId(book.id));
-    apiClient.paths["/api/story/{storyId}/audio/all"]
-      .get({
-        storyId: book.id,
-      })
-      .then((result) => {
-        setAudioListState({
-          load: false,
-          audios: result.data,
-        });
-      })
-      .catch((err) => {
-        const msg =
-          err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
-        toast.error(msg);
-      });
+    console.log(book);
+    // // await dispatch(fetchAudiosByBookId(book.id));
+    // apiClient.paths["/api/story/{storyId}/audio/all"]
+    //   .get({
+    //     storyId: book.id,
+    //   })
+    //   .then((result) => {
+    //     setAudioListState({
+    //       load: false,
+    //       audios: result.data,
+    //     });
+    //   })
+    // .catch((err) => {
+    //   const msg =
+    //     err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
+    //   toast.error(msg);
+    // });
 
     dispatch(setBook(book));
     setOpenDialog(true);
@@ -138,20 +133,19 @@ const AdminStoriesPage: React.FC = () => {
         formData.append("audio", event.target.files[0]);
 
         try {
-          const addedAudioResponse: any =
-            await apiClient.AdminController_uploadAudioStory(
-              {
-                storyId: bookState.selectedBook["id"],
-                languageId: selectedLanguage.id,
-              },
-              formData
-            );
-          console.log(addedAudioResponse.data);
+          // const addedAudioResponse: any =
+          await apiClient.AdminController_uploadAudioStory(
+            {
+              storyId: bookState.selectedBook["id"],
+              languageId: selectedLanguage.id,
+            },
+            formData
+          );
 
-          setAudioListState((prevState) => ({
-            ...prevState,
-            audios: [...prevState.audios, addedAudioResponse.data],
-          }));
+          // setAudioListState((prevState) => ({
+          //   ...prevState,
+          //   audios: [...prevState.audios, addedAudioResponse.data],
+          // }));
         } catch (error) {
           console.error(error);
           toast.error("Ошибка при загрузке аудио");
@@ -177,15 +171,15 @@ const AdminStoriesPage: React.FC = () => {
     }
   };
 
-  interface AudioListState {
-    load: boolean;
-    audios: Components.Schemas.AudioStoryResponseDto[];
-  }
+  // interface AudioListState {
+  //   load: boolean;
+  //   audios: Components.Schemas.AudioStoryResponseDto[];
+  // }
 
-  const [audiosListState, setAudioListState] = useState<AudioListState>({
-    load: true,
-    audios: [],
-  });
+  // const [audiosListState, setAudioListState] = useState<AudioListState>({
+  //   load: true,
+  //   audios: [],
+  // });
 
   useEffect(() => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {
@@ -243,7 +237,6 @@ const AdminStoriesPage: React.FC = () => {
               onUploadCover={handleOnUploadBookCover}
               onClickAddAudio={() => console.log("onClickAddAudio")}
               onClickAuth={() => {}}
-              onClickRate={(dto) => console.log("onClickRate")}
             >
               <Popover
                 open={languageListState.open}

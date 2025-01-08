@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
@@ -25,13 +25,9 @@ import SignInForm from "./forms/sign-in.form.component";
 
 import ErrorsAlertComponent from "@/components/errors-alert.component";
 import SignUpFormComponent from "./forms/sign-up.form.component";
-import { useNavigate } from "react-router-dom";
 
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Toaster } from "@/components/ui/toaster";
-import { Cross1Icon } from "@radix-ui/react-icons";
 
 enum Tab {
   SignIn = "signin",
@@ -46,7 +42,6 @@ interface AuthFormProps {
 
 const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
 
   const authState = useSelector((state: RootState) => state.auth);
 

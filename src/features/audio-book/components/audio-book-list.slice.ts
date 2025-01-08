@@ -4,17 +4,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import {
   addRatingAudio,
-  fetchAudiosByStoryId,
   fetchAudiosByEthnicGroupId,
 } from "../audio-book.actions";
 
 export interface AudioBookListState extends BaseAppState {
   audioStories: Components.Schemas.PreviewAudioStoryResponseDto[];
-}
-
-interface UpdateModerateScorePayload {
-  audioId: number;
-  moderateScore: number;
 }
 
 export interface UpdateAudioItem {
@@ -42,17 +36,6 @@ const audioBookListSlice = createSlice({
         audioStory.audios.map((audio: Components.Schemas.AudioResponseDto) =>
           audio.id === action.payload.audio.id ? action.payload.audio : audio
         );
-      }
-    },
-    updateModerateScore: (
-      state,
-      action: PayloadAction<UpdateModerateScorePayload>
-    ) => {
-      const audioStory = state.audioStories.find(
-        (story) => story.id === action.payload.storyId
-      );
-      if (audioStory) {
-        audioStory.moderateScore = action.payload.moderateScore;
       }
     },
   },

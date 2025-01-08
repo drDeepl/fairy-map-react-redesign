@@ -162,7 +162,7 @@ declare namespace Components {
              */
             ratingAudioStory: number;
         }
-        export interface AudioApplicationWithUserAudioDto {
+        export interface AudioApplicationWithUserAudioResponseDto {
             /**
              * ид заявки
              */
@@ -172,15 +172,23 @@ declare namespace Components {
              */
             userAudio: {
                 /**
-                 * userAudioId
+                 * ид озвучки
                  */
-                userAudioId: number;
+                id: number;
                 /**
-                 * url для прослушивания файла
+                 * название файла
+                 */
+                name: string;
+                /**
+                 * пользовательское название озвучки
+                 */
+                originalName: string;
+                /**
+                 * прямая ссылка на файл
                  */
                 srcAudio: string;
                 /**
-                 * информация о языке озвучки
+                 * информация о языке
                  */
                 language: {
                     /**
@@ -194,17 +202,46 @@ declare namespace Components {
                 };
             };
             /**
-             * ид пользователя
+             * информация о пользователе
              */
-            userId: number;
+            user: {
+                /**
+                 * id пользователя
+                 */
+                id: number;
+                /**
+                 * имя пользователя
+                 */
+                firstName: string;
+                /**
+                 * фамилия пользователя
+                 */
+                lastName: string;
+            };
             /**
              * статус заявки
              */
             status: string;
             /**
-             *
+             * комментарий, проверяющего
              */
             comment: string;
+            /**
+             * дата создания заявки
+             */
+            createdAt: string; // date-time
+            /**
+             * дата редактирования заявки
+             */
+            updatedAt: string; // date-time
+            /**
+             * ид сказки
+             */
+            storyId: number;
+            /**
+             * название сказки
+             */
+            storyName: string;
         }
         export interface AudioResponseDto {
             /**
@@ -793,6 +830,64 @@ declare namespace Components {
                 map: FeatureGeometryDto[];
             };
         }
+        export interface PageMetaDto {
+            /**
+             * номер текущей страницы
+             */
+            page: number;
+            /**
+             * количество элементов на странице
+             */
+            take: number;
+            /**
+             * количество элементов всего
+             */
+            itemCount: number;
+            /**
+             * количество страниц
+             */
+            pageCount: number;
+            /**
+             * есть предыдущая страница
+             */
+            hasPreviousPage: boolean;
+            /**
+             * есть следующая страница
+             */
+            hasNextPage: boolean;
+        }
+        export interface PageResponseDto {
+            data: any[][];
+            /**
+             * информация о странице
+             */
+            meta: {
+                /**
+                 * номер текущей страницы
+                 */
+                page: number;
+                /**
+                 * количество элементов на странице
+                 */
+                take: number;
+                /**
+                 * количество элементов всего
+                 */
+                itemCount: number;
+                /**
+                 * количество страниц
+                 */
+                pageCount: number;
+                /**
+                 * есть предыдущая страница
+                 */
+                hasPreviousPage: boolean;
+                /**
+                 * есть следующая страница
+                 */
+                hasNextPage: boolean;
+            };
+        }
         export interface PreviewAudioStoryResponseDto {
             /**
              * id истории
@@ -985,6 +1080,41 @@ declare namespace Components {
             srcAudio: string;
             /**
              * информация о языке озвучки
+             */
+            language: {
+                /**
+                 *
+                 */
+                name: string;
+                /**
+                 *
+                 */
+                id: number;
+            };
+            /**
+             * изначальное название озвучки
+             */
+            originalName: string;
+        }
+        export interface UserAudioWithLanguageResponseDto {
+            /**
+             * ид озвучки
+             */
+            id: number;
+            /**
+             * название файла
+             */
+            name: string;
+            /**
+             * пользовательское название озвучки
+             */
+            originalName: string;
+            /**
+             * прямая ссылка на файл
+             */
+            srcAudio: string;
+            /**
+             * информация о языке
              */
             language: {
                 /**
@@ -1467,9 +1597,46 @@ declare namespace Paths {
         }
         namespace Parameters {
             export type Authorization = string;
+            export type Page = number;
+            export type Take = number;
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page;
+            take?: Parameters.Take;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.AudioApplicationWithUserAudioDto[];
+            export interface $200 {
+                data: Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
+                /**
+                 * информация о странице
+                 */
+                meta: {
+                    /**
+                     * номер текущей страницы
+                     */
+                    page: number;
+                    /**
+                     * количество элементов на странице
+                     */
+                    take: number;
+                    /**
+                     * количество элементов всего
+                     */
+                    itemCount: number;
+                    /**
+                     * количество страниц
+                     */
+                    pageCount: number;
+                    /**
+                     * есть предыдущая страница
+                     */
+                    hasPreviousPage: boolean;
+                    /**
+                     * есть следующая страница
+                     */
+                    hasNextPage: boolean;
+                };
+            }
             export interface $400 {
             }
             export interface $401 {
@@ -2051,7 +2218,7 @@ declare namespace Paths {
             export type Authorization = string;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.AudioApplicationWithUserAudioDto[];
+            export type $200 = Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -2303,7 +2470,7 @@ export interface OperationMethods {
    * необходимы роль модератора
    */
   'AudioStoryRequestController_getAllAudioStoryRequests'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
+    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.QueryParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>
@@ -2947,7 +3114,7 @@ export interface PathsDictionary {
      * необходимы роль модератора
      */
     'get'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
+      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.QueryParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.HeaderParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>

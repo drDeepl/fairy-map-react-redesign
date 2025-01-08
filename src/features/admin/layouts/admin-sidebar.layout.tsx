@@ -8,7 +8,7 @@ import AdminSidebar from "../components/admin-sidebar.component";
 import { ItemSidebarAdmin } from "../interfaces/item-sidebar.interfaces";
 
 interface AdminSidebarLayoutProps {
-  onClickItemSidebar: (item: ItemSidebar) => void;
+  onClickItemSidebar: (item: ItemSidebarAdmin) => void;
   onClickExit: () => void;
   children: React.ReactNode;
 }

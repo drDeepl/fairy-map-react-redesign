@@ -11,23 +11,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 import { AxiosResponse } from "axios";
-import BookInfoCardComponent from "../book/components/book-info-card.component";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RouteApp } from "@/pages/constants/route.enum";
@@ -40,9 +29,9 @@ interface UserBookAudioState {
   books: StoryWithImgResponseDto[];
 }
 
-interface SelectedBookViewState {
-  book: StoryWithImgResponseDto | null;
-}
+// interface SelectedBookViewState {
+//   book: StoryWithImgResponseDto | null;
+// }
 
 const UserPage: React.FC = () => {
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
@@ -51,18 +40,16 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [userAudioStoriesState, setUserAudioStoriesState] = useState<
-    UserBookAudioState
-  >({
-    load: true,
-    books: [],
-  });
+  const [userAudioStoriesState, setUserAudioStoriesState] =
+    useState<UserBookAudioState>({
+      load: true,
+      books: [],
+    });
 
-  const [selectedBookViewState, setSelectedBookViewState] = useState<
-    SelectedBookViewState
-  >({
-    book: null,
-  });
+  // const [selectedBookViewState, setSelectedBookViewState] =
+  //   useState<SelectedBookViewState>({
+  //     book: null,
+  //   });
 
   useEffect(() => {
     if (!user) {
@@ -80,6 +67,7 @@ const UserPage: React.FC = () => {
             load: false,
             books: res.data,
           });
+          console.log(userAudioStoriesState);
         });
     }
   }, []);
@@ -88,13 +76,13 @@ const UserPage: React.FC = () => {
     console.error("on click avatar");
   };
 
-  const handleOnClickBook = (book: StoryWithImgResponseDto) => {
-    setSelectedBookViewState({ book });
-  };
+  // const handleOnClickBook = (book: StoryWithImgResponseDto) => {
+  //   setSelectedBookViewState({ book });
+  // };
 
-  const handleOnCloseBook = () => {
-    setSelectedBookViewState({ book: null });
-  };
+  // const handleOnCloseBook = () => {
+  //   setSelectedBookViewState({ book: null });
+  // };
 
   const handleOnClickLogout = () => {
     dispatch(userLogOut());
@@ -147,12 +135,13 @@ const UserPage: React.FC = () => {
           </AccordionItem>
         </Accordion>
       </div>
-      {selectedBookViewState.book ? (
+      {/* {selectedBookViewState.book ? (
         <BookInfoCardComponent
           book={selectedBookViewState.book}
           onClose={handleOnCloseBook}
+
         />
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

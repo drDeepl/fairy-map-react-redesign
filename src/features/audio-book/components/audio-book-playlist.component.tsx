@@ -83,7 +83,7 @@ const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
                       <div className="flex space-x-[3px] self-center">
                         {Array(5)
                           .fill(1)
-                          .map((num, id) => {
+                          .map((_, id) => {
                             if (audio.moderateScore > id) {
                               return (
                                 <StarFilledIcon
