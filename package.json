@@ -82,6 +82,7 @@
     "topojson": "^3.0.2",
     "topojson-client": "^3.1.0",
     "turf": "^3.0.14",
+    "vaul": "^1.1.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {

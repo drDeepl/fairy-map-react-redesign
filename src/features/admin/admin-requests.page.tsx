@@ -9,19 +9,40 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { useEffect, useRef, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import apiClient from "@/api/apiClient";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Toaster } from "@/components/ui/toaster";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { CrossCircledIcon } from "@radix-ui/react-icons";
-import { Toaster } from "@/components/ui/toaster";
-import { AxiosError } from "axios";
-
-import ReactAudioPlayer from "react-audio-player";
-
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Sheet,
   SheetContent,
@@ -29,10 +50,24 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+
+import ReactAudioPlayer from "react-audio-player";
+import { useEffect, useRef, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import apiClient from "@/api/apiClient";
+
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Cross2Icon, CrossCircledIcon } from "@radix-ui/react-icons";
+
+import { AxiosError } from "axios";
+
 import {
   EditApplicationState,
   EditApplicationData,
 } from "../application/interfaces";
+import { getDescriptionApplicationStatus } from "../application/helpers/get-description-application-status";
+import { ApplicationStatus } from "../application/constants/application-status.enum";
 
 interface ApplicationTableState {
   load: boolean;
@@ -56,50 +91,85 @@ interface AudioPlayerState {
   applicationAudio: Components.Schemas.AudioApplicationWithUserAudioResponseDto | null;
 }
 
+interface SheetState {
+  modal: boolean;
+  side: "top" | "right" | "bottom" | "left";
+}
+
 const AdminRequestsPage = () => {
+  const [sheetState, setSheetState] = useState<SheetState>({
+    modal: true,
+    side: "bottom",
+  });
+
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
 
-  const [editApplicationState, setEditApplicationState] =
-    useState<EditApplicationState | null>(null);
+  const [
+    editApplicationState,
+    setEditApplicationState,
+  ] = useState<EditApplicationState | null>(null);
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
 
   const pageInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleOnClickAudio = (
     application: Components.Schemas.AudioApplicationWithUserAudioResponseDto
   ) => {
+    const audioPlayer: HTMLElement | null = document.getElementById(
+      "audio-player__container"
+    );
+
+    if (audioPlayer) {
+      audioPlayer.classList.add("animate-in");
+    }
     setAudioPlayerState({
       applicationAudio: application,
+    });
+  };
+
+  const handleOnClickCloseAudio = () => {
+    const audioPlayer: HTMLElement | null = document.getElementById(
+      "audio-player__container"
+    );
+
+    if (audioPlayer) {
+      audioPlayer.classList.add("animate-zomm-out");
+    }
+
+    setAudioPlayerState({
+      applicationAudio: null,
     });
   };
 
   const showToast = (msg: string) => {
     return toast({
       className: cn(
-        "top-8 right-[22%] flex fixed w-1/3 border border-red-500 bg-red-50"
+        "top-10 right-0 flex fixed w-1/3 border border-red-500 bg-red-50"
       ),
       action: (
         <div className="flex items-center space-x-2 w-full">
           <CrossCircledIcon className="size-6 text-red-500" />
-          <span className="font-semibold text-md">{msg}</span>
+          <span className="font-semibold text-sm">{msg}</span>
         </div>
       ),
     });
@@ -115,7 +185,7 @@ const AdminRequestsPage = () => {
         });
       })
       .catch((error: AxiosError) => {
-        showToast("Что-то пошло не так...");
+        showToast("Ошибка при загрузки озвучки...");
       });
   }, []);
 
@@ -139,7 +209,7 @@ const AdminRequestsPage = () => {
         ...prevState,
         load: false,
       }));
-      showToast("Что-то пошло не так...");
+      showToast("Произошла ошибка при получении заявок");
     }
   };
 
@@ -158,13 +228,15 @@ const AdminRequestsPage = () => {
 
   const handleOnErrorAudio = (e: Event) => {
     console.log(e);
-    showToast("что-то пошло не так");
+    showToast("Ошибка при загрузки озвучки...");
   };
 
   const handleOnSelectStatus = (data: EditApplicationData) => {
     setEditApplicationState({
       data,
     });
+
+    setSheetState((prevState) => ({ ...prevState, side: "top" }));
   };
 
   const columns = createColumns({
@@ -175,7 +247,8 @@ const AdminRequestsPage = () => {
   return (
     <div>
       <Sheet
-        open={audioPlayerState.applicationAudio ? true : false}
+        modal={sheetState.modal}
+        open={false}
         onOpenChange={(open) => {
           if (!open) {
             setAudioPlayerState({
@@ -222,7 +295,7 @@ const AdminRequestsPage = () => {
                       .fill(1)
                       .map((_, index) => {
                         return (
-                          <PaginationItem>
+                          <PaginationItem key={index}>
                             <PaginationLink
                               className="cursor-pointer"
                               isActive={
@@ -292,26 +365,90 @@ const AdminRequestsPage = () => {
               </PaginationContent>
             </Pagination>
           ) : null}
+          {audioPlayerState.applicationAudio ? (
+            // className="sticky left-[30lvw] right-[30lvw] bottom-[5lvh] w-[40lvw] shadow-ghost"
+            <Drawer
+              open={audioPlayerState.applicationAudio != null}
+              dismissible={false}
+              modal={false}
+            >
+              <DrawerContent className="flex items-center justify-content-center w-1/3 pb-6">
+                <DrawerHeader className="flex">
+                  <DrawerTitle className="flex items-center justify-between">
+                    <span>{audioPlayerState.applicationAudio?.storyName}</span>
+                    <Button
+                      size="icon"
+                      variant="link"
+                      onClick={handleOnClickCloseAudio}
+                    >
+                      <Cross2Icon />
+                    </Button>
+                  </DrawerTitle>
+                  <DrawerDescription className="">
+                    <div className="space-x-2">
+                      <span>озвучил: </span>
+                      <span>
+                        {audioPlayerState.applicationAudio?.user.firstName}
+                      </span>
+                      <span>
+                        {audioPlayerState.applicationAudio?.user.firstName}
+                      </span>
+                    </div>
+                  </DrawerDescription>
+                </DrawerHeader>
+
+                <ReactAudioPlayer
+                  className="w-full"
+                  controls
+                  controlsList="nodownload noplaybackrate foobar"
+                  src={audioPlayerState.applicationAudio?.userAudio.srcAudio}
+                  onError={handleOnErrorAudio}
+                />
+                <div className="w-56">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="font-semibold" asChild>
+                      <Button>
+                        {getDescriptionApplicationStatus(
+                          audioPlayerState.applicationAudio.status
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      {Object.keys(ApplicationStatus).map((key) => (
+                        <DropdownMenuItem
+                          key={key}
+                          className="font-semibold"
+                          onClick={() =>
+                            audioPlayerState.applicationAudio
+                              ? handleOnSelectStatus({
+                                  value: getDescriptionApplicationStatus(key),
+                                  aplicationId:
+                                    audioPlayerState.applicationAudio.id,
+                                  comment:
+                                    audioPlayerState.applicationAudio.comment,
+                                })
+                              : null
+                          }
+                        >
+                          {getDescriptionApplicationStatus(key)}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </DrawerContent>
+            </Drawer>
+          ) : null}
         </div>
 
-        <SheetContent side="bottom">
+        <SheetContent side={sheetState.side} className="mx-4 rounded-xl">
           <SheetHeader>
-            <SheetTitle>
-              <span>{audioPlayerState.applicationAudio?.user.firstName}</span>{" "}
-              <span>{audioPlayerState.applicationAudio?.user.firstName}</span>
-            </SheetTitle>
+            <SheetTitle></SheetTitle>
             <SheetDescription>
               This action cannot be undone. This will permanently delete your
               account and remove your data from our servers.
             </SheetDescription>
           </SheetHeader>
-          <ReactAudioPlayer
-            className="w-full"
-            controls
-            controlsList="nodownload noplaybackrate foobar"
-            src={audioPlayerState.applicationAudio?.userAudio.srcAudio}
-            onError={handleOnErrorAudio}
-          />
         </SheetContent>
       </Sheet>
     </div>
