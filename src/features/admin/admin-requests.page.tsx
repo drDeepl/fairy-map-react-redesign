@@ -35,13 +35,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import {
   Sheet,
@@ -58,7 +56,11 @@ import apiClient from "@/api/apiClient";
 
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Cross2Icon, CrossCircledIcon } from "@radix-ui/react-icons";
+import {
+  CaretDownIcon,
+  Cross2Icon,
+  CrossCircledIcon,
+} from "@radix-ui/react-icons";
 
 import { AxiosError } from "axios";
 
@@ -71,7 +73,6 @@ import { ApplicationStatus } from "../application/constants/application-status.e
 
 interface ApplicationTableState {
   load: boolean;
-
   paginationData: {
     data: Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
     meta: {
@@ -104,27 +105,24 @@ const AdminRequestsPage = () => {
 
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
 
-  const [
-    editApplicationState,
-    setEditApplicationState,
-  ] = useState<EditApplicationState | null>(null);
+  const [editApplicationState, setEditApplicationState] =
+    useState<EditApplicationState | null>(null);
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -236,221 +234,233 @@ const AdminRequestsPage = () => {
       data,
     });
 
+    const updatedApplications = applicationTableState.paginationData.data.map(
+      (application) => {
+        if (application.id === data.aplicationId) {
+          application.status = data.value;
+        }
+        return application;
+      }
+    );
+
+    console.log(updatedApplications);
+
+    setApplicationTableState((prevState) => ({
+      ...prevState,
+      paginationData: {
+        ...prevState.paginationData,
+        data: updatedApplications,
+      },
+    }));
+
     setSheetState((prevState) => ({ ...prevState, side: "top" }));
   };
 
   const columns = createColumns({
     onClickAudio: handleOnClickAudio,
-    onSelectStatus: handleOnSelectStatus,
   });
 
   return (
     <div>
-      <Sheet
-        modal={sheetState.modal}
-        open={false}
-        onOpenChange={(open) => {
-          if (!open) {
-            setAudioPlayerState({
-              applicationAudio: null,
-            });
-          }
-        }}
-      >
-        <Toaster />
-        <div className="flex flex-col p-3 space-y-2">
-          {applicationTableState.load ? (
-            <Skeleton className="w-full h-80 m-2" />
-          ) : (
-            <DataTableApplicationAdmin
-              columns={columns}
-              data={applicationTableState.paginationData.data}
-            />
-          )}
+      <Toaster />
+      <div className="flex flex-col p-3 space-y-2">
+        {applicationTableState.load ? (
+          <Skeleton className="w-full h-80 m-2" />
+        ) : (
+          <DataTableApplicationAdmin
+            columns={columns}
+            data={applicationTableState.paginationData.data}
+          />
+        )}
 
-          {applicationTableState.paginationData.data.length > 0 ? (
-            <Pagination>
-              <PaginationContent>
-                {applicationTableState.paginationData.meta.hasPreviousPage ? (
-                  <PaginationItem>
-                    <PaginationPrevious
-                      isActive={
-                        applicationTableState.paginationData.meta
-                          .hasPreviousPage
-                      }
-                      className="cursor-pointer"
-                      onClick={() =>
-                        applicationTableState.paginationData.meta
-                          .hasPreviousPage
-                          ? handleOnClickPage(
-                              applicationTableState.paginationData.meta.page - 1
-                            )
-                          : null
-                      }
-                    />
-                  </PaginationItem>
-                ) : null}
-                {applicationTableState.paginationData.meta.pageCount > 5
-                  ? Array(5)
-                      .fill(1)
-                      .map((_, index) => {
-                        return (
-                          <PaginationItem key={index}>
-                            <PaginationLink
-                              className="cursor-pointer"
-                              isActive={
-                                index + 1 ===
-                                applicationTableState.paginationData.meta.page
-                              }
-                              onClick={() => handleOnClickPage(index + 1)}
-                            >
-                              {index + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      })
-                  : Array(applicationTableState.paginationData.meta.pageCount)
-                      .fill(1)
-                      .map((_, index) => {
-                        return (
-                          <PaginationItem key={index}>
-                            <PaginationLink
-                              className="cursor-pointer"
-                              isActive={
-                                index + 1 ===
-                                applicationTableState.paginationData.meta.page
-                              }
-                              onClick={() => handleOnClickPage(index + 1)}
-                            >
-                              {index + 1}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      })}
-
-                {applicationTableState.paginationData.meta.hasNextPage ? (
-                  <PaginationItem>
-                    <PaginationNext
-                      className="cursor-pointer"
-                      onClick={() =>
-                        applicationTableState.paginationData.meta
-                          .hasPreviousPage
-                          ? handleOnClickPage(
-                              applicationTableState.paginationData.meta.page + 1
-                            )
-                          : null
-                      }
-                    />
-                  </PaginationItem>
-                ) : null}
-                <PaginationItem className="flex items-center space-x-2">
-                  <Input
-                    ref={pageInputRef}
-                    type="number"
-                    min={0}
-                    className="w-10 text-center"
-                    placeholder={`${applicationTableState.paginationData.meta.page}`}
+        {applicationTableState.paginationData.data.length > 0 ? (
+          <Pagination>
+            <PaginationContent>
+              {applicationTableState.paginationData.meta.hasPreviousPage ? (
+                <PaginationItem>
+                  <PaginationPrevious
+                    isActive={
+                      applicationTableState.paginationData.meta.hasPreviousPage
+                    }
+                    className="cursor-pointer"
+                    onClick={() =>
+                      applicationTableState.paginationData.meta.hasPreviousPage
+                        ? handleOnClickPage(
+                            applicationTableState.paginationData.meta.page - 1
+                          )
+                        : null
+                    }
                   />
-                  <span>из</span>
-                  <span>
-                    {applicationTableState.paginationData.meta.pageCount}
-                  </span>
-                  <Button
-                    variant="secondary"
-                    onClick={() => handleOnApplyInputPage()}
-                  >
-                    перейти
-                  </Button>
                 </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          ) : null}
-          {audioPlayerState.applicationAudio ? (
-            // className="sticky left-[30lvw] right-[30lvw] bottom-[5lvh] w-[40lvw] shadow-ghost"
-            <Drawer
-              open={audioPlayerState.applicationAudio != null}
-              dismissible={false}
-              modal={false}
-            >
-              <DrawerContent className="flex items-center justify-content-center w-1/3 pb-6">
-                <DrawerHeader className="flex">
-                  <DrawerTitle className="flex items-center justify-between">
-                    <span>{audioPlayerState.applicationAudio?.storyName}</span>
-                    <Button
-                      size="icon"
-                      variant="link"
-                      onClick={handleOnClickCloseAudio}
-                    >
-                      <Cross2Icon />
-                    </Button>
-                  </DrawerTitle>
-                  <DrawerDescription className="">
-                    <div className="space-x-2">
-                      <span>озвучил: </span>
-                      <span>
-                        {audioPlayerState.applicationAudio?.user.firstName}
-                      </span>
-                      <span>
-                        {audioPlayerState.applicationAudio?.user.firstName}
-                      </span>
-                    </div>
-                  </DrawerDescription>
-                </DrawerHeader>
+              ) : null}
+              {applicationTableState.paginationData.meta.pageCount > 5
+                ? Array(5)
+                    .fill(1)
+                    .map((_, index) => {
+                      return (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            className="cursor-pointer"
+                            isActive={
+                              index + 1 ===
+                              applicationTableState.paginationData.meta.page
+                            }
+                            onClick={() => handleOnClickPage(index + 1)}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })
+                : Array(applicationTableState.paginationData.meta.pageCount)
+                    .fill(1)
+                    .map((_, index) => {
+                      return (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            className="cursor-pointer"
+                            isActive={
+                              index + 1 ===
+                              applicationTableState.paginationData.meta.page
+                            }
+                            onClick={() => handleOnClickPage(index + 1)}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
 
-                <ReactAudioPlayer
-                  className="w-full"
-                  controls
-                  controlsList="nodownload noplaybackrate foobar"
-                  src={audioPlayerState.applicationAudio?.userAudio.srcAudio}
-                  onError={handleOnErrorAudio}
+              {applicationTableState.paginationData.meta.hasNextPage ? (
+                <PaginationItem>
+                  <PaginationNext
+                    className="cursor-pointer"
+                    onClick={() =>
+                      applicationTableState.paginationData.meta.hasPreviousPage
+                        ? handleOnClickPage(
+                            applicationTableState.paginationData.meta.page + 1
+                          )
+                        : null
+                    }
+                  />
+                </PaginationItem>
+              ) : null}
+              <PaginationItem className="flex items-center space-x-2">
+                <Input
+                  ref={pageInputRef}
+                  type="number"
+                  min={0}
+                  className="w-10 text-center"
+                  placeholder={`${applicationTableState.paginationData.meta.page}`}
                 />
-                <div className="w-56">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="font-semibold" asChild>
-                      <Button>
-                        {getDescriptionApplicationStatus(
-                          audioPlayerState.applicationAudio.status
-                        )}
+                <span>из</span>
+                <span>
+                  {applicationTableState.paginationData.meta.pageCount}
+                </span>
+                <Button
+                  variant="secondary"
+                  onClick={() => handleOnApplyInputPage()}
+                >
+                  перейти
+                </Button>
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        ) : null}
+        {audioPlayerState.applicationAudio ? (
+          <Drawer
+            open={audioPlayerState.applicationAudio != null}
+            dismissible={false}
+            handleOnly={true}
+          >
+            <DrawerContent className="flex items-center w-[40vw] left-[30lvw] right-[30lvw] p-4">
+              <DrawerHeader className="">
+                <DrawerTitle className="">
+                  <span>{audioPlayerState.applicationAudio?.storyName}</span>
+                </DrawerTitle>
+                <DrawerDescription className="">
+                  <div className="space-x-2">
+                    <span>озвучил: </span>
+                    <span>
+                      {audioPlayerState.applicationAudio?.user.firstName}
+                    </span>
+                    <span>
+                      {audioPlayerState.applicationAudio?.user.firstName}
+                    </span>
+                  </div>
+                </DrawerDescription>
+              </DrawerHeader>
+
+              <ReactAudioPlayer
+                className="w-full"
+                controls
+                controlsList="nodownload noplaybackrate foobar"
+                src={audioPlayerState.applicationAudio?.userAudio.srcAudio}
+                onError={handleOnErrorAudio}
+              />
+
+              <DrawerFooter className="flex justify-between">
+                <div className="flex items-center justify-items-center w-full space-x-4">
+                  <DropdownMenu
+                    onOpenChange={(open: boolean) => {
+                      const caretIcon =
+                        document.getElementById("caret-status-btn");
+                      if (open) {
+                        caretIcon?.setAttribute("class", "animate-rotate-180");
+                      } else {
+                        caretIcon?.setAttribute("class", "animate-rotate-270");
+                      }
+                    }}
+                  >
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        id="status-select__btn"
+                        variant="secondary"
+                        className=""
+                      >
+                        <span className="text-center">
+                          {getDescriptionApplicationStatus(
+                            audioPlayerState.applicationAudio.status
+                          )}
+                        </span>
+                        <CaretDownIcon
+                          id="caret-status-btn"
+                          className="animate-rotate-270"
+                        />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className="">
                       {Object.keys(ApplicationStatus).map((key) => (
                         <DropdownMenuItem
                           key={key}
                           className="font-semibold"
-                          onClick={() =>
-                            audioPlayerState.applicationAudio
-                              ? handleOnSelectStatus({
-                                  value: getDescriptionApplicationStatus(key),
-                                  aplicationId:
-                                    audioPlayerState.applicationAudio.id,
-                                  comment:
-                                    audioPlayerState.applicationAudio.comment,
-                                })
-                              : null
-                          }
+                          onClick={() => {
+                            if (audioPlayerState.applicationAudio) {
+                              handleOnSelectStatus({
+                                value: key,
+                                aplicationId:
+                                  audioPlayerState.applicationAudio.id,
+                                comment:
+                                  audioPlayerState.applicationAudio.comment,
+                              });
+                            }
+                          }}
                         >
                           {getDescriptionApplicationStatus(key)}
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </div>
-              </DrawerContent>
-            </Drawer>
-          ) : null}
-        </div>
 
-        <SheetContent side={sheetState.side} className="mx-4 rounded-xl">
-          <SheetHeader>
-            <SheetTitle></SheetTitle>
-            <SheetDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+                  <Button variant="outline" onClick={handleOnClickCloseAudio}>
+                    закрыть
+                  </Button>
+                </div>
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
+        ) : null}
+      </div>
     </div>
   );
 };

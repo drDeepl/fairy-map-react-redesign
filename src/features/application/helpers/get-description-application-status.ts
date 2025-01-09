@@ -1,8 +1,6 @@
 import { ApplicationStatus } from "../constants/application-status.enum";
 
-export function getDescriptionApplicationStatus(
-  status: string
-): string | undefined {
+export function getDescriptionApplicationStatus(status: string): string {
   switch (status) {
     case "SEND":
       return ApplicationStatus.SEND;
@@ -11,6 +9,6 @@ export function getDescriptionApplicationStatus(
     case "CANCELLED":
       return ApplicationStatus.CANCELLED;
     default:
-      return undefined;
+      return "";
   }
 }
