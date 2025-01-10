@@ -240,8 +240,8 @@ const AdminRequestsPage = () => {
 
         const updatedApplications = applicationTableState.paginationData.data.map(
           (application) => {
-            if (application.id === data.aplicationId) {
-              application.status = data.status;
+            if (application.id === editApplicationState.data?.aplicationId) {
+              application.status = editApplicationState.data?.status;
             }
             return application;
           }
@@ -393,8 +393,8 @@ const AdminRequestsPage = () => {
             dismissible={false}
             handleOnly={true}
           >
-            <DrawerContent className="flex items-center w-[40vw] left-[30lvw] right-[30lvw] p-4">
-              <DrawerHeader className="">
+            <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
+              <DrawerHeader className="pt-0">
                 <DrawerTitle className="">
                   <span>{audioPlayerState.applicationAudio?.storyName}</span>
                 </DrawerTitle>
