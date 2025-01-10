@@ -1,3 +1,7 @@
+import { useEffect, useRef, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { AxiosError } from "axios";
 import { Components } from "@/api/schemas/client";
 import { createColumns } from "../application/components/data-table/columns";
 import { DataTableApplicationAdmin } from "../application/components/data-table/data-table-application-admin.component";
@@ -9,25 +13,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/toaster";
@@ -41,35 +31,21 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 
 import ReactAudioPlayer from "react-audio-player";
-import { useEffect, useRef, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CaretDownIcon, CrossCircledIcon } from "@radix-ui/react-icons";
+
 import apiClient from "@/api/apiClient";
 
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 import {
-  CaretDownIcon,
-  Cross2Icon,
-  CrossCircledIcon,
-} from "@radix-ui/react-icons";
-
-import { AxiosError } from "axios";
-
-import {
-  EditApplicationState,
-  EditApplicationData,
+  ApplicationEditState,
+  ApplicationEditData,
 } from "../application/interfaces";
 import { getDescriptionApplicationStatus } from "../application/helpers/get-description-application-status";
 import { ApplicationStatus } from "../application/constants/application-status.enum";
+import DialogForm from "./components/alert-dialog-promt.component";
+import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
 
 interface ApplicationTableState {
   load: boolean;
@@ -105,24 +81,28 @@ const AdminRequestsPage = () => {
 
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
 
-  const [editApplicationState, setEditApplicationState] =
-    useState<EditApplicationState | null>(null);
+  const [editApplicationState, setEditApplicationState] = useState<
+    ApplicationEditState
+  >({
+    data: undefined,
+  });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -183,7 +163,7 @@ const AdminRequestsPage = () => {
         });
       })
       .catch((error: AxiosError) => {
-        showToast("Ошибка при загрузки озвучки...");
+        showToast("Ошибка при получении заявок...");
       });
   }, []);
 
@@ -229,40 +209,80 @@ const AdminRequestsPage = () => {
     showToast("Ошибка при загрузки озвучки...");
   };
 
-  const handleOnSelectStatus = (data: EditApplicationData) => {
+  const handleOnSelectStatus = (data: ApplicationEditData) => {
     setEditApplicationState({
       data,
     });
-
-    const updatedApplications = applicationTableState.paginationData.data.map(
-      (application) => {
-        if (application.id === data.aplicationId) {
-          application.status = data.value;
-        }
-        return application;
-      }
-    );
-
-    console.log(updatedApplications);
-
-    setApplicationTableState((prevState) => ({
-      ...prevState,
-      paginationData: {
-        ...prevState.paginationData,
-        data: updatedApplications,
-      },
-    }));
-
-    setSheetState((prevState) => ({ ...prevState, side: "top" }));
   };
 
   const columns = createColumns({
     onClickAudio: handleOnClickAudio,
   });
 
+  const handleSubmitChangeStatusApplication = async (comment: string) => {
+    try {
+      if (editApplicationState.data) {
+        const dto = {
+          comment: editApplicationState.data.comment,
+          status: editApplicationState.data.status,
+        };
+        if (comment.length > 0) {
+          dto.comment = comment;
+          handleOnSelectStatus({
+            ...editApplicationState.data,
+            comment: comment,
+          });
+        }
+
+        await apiClient.paths[
+          "/api/audio-story-request/edit/{audioStoryReqeustId}"
+        ].put(editApplicationState.data.aplicationId, dto);
+
+        const updatedApplications = applicationTableState.paginationData.data.map(
+          (application) => {
+            if (application.id === data.aplicationId) {
+              application.status = data.status;
+            }
+            return application;
+          }
+        );
+
+        setApplicationTableState((prevState) => ({
+          ...prevState,
+          paginationData: {
+            ...prevState.paginationData,
+            data: updatedApplications,
+          },
+        }));
+      }
+    } catch (error) {
+      showToast("ошибка при изменении статуса");
+    }
+  };
+
+  const handleCancelChangeStatusApplication = async () => {
+    setEditApplicationState({ data: undefined });
+  };
+
   return (
     <div>
       <Toaster />
+      <DialogForm
+        open={editApplicationState.data != undefined}
+        title={`Вы уверены, что хотите изменить статус озвучки на "${
+          editApplicationState.data
+            ? getDescriptionApplicationStatus(
+                editApplicationState.data.status
+              ).toLocaleUpperCase()
+            : ""
+        }" ?`}
+        description="после подтверждения статус нельзя будет изменить"
+      >
+        <ChangeApplicationStatusForm
+          onSubmit={handleSubmitChangeStatusApplication}
+          onCancel={handleCancelChangeStatusApplication}
+        />
+      </DialogForm>
       <div className="flex flex-col p-3 space-y-2">
         {applicationTableState.load ? (
           <Skeleton className="w-full h-80 m-2" />
@@ -399,12 +419,13 @@ const AdminRequestsPage = () => {
                 onError={handleOnErrorAudio}
               />
 
-              <DrawerFooter className="flex justify-between">
+              <DrawerFooter className="flex justify-between text-slate-800">
                 <div className="flex items-center justify-items-center w-full space-x-4">
                   <DropdownMenu
                     onOpenChange={(open: boolean) => {
-                      const caretIcon =
-                        document.getElementById("caret-status-btn");
+                      const caretIcon = document.getElementById(
+                        "caret-status-btn"
+                      );
                       if (open) {
                         caretIcon?.setAttribute("class", "animate-rotate-180");
                       } else {
@@ -418,7 +439,7 @@ const AdminRequestsPage = () => {
                         variant="secondary"
                         className=""
                       >
-                        <span className="text-center">
+                        <span className="text-center text-slate-800">
                           {getDescriptionApplicationStatus(
                             audioPlayerState.applicationAudio.status
                           )}
@@ -437,7 +458,7 @@ const AdminRequestsPage = () => {
                           onClick={() => {
                             if (audioPlayerState.applicationAudio) {
                               handleOnSelectStatus({
-                                value: key,
+                                status: key,
                                 aplicationId:
                                   audioPlayerState.applicationAudio.id,
                                 comment:
@@ -452,7 +473,11 @@ const AdminRequestsPage = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                  <Button variant="outline" onClick={handleOnClickCloseAudio}>
+                  <Button
+                    variant="outline"
+                    onClick={handleOnClickCloseAudio}
+                    className="bg-slate-200 "
+                  >
                     закрыть
                   </Button>
                 </div>

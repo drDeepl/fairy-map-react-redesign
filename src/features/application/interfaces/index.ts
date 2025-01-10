@@ -1,9 +1,9 @@
-export interface EditApplicationState {
-  data: EditApplicationData;
+export interface ApplicationEditState {
+  data: ApplicationEditData | undefined;
 }
 
-export interface EditApplicationData {
-  value: string;
+export interface ApplicationEditData {
+  status: string;
   aplicationId: number;
   comment: string;
 }
