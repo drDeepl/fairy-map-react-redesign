@@ -113,7 +113,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         <Separator className="my-2" />
 
         <CardDescription className="text-slate-700 text-lg text-center">
-          <div className="flex flex-col justify-center items-center space-y-1 mb-2 animate-zoom-in">
+          <div className="flex flex-col justify-center items-center space-y-1 mb-2 -mr-2 animate-zoom-in">
             <div>
               <small className="text-slate-500 mr-1">озвучил:</small>
               <small className="text-slate-500">{`${playlistState.currentAudio.author.firstName} ${playlistState.currentAudio.author.lastName}`}</small>

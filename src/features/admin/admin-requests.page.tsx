@@ -81,28 +81,26 @@ const AdminRequestsPage = () => {
 
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
 
-  const [editApplicationState, setEditApplicationState] = useState<
-    ApplicationEditState
-  >({
-    data: undefined,
-  });
+  const [editApplicationState, setEditApplicationState] =
+    useState<ApplicationEditState>({
+      data: undefined,
+    });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -234,18 +232,19 @@ const AdminRequestsPage = () => {
           });
         }
 
-        await apiClient.paths[
+        const res = await apiClient.paths[
           "/api/audio-story-request/edit/{audioStoryReqeustId}"
         ].put(editApplicationState.data.aplicationId, dto);
 
-        const updatedApplications = applicationTableState.paginationData.data.map(
-          (application) => {
+        console.log(res.data);
+
+        const updatedApplications =
+          applicationTableState.paginationData.data.map((application) => {
             if (application.id === editApplicationState.data?.aplicationId) {
               application.status = editApplicationState.data?.status;
             }
             return application;
-          }
-        );
+          });
 
         setApplicationTableState((prevState) => ({
           ...prevState,
@@ -255,8 +254,11 @@ const AdminRequestsPage = () => {
           },
         }));
       }
-    } catch (error) {
-      showToast("ошибка при изменении статуса");
+    } catch (error: any) {
+      const msg = error.response
+        ? error.response.data.message
+        : "ошибка при изменении статуса";
+      showToast(msg);
     }
   };
 
@@ -423,9 +425,8 @@ const AdminRequestsPage = () => {
                 <div className="flex items-center justify-items-center w-full space-x-4">
                   <DropdownMenu
                     onOpenChange={(open: boolean) => {
-                      const caretIcon = document.getElementById(
-                        "caret-status-btn"
-                      );
+                      const caretIcon =
+                        document.getElementById("caret-status-btn");
                       if (open) {
                         caretIcon?.setAttribute("class", "animate-rotate-180");
                       } else {

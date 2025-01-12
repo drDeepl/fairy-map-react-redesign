@@ -1565,7 +1565,7 @@ declare namespace Paths {
         }
         export type RequestBody = Components.Schemas.EditAudioStoryApplicaitonDto;
         namespace Responses {
-            export type $200 = Components.Schemas.AudioStoryRequestEntity;
+            export type $200 = Components.Schemas.AudioApplicationWithUserAudioResponseDto;
             export interface $400 {
             }
             export interface $401 {
@@ -2495,7 +2495,7 @@ export interface OperationMethods {
   /**
    * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
    * 
-   * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
+   * необходима роль модератора или администратора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
    */
   'AudioStoryRequestController_editAudioStoryRequest'(
     parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
@@ -3145,7 +3145,7 @@ export interface PathsDictionary {
     /**
      * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
      * 
-     * необходима роль модератора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
+     * необходима роль модератора или администратора. после редактирования, отредактированная запись по вебсокету отправляется пользователю из userId(создавшему заявку) в событие с названием "statuses"
      */
     'put'(
       parameters?: Parameters<Paths.AudioStoryRequestControllerEditAudioStoryRequest.PathParameters & Paths.AudioStoryRequestControllerEditAudioStoryRequest.HeaderParameters> | null,
