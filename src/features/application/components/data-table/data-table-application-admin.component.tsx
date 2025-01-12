@@ -35,7 +35,7 @@ export function DataTableApplicationAdmin<TData, TValue>({
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-center">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -57,7 +57,7 @@ export function DataTableApplicationAdmin<TData, TValue>({
               >
                 {row.getVisibleCells().map((cell) => {
                   return (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-center">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

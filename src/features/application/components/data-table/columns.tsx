@@ -2,16 +2,24 @@ import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { PlayIcon } from "lucide-react";
-import { getDescriptionApplicationStatus } from "../../helpers/get-description-application-status";
+
+import StatusDropdownMenu from "../status-dropdown.component";
+import {
+  getStyleApplicationStatus,
+  getDescriptionApplicationStatus,
+} from "../../helpers/get-description-application-status";
 
 interface AudioApplicationTableProps {
   onClickAudio: (
     data: Components.Schemas.AudioApplicationWithUserAudioResponseDto
   ) => void;
+
+  onSelectStatus: (status: string) => Promise<void>;
 }
 
 export const createColumns = ({
   onClickAudio,
+  onSelectStatus,
 }: AudioApplicationTableProps): ColumnDef<Components.Schemas.AudioApplicationWithUserAudioResponseDto>[] => [
   {
     accessorKey: "userAudio.originalName",
@@ -19,7 +27,7 @@ export const createColumns = ({
     cell: (info) => (
       <Button
         variant="ghost"
-        className="border border-ghost"
+        className="border border-baby-blue-800 bg-baby-blue-50 text-slate-800"
         onClick={() => onClickAudio(info.row.original)}
       >
         <span>{info.row.original.userAudio.originalName}</span>
@@ -48,8 +56,15 @@ export const createColumns = ({
   {
     accessorKey: "status",
     header: "статус",
-    cell: (info) =>
-      `${getDescriptionApplicationStatus(info.row.original.status)}`,
+    cell: (info) => (
+      <span
+        className={`p-3 ${getStyleApplicationStatus(
+          info.row.original.status
+        )} font-semibold text-center`}
+      >
+        {getDescriptionApplicationStatus(info.row.original.status)}
+      </span>
+    ),
   },
   {
     accessorKey: "comment",

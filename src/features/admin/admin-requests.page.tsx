@@ -42,10 +42,14 @@ import {
   ApplicationEditState,
   ApplicationEditData,
 } from "../application/interfaces";
-import { getDescriptionApplicationStatus } from "../application/helpers/get-description-application-status";
+import {
+  getDescriptionApplicationStatus,
+  getStyleApplicationStatus,
+} from "../application/helpers/get-description-application-status";
 import { ApplicationStatus } from "../application/constants/application-status.enum";
 import DialogForm from "./components/alert-dialog-promt.component";
 import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
+import StatusDropdownMenu from "../application/components/status-dropdown.component";
 
 interface ApplicationTableState {
   load: boolean;
@@ -137,7 +141,7 @@ const AdminRequestsPage = () => {
     });
   };
 
-  const showToast = (msg: string) => {
+  const showErrorToast = (msg: string) => {
     return toast({
       className: cn(
         "top-10 right-0 flex fixed w-1/3 border border-red-500 bg-red-50"
@@ -145,6 +149,20 @@ const AdminRequestsPage = () => {
       action: (
         <div className="flex items-center space-x-2 w-full">
           <CrossCircledIcon className="size-6 text-red-500" />
+          <span className="font-semibold text-sm">{msg}</span>
+        </div>
+      ),
+    });
+  };
+
+  const showSuccessToast = (msg: string) => {
+    return toast({
+      className: cn(
+        "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
+      ),
+      action: (
+        <div className="flex items-center space-x-2 w-full text-green-500">
+          <CrossCircledIcon className="size-6 " />
           <span className="font-semibold text-sm">{msg}</span>
         </div>
       ),
@@ -161,7 +179,7 @@ const AdminRequestsPage = () => {
         });
       })
       .catch((error: AxiosError) => {
-        showToast("Ошибка при получении заявок...");
+        showErrorToast("Ошибка при получении заявок...");
       });
   }, []);
 
@@ -185,7 +203,7 @@ const AdminRequestsPage = () => {
         ...prevState,
         load: false,
       }));
-      showToast("Произошла ошибка при получении заявок");
+      showErrorToast("Произошла ошибка при получении заявок");
     }
   };
 
@@ -204,7 +222,7 @@ const AdminRequestsPage = () => {
 
   const handleOnErrorAudio = (e: Event) => {
     console.log(e);
-    showToast("Ошибка при загрузки озвучки...");
+    showErrorToast("Ошибка при загрузки озвучки...");
   };
 
   const handleOnSelectStatus = (data: ApplicationEditData) => {
@@ -215,6 +233,15 @@ const AdminRequestsPage = () => {
 
   const columns = createColumns({
     onClickAudio: handleOnClickAudio,
+    onSelectStatus: async (key: string) => {
+      if (audioPlayerState.applicationAudio) {
+        handleOnSelectStatus({
+          status: key,
+          aplicationId: audioPlayerState.applicationAudio.id,
+          comment: audioPlayerState.applicationAudio.comment,
+        });
+      }
+    },
   });
 
   const handleSubmitChangeStatusApplication = async (comment: string) => {
@@ -236,7 +263,7 @@ const AdminRequestsPage = () => {
           "/api/audio-story-request/edit/{audioStoryReqeustId}"
         ].put(editApplicationState.data.aplicationId, dto);
 
-        console.log(res.data);
+        showSuccessToast("статус заявки успешно изменён");
 
         const updatedApplications =
           applicationTableState.paginationData.data.map((application) => {
@@ -253,12 +280,13 @@ const AdminRequestsPage = () => {
             data: updatedApplications,
           },
         }));
+        setEditApplicationState({ data: undefined });
       }
     } catch (error: any) {
       const msg = error.response
         ? error.response.data.message
         : "ошибка при изменении статуса";
-      showToast(msg);
+      showErrorToast(msg);
     }
   };
 
@@ -397,18 +425,23 @@ const AdminRequestsPage = () => {
           >
             <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
               <DrawerHeader className="pt-0">
-                <DrawerTitle className="">
-                  <span>{audioPlayerState.applicationAudio?.storyName}</span>
+                <DrawerTitle className="text-center text-xl">
+                  <span>
+                    {audioPlayerState.applicationAudio?.userAudio.originalName}
+                  </span>
                 </DrawerTitle>
-                <DrawerDescription className="">
-                  <div className="space-x-2">
-                    <span>озвучил: </span>
-                    <span>
-                      {audioPlayerState.applicationAudio?.user.firstName}
-                    </span>
-                    <span>
-                      {audioPlayerState.applicationAudio?.user.firstName}
-                    </span>
+                <DrawerDescription className="text-md">
+                  <div className="flex flex-col items-center ">
+                    <span>{audioPlayerState.applicationAudio?.storyName}</span>
+                    <div className="space-x-1">
+                      <span>озвучил: </span>
+                      <span>
+                        {audioPlayerState.applicationAudio?.user.firstName}
+                      </span>
+                      <span>
+                        {audioPlayerState.applicationAudio?.user.firstName}
+                      </span>
+                    </div>
                   </div>
                 </DrawerDescription>
               </DrawerHeader>
@@ -423,61 +456,25 @@ const AdminRequestsPage = () => {
 
               <DrawerFooter className="flex justify-between text-slate-800">
                 <div className="flex items-center justify-items-center w-full space-x-4">
-                  <DropdownMenu
-                    onOpenChange={(open: boolean) => {
-                      const caretIcon =
-                        document.getElementById("caret-status-btn");
-                      if (open) {
-                        caretIcon?.setAttribute("class", "animate-rotate-180");
-                      } else {
-                        caretIcon?.setAttribute("class", "animate-rotate-270");
-                      }
-                    }}
-                  >
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        id="status-select__btn"
-                        variant="secondary"
-                        className=""
-                      >
-                        <span className="text-center text-slate-800">
-                          {getDescriptionApplicationStatus(
-                            audioPlayerState.applicationAudio.status
-                          )}
-                        </span>
-                        <CaretDownIcon
-                          id="caret-status-btn"
-                          className="animate-rotate-270"
-                        />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="">
-                      {Object.keys(ApplicationStatus).map((key) => (
-                        <DropdownMenuItem
-                          key={key}
-                          className="font-semibold"
-                          onClick={() => {
-                            if (audioPlayerState.applicationAudio) {
-                              handleOnSelectStatus({
-                                status: key,
-                                aplicationId:
-                                  audioPlayerState.applicationAudio.id,
-                                comment:
-                                  audioPlayerState.applicationAudio.comment,
-                              });
-                            }
-                          }}
-                        >
-                          {getDescriptionApplicationStatus(key)}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {audioPlayerState.applicationAudio.status === "SEND" ? (
+                    <StatusDropdownMenu
+                      onSelectStatus={async (key: string) => {
+                        if (audioPlayerState.applicationAudio) {
+                          handleOnSelectStatus({
+                            status: key,
+                            aplicationId: audioPlayerState.applicationAudio.id,
+                            comment: audioPlayerState.applicationAudio.comment,
+                          });
+                        }
+                      }}
+                      currentStatus={audioPlayerState.applicationAudio.status}
+                    />
+                  ) : null}
 
                   <Button
                     variant="outline"
                     onClick={handleOnClickCloseAudio}
-                    className="bg-slate-200 "
+                    className="bg-slate-100"
                   >
                     закрыть
                   </Button>
