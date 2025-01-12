@@ -1,12 +1,11 @@
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
-import { ColumnDef } from "@tanstack/react-table";
-import { PlayIcon } from "lucide-react";
-
 import {
   getStyleApplicationStatus,
   getDescriptionApplicationStatus,
-} from "../../helpers/get-description-application-status";
+} from "@/features/application/helpers/get-description-application-status";
+import { ColumnDef } from "@tanstack/react-table";
+import { PlayIcon } from "lucide-react";
 
 interface AudioApplicationTableProps {
   onClickAudio: (
@@ -40,14 +39,6 @@ export const createColumns = ({
     accessorKey: "storyName",
     header: "сказка",
     cell: (info) => info.getValue(),
-  },
-  {
-    accessorKey: "user",
-    header: "отправил",
-    cell: (info) => {
-      const { firstName, lastName } = info.row.original.user;
-      return `${firstName} ${lastName}`;
-    },
   },
   {
     accessorKey: "status",

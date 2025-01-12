@@ -14,12 +14,6 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/toaster";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -34,7 +28,7 @@ import {
 
 import ReactAudioPlayer from "react-audio-player";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CaretDownIcon, CrossCircledIcon } from "@radix-ui/react-icons";
+import { CrossCircledIcon } from "@radix-ui/react-icons";
 
 import apiClient from "@/api/apiClient";
 
@@ -42,11 +36,8 @@ import {
   ApplicationEditState,
   ApplicationEditData,
 } from "../application/interfaces";
-import {
-  getDescriptionApplicationStatus,
-  getStyleApplicationStatus,
-} from "../application/helpers/get-description-application-status";
-import { ApplicationStatus } from "../application/constants/application-status.enum";
+import { getDescriptionApplicationStatus } from "../application/helpers/get-description-application-status";
+
 import DialogForm from "./components/alert-dialog-promt.component";
 import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
 import StatusDropdownMenu from "../application/components/status-dropdown.component";
@@ -72,17 +63,7 @@ interface AudioPlayerState {
   applicationAudio: Components.Schemas.AudioApplicationWithUserAudioResponseDto | null;
 }
 
-interface SheetState {
-  modal: boolean;
-  side: "top" | "right" | "bottom" | "left";
-}
-
 const AdminRequestsPage = () => {
-  const [sheetState, setSheetState] = useState<SheetState>({
-    modal: true,
-    side: "bottom",
-  });
-
   const { toast } = useToast();
 
   const [applicationTableState, setApplicationTableState] =
@@ -233,15 +214,6 @@ const AdminRequestsPage = () => {
 
   const columns = createColumns({
     onClickAudio: handleOnClickAudio,
-    onSelectStatus: async (key: string) => {
-      if (audioPlayerState.applicationAudio) {
-        handleOnSelectStatus({
-          status: key,
-          aplicationId: audioPlayerState.applicationAudio.id,
-          comment: audioPlayerState.applicationAudio.comment,
-        });
-      }
-    },
   });
 
   const handleSubmitChangeStatusApplication = async (comment: string) => {

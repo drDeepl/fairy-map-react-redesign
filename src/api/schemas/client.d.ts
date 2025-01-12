@@ -1578,13 +1578,50 @@ declare namespace Paths {
         }
         namespace Parameters {
             export type Authorization = string;
+            export type Page = number;
+            export type Take = number;
             export type UserId = number;
         }
         export interface PathParameters {
             userId: Parameters.UserId;
         }
+        export interface QueryParameters {
+            page?: Parameters.Page;
+            take?: Parameters.Take;
+        }
         namespace Responses {
-            export type $200 = Components.Schemas.AudioStoryRequestEntity[];
+            export interface $200 {
+                data: Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
+                /**
+                 * информация о странице
+                 */
+                meta: {
+                    /**
+                     * номер текущей страницы
+                     */
+                    page: number;
+                    /**
+                     * количество элементов на странице
+                     */
+                    take: number;
+                    /**
+                     * количество элементов всего
+                     */
+                    itemCount: number;
+                    /**
+                     * количество страниц
+                     */
+                    pageCount: number;
+                    /**
+                     * есть предыдущая страница
+                     */
+                    hasPreviousPage: boolean;
+                    /**
+                     * есть следующая страница
+                     */
+                    hasNextPage: boolean;
+                };
+            }
             export interface $400 {
             }
             export interface $401 {
@@ -2216,9 +2253,46 @@ declare namespace Paths {
         }
         namespace Parameters {
             export type Authorization = string;
+            export type Page = number;
+            export type Take = number;
+        }
+        export interface QueryParameters {
+            page?: Parameters.Page;
+            take?: Parameters.Take;
         }
         namespace Responses {
-            export type $200 = Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
+            export interface $200 {
+                data: Components.Schemas.AudioApplicationWithUserAudioResponseDto[];
+                /**
+                 * информация о странице
+                 */
+                meta: {
+                    /**
+                     * номер текущей страницы
+                     */
+                    page: number;
+                    /**
+                     * количество элементов на странице
+                     */
+                    take: number;
+                    /**
+                     * количество элементов всего
+                     */
+                    itemCount: number;
+                    /**
+                     * количество страниц
+                     */
+                    pageCount: number;
+                    /**
+                     * есть предыдущая страница
+                     */
+                    hasPreviousPage: boolean;
+                    /**
+                     * есть следующая страница
+                     */
+                    hasNextPage: boolean;
+                };
+            }
             export interface $400 {
             }
             export interface $401 {
@@ -2354,7 +2428,7 @@ export interface OperationMethods {
    * UserController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
    */
   'UserController_getAllAudioStoryRequestsCurrentUser'(
-    parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
+    parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.QueryParameters & Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
@@ -2480,7 +2554,7 @@ export interface OperationMethods {
    * Необходима роль модератора
    */
   'AudioStoryRequestController_getAllAudioStoryReqeustsByUserId'(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
+    parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.QueryParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
@@ -2970,7 +3044,7 @@ export interface PathsDictionary {
      * UserController_getAllAudioStoryRequestsCurrentUser - получение всех заявок на озвучки текущего пользователя
      */
     'get'(
-      parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
+      parameters?: Parameters<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.QueryParameters & Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.HeaderParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>
@@ -3126,7 +3200,7 @@ export interface PathsDictionary {
      * Необходима роль модератора
      */
     'get'(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
+      parameters?: Parameters<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.PathParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.QueryParameters & Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.HeaderParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>
