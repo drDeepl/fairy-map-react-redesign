@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
+import { ToastContainer, toast } from "react-toastify";
 
 interface MapPageProps {
   width: number;
@@ -107,30 +108,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
-  const handleOnSubmitAuth = async (msg: string) => {
-    await handleOnCloseAuthForm();
-    if (authFormState.notifySuccess) {
-      Report.success(
-        msg,
-        "* чтобы остаться на странице щелкните по зеленому фону",
-        "личный кабинет",
-        () => (
-          <Button
-            onClick={() =>
-              navigate(getRoutePageByUserRole(authState.user!.role))
-            }
-          ></Button>
-        ),
-        {
-          backOverlayClickToClose: true,
-          borderRadius: "0.5rem",
-          success: {
-            titleColor: "#334155",
-            messageColor: "#94a3b8",
-          },
-        }
-      );
-    }
+  const handleOnSubmitAuth = async () => {
+    navigate(getRoutePageByUserRole(authState.user!.role));
   };
 
   const [selectedBook, setSelectedBook] =
@@ -177,6 +156,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   return (
     <Dialog open={openDialog}>
       <div className="map-pag__content">
+        <ToastContainer containerId="mapPageToast" />
         <div className="fixed flex items-center justify-between p-4 w-full">
           <Input
             className="min-h-11 max-w-fit bg-slate-50 self-center"
