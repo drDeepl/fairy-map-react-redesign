@@ -3,42 +3,70 @@ import { useNavigate } from "react-router-dom";
 import React from "react";
 import { RouteApp } from "./constants/route.enum";
 import { motion } from "framer-motion";
+import { MapPinned } from "lucide-react";
 
 const WelcomePage: React.FC = () => {
-  const title = 'Проект "Сохранение культурного наследия России"';
+  const title = '"Сохранение культурного наследия России"';
+
+  const transition = { duration: 1, ease: [0.25, 0.1, 0.25, 1] };
+  const variants = {
+    hidden: { filter: "blur(10px)", transform: "translateY(20%)", opacity: 0 },
+    visible: { filter: "blur(0)", transform: "translateY(0)", opacity: 1 },
+  };
 
   const description =
-    "Проект представляет собой интерактивный веб-сайт, на котором размещена карта России. Пользователь может выбрать регион, а затем этническую группу и язык, чтобы прослушать сказку, соответствующую этой группе";
+    "Приложения представляет собой интерактивный веб-сайт, на котором размещена карта России. Пользователь может выбрать регион, а затем этническую группу и язык, чтобы прослушать сказку, соответствующую выбранной группе";
   const navigate = useNavigate();
   const handleOnMap = () => {
     navigate(RouteApp.MapPage);
   };
 
+  const words = title.split(" ");
+
   return (
-    <div className={`bg-[url(/welcome-page-bg.png)] bg-center bg-scroll`}>
-      <motion.div
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: "easeOut" }}
-      >
-        <div className="min-h-screen flex flex-col items-center justify-center backdrop-blur-sm bg-gradient-to-t from-orange-50">
-          <div className="flex flex-col items-center">
-            <h1 className="text-slate-700 text-3xl font-bold mb-3">{title}</h1>
-            <p className="text-slate-600 text-center text-balance">
-              {description}
-            </p>
-          </div>
-          <div className="flex flex-around space-x-2">
+    <motion.div
+      className={`bg-[url(/welcome-page-bg.png)] bg-center bg-scroll`}
+      initial="hidden"
+      whileInView="visible"
+      transition={{ staggerChildren: 0.04 }}
+    >
+      <motion.div className="min-h-screen flex flex-col items-center justify-center backdrop-blur-sm bg-gradient-to-t from-orange-50">
+        <h1 className="text-slate-600 text-3xl font-bold mb-3 mt-20">
+          {words.map((word, index) => (
+            <React.Fragment key={index}>
+              <motion.span
+                className="inline-block"
+                transition={transition}
+                variants={variants}
+              >
+                {word}
+              </motion.span>
+              {index < words.length - 1 && " "}
+            </React.Fragment>
+          ))}
+        </h1>
+        <motion.p
+          className="text-slate-500 text-lg mb-4 p-2 w-5/6"
+          transition={transition}
+          variants={variants}
+        >
+          {description}
+        </motion.p>
+        <div className="flex flex-around space-x-2">
+          <motion.div transition={transition} variants={variants}>
             <Button
-              className="mt-4 bg-orange-600  hover:bg-slate-100 hover:text-slate-700 animate-jump-heart"
+              className="flex flex-col mt-2 bg-orange-600  hover:bg-slate-100 hover:text-orange-600 hover:border border-orange-600 animate-jump-heart"
               onClick={handleOnMap}
             >
-              карта
+              <div className="flex items-center space-x-2">
+                <span>к карте</span>
+                <MapPinned className="" />
+              </div>
             </Button>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   );
 };
 

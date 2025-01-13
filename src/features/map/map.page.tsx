@@ -137,7 +137,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     } else {
       dispatch(setFeatures(JSON.parse(features)));
     }
-    setLoad(false);
+    // setLoad(false);
   }, [dispatch]);
 
   const [currentTab, setCurrentTab] = useState<string>(

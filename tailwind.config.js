@@ -46,6 +46,14 @@ export default {
             transform: "scale(.5)",
           },
         },
+        ring: {
+          "0%": {
+            transform: "rotate(0deg)",
+          },
+          "100%": {
+            transform: "rotate(360deg)",
+          },
+        },
         tada: {
           "0%": {
             transform: "scale3d(1, 1, 1)",
@@ -147,8 +155,24 @@ export default {
             transform: "scale(0)",
           },
         },
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "tranlate(0px, 0px) scale(1)",
+          },
+        },
       },
       animation: {
+        blob: "blob 1.5s infinite",
+        ring: "ring 0.3s",
         "rotate-180": "rotate180 0.3s linear forwards",
         "rotate-270": "rotate270 0.3s linear forwards",
         "zoom-in": "zoom-in 0.3s ease-out",
