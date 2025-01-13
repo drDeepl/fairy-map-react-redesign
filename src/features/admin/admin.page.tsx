@@ -16,15 +16,20 @@ import { userLogOut } from "../auth/auth.slice";
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
+  const prevTab: string | null = localStorage.getItem("currentTab");
+
   const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentTab, setCurrentTab] = useState<string>(MenuItemAdmin.Story);
+  const [currentTab, setCurrentTab] = useState<string>(
+    prevTab ? prevTab : MenuItemAdmin.Story
+  );
 
   const handleOnClickExit = () => {
     dispatch(userLogOut());
     navigate(-1);
+    localStorage.removeItem("currentTab");
   };
 
   useEffect(() => {
@@ -41,8 +46,9 @@ const AdminPage: React.FC = () => {
     return <LoadSpinner />;
   }
 
-  const handleOnClickItemSidebar = (item: ItemSidebarAdmin) => {
+  const handleOnClickItemSidebar = async (item: ItemSidebarAdmin) => {
     setCurrentTab(item.name);
+    localStorage.setItem("currentTab", item.name);
   };
 
   return (

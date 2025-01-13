@@ -15,7 +15,11 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import { Cross1Icon, EnterFullScreenIcon } from "@radix-ui/react-icons";
+import {
+  Cross1Icon,
+  EnterFullScreenIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -37,18 +41,21 @@ import { RootState } from "@/app/store";
 import { useToast } from "@/hooks/use-toast";
 import { useSelector } from "react-redux";
 import { FileAudio } from "lucide-react";
+import { AuthState } from "@/features/auth/auth.slice";
+import { Toaster } from "@/components/ui/toaster";
+import { cn } from "@/lib/utils";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
   onClose: () => void;
-  onClickRate: (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
-  onClickAuth: () => void;
   onClickAddAudio: () => void;
+  onClickAuth?: () => void;
+  onClickRate?: (
+    dto: Components.Schemas.AddRatingAudioStoryDto
+  ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   children?: React.ReactNode;
 }
 
@@ -79,7 +86,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   children,
 }) => {
   const { toast } = useToast();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
   const [listAudioState, setListAudioState] = useState<ListAudiosState>({
     load: true,
@@ -101,12 +108,19 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   const handleAxiosError = (error: AxiosError) => {
     const msg =
       error.code === "ERR_NETWORK" ? error.code : "что-то пошло не так";
-    toast.error(msg);
+    toast({
+      className: cn("top-4 border border-red-500 bg-red-100 flex fixed w-80"),
+
+      action: (
+        <div className="w-full flex items-center space-x-4 text-red-500">
+          <ExclamationTriangleIcon className="size-6 self-end " />
+          <span className="font-semibold text-md">{msg}</span>
+        </div>
+      ),
+    });
   };
 
   useEffect(() => {
-    console.log(book);
-
     setInfoBookState((prevState) => ({ ...prevState, loadText: true }));
     apiClient
       .StoryController_getTextStoryByStoryId(book.id)
@@ -175,7 +189,11 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         },
         title:
           "подать заявку на добавление озвучки могут только авторизованные пользователи",
-        action: <Button onClick={() => onClickAuth()}>войти</Button>,
+        action: (
+          <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
+            войти
+          </Button>
+        ),
       });
     } else {
       onClickAddAudio();
@@ -184,6 +202,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   return (
     <Card className="border-none">
+      <Toaster />
       <CardHeader className="m-0 py-0 w-full">
         {textAction.fullScreen ? null : (
           <div className="w-full flex my-4 animate-out gap-4">
@@ -242,32 +261,41 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <Skeleton className="h-24" />
                   </div>
                 ) : (
-                  <div className="flex">
-                    <AudioBookPlayer
-                      audios={listAudioState.audios}
-                      onClickAuth={onClickAuth}
-                      onClickRate={onClickRate}
-                      onClose={() => console.log("close")}
-                      onClickAddAudio={handleOnClickAddAudio}
-                      hideHeader={true}
-                    />
-                    <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
-                      <FileAudio
-                        className="size-9 text-slate-700 p-2"
-                        onClick={onClickAddAudio}
+                  <div className="flex -mb-12">
+                    {listAudioState.audios.length > 0 ? (
+                      <AudioBookPlayer
+                        audios={listAudioState.audios}
+                        onClickAuth={onClickAuth}
+                        onClickRate={onClickRate}
+                        onClose={() => console.log("close")}
+                        onClickAddAudio={handleOnClickAddAudio}
+                        hideHeader={true}
                       />
-                    </div>
+                    ) : (
+                      <p className="self-center">аудиокниги не найдены</p>
+                    )}
+                    {children ? (
+                      <div className="flex items-center cursor-pointer ml-2 mt-1 size-10">
+                        {children}
+                      </div>
+                    ) : (
+                      <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
+                        <FileAudio
+                          className="size-9 text-slate-700 p-2"
+                          onClick={onClickAddAudio}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
-
-                <div className="flex space-x-4 mt-2">{children}</div>
               </CardDescription>
             </div>
           </div>
         )}
       </CardHeader>
 
-      <CardFooter className={`${textAction.fullScreen ? "" : "-mt-12"}`}>
+      <CardFooter>
+        {/* {className={`${textAction.fullScreen ? "" : "-mt-10"}`}} */}
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">
             <AccordionTrigger

@@ -28,10 +28,10 @@ interface PlaylistState {
 
 interface AudioBookPlayerProps {
   audios: Components.Schemas.AudioResponseDto[];
-  onClickRate: (
+  onClickRate?: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
-  onClickAuth: () => void;
+  onClickAuth?: () => void;
   onClose: () => void;
   onClickAddAudio: () => void;
   hideHeader: boolean;
@@ -50,7 +50,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     currentAudio: audios[0],
   });
 
-  const handleOnError = (e: Event) => {
+  const handleOnError = () => {
     toast.error("произошла ошибка при загрузки аудиозаписи");
   };
 
@@ -59,6 +59,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   };
 
   const handleOnClickRate = async (value: number) => {
+    if (!onClickRate) {
+      return;
+    }
     try {
       const addedRatingDto = await onClickRate({
         rating: value,
@@ -76,7 +79,8 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         toast.error("что-то пошло не так...");
       }
     } catch (error) {
-      toast.error(error.message);
+      console.log(error);
+      toast.error("что-то пошло не так");
     }
   };
 
@@ -109,7 +113,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         <Separator className="my-2" />
 
         <CardDescription className="text-slate-700 text-lg text-center">
-          <div className="flex flex-col justify-center items-center space-y-1 mb-2 animate-zoom-in">
+          <div className="flex flex-col justify-center items-center space-y-1 mb-2 -mr-2 animate-zoom-in">
             <div>
               <small className="text-slate-500 mr-1">озвучил:</small>
               <small className="text-slate-500">{`${playlistState.currentAudio.author.firstName} ${playlistState.currentAudio.author.lastName}`}</small>

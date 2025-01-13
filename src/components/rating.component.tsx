@@ -10,8 +10,8 @@ import { Toaster } from "@/components/ui/toaster";
 
 interface StarRatingProps {
   commonRating: number;
-  onClickRate: (value: number) => Promise<void>;
-  onClickAuth: () => void;
+  onClickRate?: (value: number) => Promise<void>;
+  onClickAuth?: () => void;
 }
 
 const filledColorClass = "text-orange-500";
@@ -27,9 +27,9 @@ const StarRating: React.FC<StarRatingProps> = ({
   const [load, setLoad] = useState<boolean>(false);
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
-    const stars = document.getElementsByClassName("stars") as HTMLCollectionOf<
-      SVGAElement
-    >;
+    const stars = document.getElementsByClassName(
+      "stars"
+    ) as HTMLCollectionOf<SVGAElement>;
 
     const className = stars[0].getAttribute("class")?.split(" ");
     if (className) {
@@ -54,7 +54,7 @@ const StarRating: React.FC<StarRatingProps> = ({
   };
 
   const handleOnClickRate = async (value: number) => {
-    if (!user) {
+    if (!user && onClickAuth) {
       toast({
         style: {
           border: "1.5px solid var(--deep-red)",
@@ -66,10 +66,12 @@ const StarRating: React.FC<StarRatingProps> = ({
     } else {
       loadIcons(true);
       setLoad(true);
-      onClickRate(value + 1).then(() => {
-        setLoad(false);
-        loadIcons(false);
-      });
+      if (onClickRate) {
+        onClickRate(value + 1).then(() => {
+          setLoad(false);
+          loadIcons(false);
+        });
+      }
     }
   };
 

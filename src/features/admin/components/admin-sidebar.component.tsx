@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -19,7 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { ExitIcon } from "@radix-ui/react-icons";
 
 interface AdminSidebarProps {
-  onClickItem: (item: ItemSidebar) => void;
+  onClickItem: (item: ItemSidebarAdmin) => void;
   onClickExit: () => void;
 }
 

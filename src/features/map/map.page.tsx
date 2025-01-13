@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/app/store";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MapComponent from "./map.component";
 import { fetchMapData } from "./map.actions";
@@ -14,19 +14,10 @@ import { Components } from "@/api/schemas/client";
 
 import { addRatingAudio } from "../audio-book/audio-book.actions";
 
-import { Report } from "notiflix/build/notiflix-report-aio";
-
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
-import { PaperPlaneIcon } from "@radix-ui/react-icons";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import apiClient from "@/api/apiClient";
+import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
 
-import { AxiosResponse, OperationResponse } from "openapi-client-axios";
-import { Block, Notify } from "notiflix";
-import CreateApplicationAudioForm from "../audio-book/forms/create-application-audio.form";
-import { CreateApplicationAudioDataForm } from "../audio-book/interfaces/application-audio.interfaces";
 import { LanguageListState } from "../language/language-list.slice";
 import { fetchLanguages } from "../language/language.actions";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -35,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
+import { ToastContainer } from "react-toastify";
 
 interface MapPageProps {
   width: number;
@@ -44,13 +36,6 @@ interface MapPageProps {
 interface AuthFormState {
   open: boolean;
   notifySuccess: boolean;
-}
-
-interface ApplicationAudioFormState {
-  open: boolean;
-  useTermsApply: boolean;
-  storyId: number | null;
-  languageId: number | null;
 }
 
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
@@ -69,12 +54,12 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
-    console.log(event.target.value); // Логирование значения в консоль
   };
 
   const [authFormState, setAuthFormState] = useState<AuthFormState>({
@@ -99,36 +84,24 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-
-  const [applicationAudioFormState, setApplicationAudioFormState] =
-    useState<ApplicationAudioFormState>({
-      open: false,
-      useTermsApply: false,
-      storyId: null,
-      languageId: null,
-    });
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
     setSelectedAudioBook(audio);
+    console.log(selectedAudioBook);
   };
 
-  const handleOnCloseAudioBook = async () => {
-    setOpenDialog(false);
-    setSelectedAudioBook(null);
-  };
-
-  // const onSubmit
-  const onSubmitApplicationAudioFormState = async (
-    data: CreateApplicationAudioDataForm
-  ) => {
-    console.warn(data);
-  };
+  // const handleOnCloseAudioBook = async () => {
+  //   setOpenDialog(false);
+  //   setSelectedAudioBook(null);
+  // };
 
   const handleOnClickRate = async (
     dto: Components.Schemas.AddRatingAudioStoryDto
@@ -136,35 +109,14 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
-  const handleOnSubmitAuth = async (msg: string) => {
-    await handleOnCloseAuthForm();
-    if (authFormState.notifySuccess) {
-      Report.success(
-        msg,
-        "* чтобы остаться на странице щелкните по зеленому фону",
-        "личный кабинет",
-        () => (
-          <Button
-            onClick={() =>
-              navigate(getRoutePageByUserRole(authState.user!.role))
-            }
-          ></Button>
-        ),
-        {
-          backOverlayClickToClose: true,
-          borderRadius: "0.5rem",
-
-          success: {
-            titleColor: "#334155",
-            messageColor: "#94a3b8",
-          },
-        }
-      );
-    }
+  const handleOnSubmitAuth = async () => {
+    navigate(getRoutePageByUserRole(authState.user!.role));
   };
 
-  const [selectedBook, setSelectedBook] =
-    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
@@ -174,7 +126,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
 
   const handleOnCloseBook = async () => {
-    console.log("handleOnCloseBook");
     setOpenDialog(false);
     setSelectedBook(null);
   };
@@ -195,8 +146,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const handleOnClickAddAudio = () => {
     setCurrentTab(BookInfoTabs.AddApplicationAudio.toString());
-
-    setApplicationAudioFormState((prevState) => ({ ...prevState, open: true }));
   };
 
   if (mapState.loading || load) {
@@ -210,6 +159,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   return (
     <Dialog open={openDialog}>
       <div className="map-pag__content">
+        <ToastContainer containerId="mapPageToast" />
         <div className="fixed flex items-center justify-between p-4 w-full">
           <Input
             className="min-h-11 max-w-fit bg-slate-50 self-center"

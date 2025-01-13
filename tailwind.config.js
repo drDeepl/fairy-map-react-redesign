@@ -170,6 +170,12 @@ export default {
       },
       colors: {
         ghost: "#D4E6FA",
+        "baby-blue": {
+          50: "#F6FAFE",
+          100: "#EDF5FD",
+          500: "#D4E6FA",
+          800: "#A9B8C8",
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
