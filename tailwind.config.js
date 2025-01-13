@@ -1,6 +1,5 @@
-import { transform } from "topojson-client";
-
 /** @type {import('tailwindcss').Config} */
+
 export default {
   darkMode: ["class"],
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
