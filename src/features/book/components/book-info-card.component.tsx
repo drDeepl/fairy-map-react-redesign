@@ -37,11 +37,11 @@ import { AxiosError, AxiosResponse } from "axios";
 
 import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 
-import { RootState } from "@/app/store";
+// import { RootState } from "@/app/store";
 import { useToast } from "@/hooks/use-toast";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { FileAudio } from "lucide-react";
-import { AuthState } from "@/features/auth/auth.slice";
+// import { AuthState } from "@/features/auth/auth.slice";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
 
@@ -87,7 +87,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   children,
 }) => {
   const { toast } = useToast();
-  const { user }: AuthState = useSelector((state: RootState) => state.auth);
+  // const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
   const [listAudioState, setListAudioState] = useState<ListAudiosState>({
     load: true,
@@ -181,25 +181,25 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  const handleOnClickAddAudio = () => {
-    if (!user) {
-      toast({
-        style: {
-          border: "1.5px solid var(--deep-red)",
-          right: "2rem",
-        },
-        title:
-          "подать заявку на добавление озвучки могут только авторизованные пользователи",
-        action: (
-          <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
-            войти
-          </Button>
-        ),
-      });
-    } else {
-      onClickAddAudio();
-    }
-  };
+  // const handleOnClickAddAudio = () => {
+  //   if (!user) {
+  //     toast({
+  //       style: {
+  //         border: "1.5px solid var(--deep-red)",
+  //         right: "2rem",
+  //       },
+  //       title:
+  //         "подать заявку на добавление озвучки могут только авторизованные пользователи",
+  //       action: (
+  //         <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
+  //           войти
+  //         </Button>
+  //       ),
+  //     });
+  //   } else {
+  //     onClickAddAudio();
+  //   }
+  // };
 
   return (
     <Card className="border-none">
@@ -271,7 +271,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         onClose={() => console.log("close")}
                         // onClickAddAudio={handleOnClickAddAudio}
                         hideHeader={true}
-                        showRating={onClickRate != undefined}
                       />
                     ) : (
                       <p className="self-center">аудиокниги не найдены</p>

@@ -30,13 +30,10 @@ import { ToastContainer } from "react-toastify";
 import {
   Drawer,
   DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import ReactAudioPlayer from "react-audio-player";
-import AudioBookPlaylist from "../audio-book/components/audio-book-playlist.component";
+
 import AudioBookPlayer from "../audio-book/audio-book-player.component";
 import { Cross1Icon } from "@radix-ui/react-icons";
 

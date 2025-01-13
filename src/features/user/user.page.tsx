@@ -55,11 +55,6 @@ import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
-interface UserBookAudioState {
-  load: boolean;
-  books: Components.Schemas.StoryWithImgResponseDto[];
-}
-
 interface AudioPlayerState {
   applicationAudio: Components.Schemas.AudioApplicationWithUserAudioResponseDto | null;
 }

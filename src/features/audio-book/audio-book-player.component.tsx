@@ -34,8 +34,6 @@ interface AudioBookPlayerProps {
   hideHeader: boolean;
   onClickAuth?: () => void;
   onClose: () => void;
-  onClickAddAudio?: () => void;
-  showRating: boolean;
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
@@ -43,9 +41,8 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickRate,
   onClose,
   onClickAuth,
-  onClickAddAudio,
+
   hideHeader,
-  showRating,
 }) => {
   const [playlistState, setPlaylistState] = useState<PlaylistState>({
     open: false,
