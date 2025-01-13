@@ -29,8 +29,6 @@ import SignUpFormComponent from "./forms/sign-up.form.component";
 import { Components } from "@/api/schemas/client";
 import { Button } from "@/components/ui/button";
 
-import { CrossCircledIcon } from "@radix-ui/react-icons";
-import { cn } from "@/lib/utils";
 import { ToastContainer, toast } from "react-toastify";
 import SuccessToast from "@/components/success-toast-action.component";
 
@@ -134,19 +132,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
         onClose: () => onClose(),
       }
     );
-  // {
-  //   return toast({
-  //     className: cn(
-  //       "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
-  //     ),
-  //     action: (
-  //       <div className="flex items-center space-x-2 w-full text-green-500">
-  //         <CrossCircledIcon className="size-6 " />
-  //         <span className="font-semibold text-sm">{msg}</span>
-  //       </div>
-  //     ),
-  //   });
-  // };
 
   useEffect(() => {
     if (authState.success) {

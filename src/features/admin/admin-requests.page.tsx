@@ -66,26 +66,28 @@ interface AudioPlayerState {
 const AdminRequestsPage = () => {
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
 
-  const [editApplicationState, setEditApplicationState] =
-    useState<ApplicationEditState>({
-      data: undefined,
-    });
+  const [editApplicationState, setEditApplicationState] = useState<
+    ApplicationEditState
+  >({
+    data: undefined,
+  });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -160,6 +162,7 @@ const AdminRequestsPage = () => {
         });
       })
       .catch((error: AxiosError) => {
+        console.log(error);
         showErrorToast("Ошибка при получении заявок...");
       });
   }, []);
@@ -231,19 +234,20 @@ const AdminRequestsPage = () => {
           });
         }
 
-        const res = await apiClient.paths[
+        await apiClient.paths[
           "/api/audio-story-request/edit/{audioStoryReqeustId}"
         ].put(editApplicationState.data.aplicationId, dto);
 
         showSuccessToast("статус заявки успешно изменён");
 
-        const updatedApplications =
-          applicationTableState.paginationData.data.map((application) => {
+        const updatedApplications = applicationTableState.paginationData.data.map(
+          (application) => {
             if (application.id === editApplicationState.data?.aplicationId) {
               application.status = editApplicationState.data?.status;
             }
             return application;
-          });
+          }
+        );
 
         setApplicationTableState((prevState) => ({
           ...prevState,
@@ -254,10 +258,9 @@ const AdminRequestsPage = () => {
         }));
         setEditApplicationState({ data: undefined });
       }
-    } catch (error: any) {
-      const msg = error.response
-        ? error.response.data.message
-        : "ошибка при изменении статуса";
+    } catch (error) {
+      console.log(error);
+      const msg = "ошибка при изменении статуса";
       showErrorToast(msg);
     }
   };

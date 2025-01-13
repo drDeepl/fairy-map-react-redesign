@@ -14,8 +14,6 @@ import { Components } from "@/api/schemas/client";
 
 import { addRatingAudio } from "../audio-book/audio-book.actions";
 
-import { Report } from "notiflix/build/notiflix-report-aio";
-
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
@@ -28,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 interface MapPageProps {
   width: number;
@@ -56,8 +54,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -85,8 +84,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
@@ -112,8 +113,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     navigate(getRoutePageByUserRole(authState.user!.role));
   };
 
-  const [selectedBook, setSelectedBook] =
-    useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [
+    selectedBook,
+    setSelectedBook,
+  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto

@@ -14,17 +14,9 @@ import {
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 import { AxiosError, AxiosResponse } from "axios";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { RouteApp } from "@/pages/constants/route.enum";
-import {
-  CrossCircledIcon,
-  ExitFullScreenIcon,
-  ExitIcon,
-} from "@radix-ui/react-icons";
+import { CrossCircledIcon, ExitIcon } from "@radix-ui/react-icons";
 import { DataTableApplicationAdmin } from "../application/components/data-table/data-table-application-admin.component";
 import {
   Pagination,
@@ -97,27 +89,29 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [userAudioStoriesState, setUserAudioStoriesState] =
-    useState<UserBookAudioState>({
-      load: true,
-      books: [],
-    });
+  const [userAudioStoriesState, setUserAudioStoriesState] = useState<
+    UserBookAudioState
+  >({
+    load: true,
+    books: [],
+  });
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
@@ -167,19 +161,19 @@ const UserPage: React.FC = () => {
     });
   };
 
-  const showSuccessToast = (msg: string) => {
-    return toast({
-      className: cn(
-        "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
-      ),
-      action: (
-        <div className="flex items-center space-x-2 w-full text-green-500">
-          <CrossCircledIcon className="size-6 " />
-          <span className="font-semibold text-sm">{msg}</span>
-        </div>
-      ),
-    });
-  };
+  // const showSuccessToast = (msg: string) => {
+  //   return toast({
+  //     className: cn(
+  //       "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
+  //     ),
+  //     action: (
+  //       <div className="flex items-center space-x-2 w-full text-green-500">
+  //         <CrossCircledIcon className="size-6 " />
+  //         <span className="font-semibold text-sm">{msg}</span>
+  //       </div>
+  //     ),
+  //   });
+  // };
 
   const handleOnClickPage = async (page: number) => {
     try {
@@ -239,6 +233,7 @@ const UserPage: React.FC = () => {
           });
         })
         .catch((error: AxiosError) => {
+          console.log(error);
           showErrorToast("Ошибка при получении заявок...");
         });
       setLoad(false);
