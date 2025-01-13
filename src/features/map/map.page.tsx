@@ -27,6 +27,18 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import ReactAudioPlayer from "react-audio-player";
+import AudioBookPlaylist from "../audio-book/components/audio-book-playlist.component";
+import AudioBookPlayer from "../audio-book/audio-book-player.component";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 interface MapPageProps {
   width: number;
@@ -121,8 +133,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    setSelectedBook(book);
     setOpenDialog(true);
+    setSelectedBook(book);
   };
 
   const handleOnCloseBook = async () => {
@@ -137,7 +149,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     } else {
       dispatch(setFeatures(JSON.parse(features)));
     }
-    // setLoad(false);
+    setLoad(false);
   }, [dispatch]);
 
   const [currentTab, setCurrentTab] = useState<string>(
@@ -157,79 +169,134 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   }
 
   return (
-    <Dialog open={openDialog}>
-      <div className="map-pag__content">
-        <ToastContainer containerId="mapPageToast" />
-        <div className="fixed flex items-center justify-between p-4 w-full">
-          <Input
-            className="min-h-11 max-w-fit bg-slate-50 self-center"
-            type="text"
-            placeholder="введите название этнической группы"
-            value={ethnicGroupInputValue}
-            onChange={handleInputChange}
-          />
+    <div className="map-pag__content">
+      <ToastContainer containerId="mapPageToast" />
+      <div className="fixed flex items-center justify-between p-4 w-full">
+        <Input
+          className="min-h-11 max-w-fit bg-slate-50 self-center"
+          type="text"
+          placeholder="введите название этнической группы"
+          value={ethnicGroupInputValue}
+          onChange={handleInputChange}
+        />
 
-          <Button
-            className="rounded-full bg-slate-50 self-center size-11"
-            variant="ghost"
-            size="icon"
-            onClick={() => handleOnClickAvatar()}
-          >
-            <span className="text-black">
-              {authState.user
-                ? authState.user.email.split("@")[0][0].toUpperCase()
-                : "?"}
-            </span>
-          </Button>
+        <Button
+          className="rounded-full bg-slate-50 self-center size-11"
+          variant="ghost"
+          size="icon"
+          onClick={() => handleOnClickAvatar()}
+        >
+          <span className="text-black">
+            {authState.user
+              ? authState.user.email.split("@")[0][0].toUpperCase()
+              : "?"}
+          </span>
+        </Button>
 
-          <AuthForm
-            visible={authFormState.open}
-            onSubmit={handleOnSubmitAuth}
-            onClose={() => handleOnCloseAuthForm()}
-          />
-        </div>
-
-        {mapState.dataMap ? (
-          <MapComponent
-            features={mapState.dataMap.features}
-            width={width}
-            height={height}
-            onClickAudioBook={handleOnClickAudioBook}
-            onClickBook={handleOnClickBook}
-          />
-        ) : null}
-
-        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
-          <Tabs
-            defaultValue={currentTab}
-            value={currentTab}
-            className="m-0 size-full"
-          >
-            <TabsContent value={BookInfoTabs.BookInfo.toString()}>
-              {selectedBook ? (
-                <BookInfoCardComponent
-                  book={selectedBook}
-                  onClickRate={handleOnClickRate}
-                  onClickAuth={() => {
-                    setAuthFormState({ open: true, notifySuccess: false });
-                  }}
-                  onClose={() => handleOnCloseBook()}
-                  onClickAddAudio={handleOnClickAddAudio}
-                ></BookInfoCardComponent>
-              ) : null}
-            </TabsContent>
-            <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
-              <CreateApplicationAudioForm
-                storyId={selectedBook ? selectedBook.id : 0}
-                languages={languageListState.languages}
-                userId={authState.user ? Number(authState.user.sub) : 0}
-                onClose={() => setCurrentTab(BookInfoTabs.BookInfo.toString())}
-              />
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
+        <AuthForm
+          visible={authFormState.open}
+          onSubmit={handleOnSubmitAuth}
+          onClose={() => handleOnCloseAuthForm()}
+        />
       </div>
-    </Dialog>
+
+      {selectedAudioBook ? (
+        <Drawer
+          open={selectedAudioBook != undefined}
+          modal={true}
+          dismissible={false}
+          handleOnly={true}
+        >
+          <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
+            <DrawerHeader className="pt-0">
+              <DrawerTitle className="flex justify-between items-center text-center text-xl">
+                <span>{selectedAudioBook.name}</span>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={() => setSelectedAudioBook(null)}
+                >
+                  <Cross1Icon />
+                </Button>
+              </DrawerTitle>
+              {/* <DrawerDescription className="text-md">
+                  <div className="flex flex-col items-center ">
+                    <span>{selectedAudioBook}</span>
+                  </div>
+                </DrawerDescription> */}
+            </DrawerHeader>
+
+            <AudioBookPlayer
+              audios={selectedAudioBook.audios}
+              onClose={() => setSelectedAudioBook(null)}
+              onClickRate={handleOnClickRate}
+              onClickAuth={() => {
+                setAuthFormState({ open: true, notifySuccess: false });
+              }}
+              hideHeader={true}
+            />
+
+            {/* <DrawerFooter className="flex justify-between text-slate-800">
+                <div className="flex items-center justify-items-center w-full space-x-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleOnClickCloseAudio}
+                    className="bg-slate-100"
+                  >
+                    закрыть
+                  </Button>
+                </div>
+              </DrawerFooter> */}
+          </DrawerContent>
+        </Drawer>
+      ) : null}
+
+      {openDialog ? (
+        <Dialog open={openDialog}>
+          <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
+            <Tabs
+              defaultValue={currentTab}
+              value={currentTab}
+              className="m-0 size-full"
+            >
+              <TabsContent value={BookInfoTabs.BookInfo.toString()}>
+                {selectedBook ? (
+                  <BookInfoCardComponent
+                    book={selectedBook}
+                    onClickRate={handleOnClickRate}
+                    onClickAuth={() => {
+                      setAuthFormState({ open: true, notifySuccess: false });
+                    }}
+                    onClose={() => handleOnCloseBook()}
+                    onClickAddAudio={handleOnClickAddAudio}
+                  ></BookInfoCardComponent>
+                ) : null}
+              </TabsContent>
+              <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
+                <CreateApplicationAudioForm
+                  storyId={selectedBook ? selectedBook.id : 0}
+                  languages={languageListState.languages}
+                  userId={authState.user ? Number(authState.user.sub) : 0}
+                  onClose={() =>
+                    setCurrentTab(BookInfoTabs.BookInfo.toString())
+                  }
+                />
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+      ) : null}
+
+      {mapState.dataMap ? (
+        <MapComponent
+          features={mapState.dataMap.features}
+          width={width}
+          height={height}
+          onClickAudioBook={handleOnClickAudioBook}
+          onClickBook={handleOnClickBook}
+        />
+      ) : null}
+    </div>
   );
 };
 
