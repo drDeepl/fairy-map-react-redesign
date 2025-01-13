@@ -51,6 +51,7 @@ interface BookInfoCardProps {
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
+
   onClickAddAudio: () => void;
   onClickAuth?: () => void;
   onClickRate?: (
@@ -268,8 +269,9 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         onClickAuth={onClickAuth}
                         onClickRate={onClickRate}
                         onClose={() => console.log("close")}
-                        onClickAddAudio={handleOnClickAddAudio}
+                        // onClickAddAudio={handleOnClickAddAudio}
                         hideHeader={true}
+                        showRating={onClickRate != undefined}
                       />
                     ) : (
                       <p className="self-center">аудиокниги не найдены</p>
@@ -279,11 +281,13 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         {children}
                       </div>
                     ) : (
-                      <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
-                        <FileAudio
-                          className="size-9 text-slate-700 p-2"
-                          onClick={onClickAddAudio}
-                        />
+                      <div>
+                        <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
+                          <FileAudio
+                            className="size-9 text-slate-700 p-2"
+                            onClick={onClickAddAudio}
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

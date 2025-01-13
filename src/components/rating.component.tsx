@@ -27,9 +27,9 @@ const StarRating: React.FC<StarRatingProps> = ({
   const [load, setLoad] = useState<boolean>(false);
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
-    const stars = document.getElementsByClassName(
-      "stars"
-    ) as HTMLCollectionOf<SVGAElement>;
+    const stars = document.getElementsByClassName("stars") as HTMLCollectionOf<
+      SVGAElement
+    >;
 
     const className = stars[0].getAttribute("class")?.split(" ");
     if (className) {
@@ -99,9 +99,9 @@ const StarRating: React.FC<StarRatingProps> = ({
                 <Button
                   variant="link"
                   className="p-1"
-                  onClick={() => handleOnClickRate(value)}
+                  onClick={() => (onClickRate ? handleOnClickRate(value) : {})}
                   onMouseOver={() => {
-                    if (!load) {
+                    if (!load && onClickRate) {
                       replaceFilledIcon("text-slate-50", 4);
                       replaceFilledIcon("text-orange-500", value);
                     }

@@ -235,18 +235,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               }}
               hideHeader={true}
             />
-
-            {/* <DrawerFooter className="flex justify-between text-slate-800">
-                <div className="flex items-center justify-items-center w-full space-x-4">
-                  <Button
-                    variant="outline"
-                    onClick={handleOnClickCloseAudio}
-                    className="bg-slate-100"
-                  >
-                    закрыть
-                  </Button>
-                </div>
-              </DrawerFooter> */}
           </DrawerContent>
         </Drawer>
       ) : null}

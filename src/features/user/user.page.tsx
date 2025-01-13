@@ -51,6 +51,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ReactAudioPlayer from "react-audio-player";
 
 import { useToast } from "@/hooks/use-toast";
+import ListBookCarousel from "../book/components/list-book-carousel.component";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 interface UserBookAudioState {
   load: boolean;
@@ -76,6 +79,16 @@ interface ApplicationTableState {
   };
 }
 
+interface ListBookState {
+  load: boolean;
+  books: Components.Schemas.StoryWithImgResponseDto[];
+}
+
+interface BookInfoState {
+  load: boolean;
+  book: Components.Schemas.StoryWithImgResponseDto | null;
+}
+
 const itemsPerPage = 10;
 
 const UserPage: React.FC = () => {
@@ -88,13 +101,6 @@ const UserPage: React.FC = () => {
   const { toast } = useToast();
 
   const [load, setLoad] = useState<boolean>(true);
-
-  const [userAudioStoriesState, setUserAudioStoriesState] = useState<
-    UserBookAudioState
-  >({
-    load: true,
-    books: [],
-  });
 
   const [applicationTableState, setApplicationTableState] = useState<
     ApplicationTableState
@@ -132,6 +138,11 @@ const UserPage: React.FC = () => {
       applicationAudio: application,
     });
   };
+
+  const [listBookState, setListBookState] = useState<ListBookState>({
+    load: true,
+    books: [],
+  });
 
   const handleOnClickCloseAudio = () => {
     const audioPlayer: HTMLElement | null = document.getElementById(
@@ -219,6 +230,20 @@ const UserPage: React.FC = () => {
     showErrorToast("Ошибка при загрузки озвучки...");
   };
 
+  const [bookInfoState, setBookInfoState] = useState<BookInfoState>({
+    load: true,
+    book: null,
+  });
+
+  const handleOnClickPreviewBook = async (
+    book: Components.Schemas.StoryWithImgResponseDto
+  ) => {
+    setBookInfoState({
+      load: false,
+      book: book,
+    });
+  };
+
   useEffect(() => {
     if (!user) {
       navigate(-1);
@@ -245,11 +270,11 @@ const UserPage: React.FC = () => {
           (
             res: AxiosResponse<Components.Schemas.StoryWithImgResponseDto[]>
           ) => {
-            setUserAudioStoriesState({
+            setListBookState({
               load: false,
               books: res.data,
             });
-            console.log(userAudioStoriesState);
+            console.log(listBookState);
           }
         );
     }
@@ -271,7 +296,7 @@ const UserPage: React.FC = () => {
   return (
     <div className="flex flex-col justify-center">
       <Toaster />
-      <div className="sticky w-full flex justify-between items-center px-4 py-4 pl-20 shadow-md rounded-md">
+      <div className="sticky w-full flex justify-between items-center px-4 py-4 lg:pl-20 md:pl-6 shadow-md rounded-md">
         <p className="text-black font-semibold text-xl capitalize">
           Привет, {user?.firstName}!👋
         </p>
@@ -312,13 +337,23 @@ const UserPage: React.FC = () => {
           </TooltipProvider>
         </div>
       </div>
-      <div className="px-24 py-4">
+      <div className="lg:px-24 py-4 md:px-6">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="audio-stories">
             <AccordionTrigger className="text-lg">
               Книги с моей озвучкой
             </AccordionTrigger>
-            <AccordionContent className="p-0"></AccordionContent>
+            <AccordionContent className="p-0">
+              {listBookState.load ? (
+                <Skeleton className="w-full h-48" />
+              ) : (
+                <ListBookCarousel
+                  load={listBookState.load}
+                  books={listBookState.books}
+                  onClickBook={handleOnClickPreviewBook}
+                ></ListBookCarousel>
+              )}
+            </AccordionContent>
           </AccordionItem>
           <AccordionItem value="requests-audio-story">
             <AccordionTrigger className="text-lg">
@@ -484,6 +519,20 @@ const UserPage: React.FC = () => {
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
+      ) : null}
+
+      {bookInfoState.book != null ? (
+        <Dialog open={bookInfoState.book != null}>
+          <DialogContent className="[&>button]:hidden m-0 p-0">
+            <BookInfoCardComponent
+              book={bookInfoState.book}
+              onClose={() => setBookInfoState({ load: true, book: null })}
+              onClickAddAudio={() => {}}
+            >
+              <span></span>
+            </BookInfoCardComponent>
+          </DialogContent>
+        </Dialog>
       ) : null}
     </div>
   );

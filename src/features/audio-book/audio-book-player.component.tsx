@@ -31,10 +31,11 @@ interface AudioBookPlayerProps {
   onClickRate?: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
+  hideHeader: boolean;
   onClickAuth?: () => void;
   onClose: () => void;
   onClickAddAudio?: () => void;
-  hideHeader: boolean;
+  showRating: boolean;
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
@@ -44,6 +45,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   onClickAuth,
   onClickAddAudio,
   hideHeader,
+  showRating,
 }) => {
   const [playlistState, setPlaylistState] = useState<PlaylistState>({
     open: false,
@@ -122,7 +124,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
             <StarRating
               commonRating={playlistState.currentAudio.moderateScore}
-              onClickRate={handleOnClickRate}
+              onClickRate={onClickRate ? handleOnClickRate : undefined}
               onClickAuth={onClickAuth}
             />
           </div>
