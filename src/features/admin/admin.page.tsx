@@ -12,6 +12,7 @@ import { MenuItemAdmin } from "./constants/sidebar-items";
 import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { userLogOut } from "../auth/auth.slice";
+import { RouteApp } from "@/pages/constants/route.enum";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -27,8 +28,8 @@ const AdminPage: React.FC = () => {
   );
 
   const handleOnClickExit = () => {
+    navigate(RouteApp.MapPage);
     dispatch(userLogOut());
-    navigate(-1);
     localStorage.removeItem("currentTab");
   };
 

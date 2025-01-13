@@ -33,19 +33,18 @@ const WelcomePage: React.FC = () => {
     >
       <motion.div className="min-h-screen flex flex-col items-center justify-center backdrop-blur-sm bg-gradient-to-t from-orange-50">
         <motion.div
-          className="flex flex-col items-center px-4 py-6 w-5/6 lg:w-4/6 rounded-xl backdrop-blur-sm bg-gradient-to-t text-center font-semibold shadow-md"
+          className="flex flex-col items-center px-2 w-5/6 lg:w-4/6 rounded-xl backdrop-blur-sm bg-gradient-to-t text-center font-semibold shadow-md"
           transition={transition}
           variants={variants}
         >
+          <motion.span
+            className="inline-block place-self-start pb-6 text-slate-600"
+            transition={transition}
+            variants={variants}
+          >
+            <QuoteIcon className="size-14" />
+          </motion.span>
           <h1 className="flex text-slate-600 text-3xl font-bold mb-4">
-            <motion.span
-              className="inline-block"
-              transition={transition}
-              variants={variants}
-            >
-              <QuoteIcon className="" />
-            </motion.span>
-
             {words.map((word, index) => (
               <React.Fragment key={index}>
                 <motion.span
@@ -58,14 +57,6 @@ const WelcomePage: React.FC = () => {
                 {index < words.length - 1 && " "}
               </React.Fragment>
             ))}
-
-            <motion.span
-              className="inline-block self-end"
-              transition={transition}
-              variants={variants}
-            >
-              <QuoteIcon />
-            </motion.span>
           </h1>
           <motion.div transition={transition} variants={variants} className="">
             <motion.p
@@ -89,6 +80,13 @@ const WelcomePage: React.FC = () => {
               </Button>
             </motion.div>
           </div>
+          <motion.span
+            className="inline-block place-self-end pt-6 pb-0 mb-0 text-slate-600"
+            transition={transition}
+            variants={variants}
+          >
+            <QuoteIcon className="size-14 scale-x-[-1]" />
+          </motion.span>
         </motion.div>
       </motion.div>
     </motion.div>

@@ -125,7 +125,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   }, []);
 
-  const handleClickPoint = (ethnicGroupPoint: EthnicGroupPoint) => {
+  const handleClickPoint = async (ethnicGroupPoint: EthnicGroupPoint) => {
     apiClient.paths["/api/story/ethnic-group/{ethnicGroupId}"]
       .get({
         ethnicGroupId: ethnicGroupPoint.ethnicGroupId,

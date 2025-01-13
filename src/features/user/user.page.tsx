@@ -243,6 +243,7 @@ const UserPage: React.FC = () => {
       navigate(-1);
     } else {
       console.error("todo: fetch StoryWithImgResponseDto by authorId");
+      console.log(user);
       apiClient.paths["/api/user/story/audio/request/my"]
         .get({ take: itemsPerPage })
         .then((result) => {
