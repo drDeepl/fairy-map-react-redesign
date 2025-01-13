@@ -97,22 +97,21 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
