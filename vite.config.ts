@@ -7,6 +7,15 @@ import * as path from "path";
 export default ({ mode }: any) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   return defineConfig({
+    server: {
+      proxy: {
+        "/api": {
+          target: "http://82.97.249.207:3000",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
     plugins: [react()],
     build: {
       target: "ES2022",
