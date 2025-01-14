@@ -2,7 +2,12 @@ import { Components } from "@/api/schemas/client";
 import React from "react";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import NotCoverBook from "@/components/not-cover-book.component";
 
 interface PreviewBookCardProps {
@@ -27,9 +32,19 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
           )}
         </AspectRatio>
       </CardContent>
-      <CardFooter className="p-2">
-        <CardTitle className="">{story.name}</CardTitle>
-      </CardFooter>
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <CardFooter className="p-2  flex justify-center items-center">
+            <TooltipTrigger asChild>
+              <CardTitle className="line-clamp-2 ">{story.name}</CardTitle>
+            </TooltipTrigger>
+          </CardFooter>
+
+          <TooltipContent side="bottom">
+            <span>{story.name}</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </Card>
   );
 };

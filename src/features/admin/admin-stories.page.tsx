@@ -26,6 +26,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { setBook } from "../book/book.slice";
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -218,17 +224,27 @@ const AdminStoriesPage: React.FC = () => {
                   }));
                 }}
               >
-                <PopoverTrigger
-                  asChild
-                  onClick={() =>
-                    setLanguageListState((prevState) => ({
-                      ...prevState,
-                      open: true,
-                    }))
-                  }
-                >
-                  <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
-                </PopoverTrigger>
+                <TooltipProvider delayDuration={500}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <PopoverTrigger
+                        asChild
+                        onClick={() =>
+                          setLanguageListState((prevState) => ({
+                            ...prevState,
+                            open: true,
+                          }))
+                        }
+                      >
+                        <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
+                      </PopoverTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      загрузить озвучку
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+
                 <PopoverContent>
                   <Command>
                     <p className="self-center font-semibold">

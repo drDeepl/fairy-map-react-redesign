@@ -7,6 +7,12 @@ import {
   getStyleApplicationStatus,
   getDescriptionApplicationStatus,
 } from "../../helpers/get-description-application-status";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AudioApplicationTableProps {
   onClickAudio: (
@@ -16,7 +22,9 @@ interface AudioApplicationTableProps {
 
 export const createColumns = ({
   onClickAudio,
-}: AudioApplicationTableProps): ColumnDef<Components.Schemas.AudioApplicationWithUserAudioResponseDto>[] => [
+}: AudioApplicationTableProps): ColumnDef<
+  Components.Schemas.AudioApplicationWithUserAudioResponseDto
+>[] => [
   {
     accessorKey: "userAudio.originalName",
     header: "озвучка",
@@ -65,5 +73,17 @@ export const createColumns = ({
   {
     accessorKey: "comment",
     header: "комментарий",
+    cell: (info) => (
+      <TooltipProvider delayDuration={500}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="line-clamp-2 cursor-help">
+              {info.row.original.comment}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{info.row.original.comment}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
   },
 ];

@@ -19,6 +19,7 @@ import {
   Cross1Icon,
   EnterFullScreenIcon,
   ExclamationTriangleIcon,
+  SymbolIcon,
 } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
@@ -210,7 +211,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             <div className="w-44 h-56 flex justify-items-center justify-center">
               {infoBookState.loadCover ? (
                 <div>
-                  <LoadSpinner />
+                  {/* <LoadSpinner /> */}
+                  <Skeleton className="w-44 h-60 bg-neutral-300" />
                 </div>
               ) : (
                 <Label
@@ -224,7 +226,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                       className="rounded-t-xl w-44 h-60 object-cover"
                     />
                   ) : (
-                    <div className="w-44 h-60">
+                    <div className="w-44 h-60 animate-shimmer">
                       <NotCoverBook />
                     </div>
                   )}
@@ -243,7 +245,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
 
             <div className="w-2/3">
-              <CardTitle className="">
+              <CardTitle>
                 <div className="flex justify-between items-center space-x-2 mb-6">
                   <span>{infoBookState.book.name}</span>
                   <Button
