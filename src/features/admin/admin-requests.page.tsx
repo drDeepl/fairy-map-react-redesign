@@ -239,14 +239,18 @@ const AdminRequestsPage = () => {
             (application) =>
               application.id === editApplicationState.data?.aplicationId
           );
+
           if (successedApplicaiton) {
+            const data = {
+              userAudioId: successedApplicaiton.userAudio.id,
+              userId: successedApplicaiton.user.id,
+              moderateScore: 0,
+            };
+
+            console.log(data);
             await apiClient.paths["/api/admin/story/{storyId}/audio"].put(
-              successedApplicaiton?.storyId,
-              {
-                userAudioId: successedApplicaiton.userAudio.id,
-                userId: successedApplicaiton.user.id,
-                moderateScore: 0,
-              }
+              successedApplicaiton.storyId,
+              data
             );
           }
         }

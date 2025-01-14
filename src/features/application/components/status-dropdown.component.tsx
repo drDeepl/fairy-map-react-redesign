@@ -36,15 +36,17 @@ const StatusDropdownMenu: React.FC<StatusDropdownMenuProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="">
-        {Object.keys(ApplicationStatus).map((key) => (
-          <DropdownMenuItem
-            key={key}
-            className="font-semibold bg-"
-            onClick={() => onSelectStatus(key)}
-          >
-            {getDescriptionApplicationStatus(key)}
-          </DropdownMenuItem>
-        ))}
+        {Object.keys(ApplicationStatus)
+          .filter((key) => key != "SEND")
+          .map((key) => (
+            <DropdownMenuItem
+              key={key}
+              className="font-semibold bg-"
+              onClick={() => onSelectStatus(key)}
+            >
+              {getDescriptionApplicationStatus(key)}
+            </DropdownMenuItem>
+          ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

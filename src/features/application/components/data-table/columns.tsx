@@ -62,9 +62,9 @@ export const createColumns = ({
     header: "статус",
     cell: (info) => (
       <span
-        className={`p-3 ${getStyleApplicationStatus(
+        className={`p-2 ${getStyleApplicationStatus(
           info.row.original.status
-        )} font-semibold text-center`}
+        )} font-semibold text-center self-center cursor-default`}
       >
         {getDescriptionApplicationStatus(info.row.original.status)}
       </span>

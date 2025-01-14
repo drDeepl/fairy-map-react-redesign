@@ -1,5 +1,5 @@
 export enum ApplicationStatus {
-  SEND = "на рассмотрении",
+  SEND = "отправлено",
   SUCCESSED = "одобрено",
   CANCELLED = "отменено",
 }
