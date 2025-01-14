@@ -61,8 +61,10 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -92,22 +94,6 @@ const AdminStoriesPage: React.FC = () => {
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
     console.log(book);
-    // // await dispatch(fetchAudiosByBookId(book.id));
-    // apiClient.paths["/api/story/{storyId}/audio/all"]
-    //   .get({
-    //     storyId: book.id,
-    //   })
-    //   .then((result) => {
-    //     setAudioListState({
-    //       load: false,
-    //       audios: result.data,
-    //     });
-    //   })
-    // .catch((err) => {
-    //   const msg =
-    //     err.code === "ERR_NETWORK" ? err.code : "что-то пошло не так";
-    //   toast.error(msg);
-    // });
 
     dispatch(setBook(book));
     setOpenDialog(true);
@@ -141,11 +127,6 @@ const AdminStoriesPage: React.FC = () => {
             },
             formData
           );
-
-          // setAudioListState((prevState) => ({
-          //   ...prevState,
-          //   audios: [...prevState.audios, addedAudioResponse.data],
-          // }));
         } catch (error) {
           console.error(error);
           toast.error("Ошибка при загрузке аудио");
@@ -170,16 +151,6 @@ const AdminStoriesPage: React.FC = () => {
       fileInputRef.current.click();
     }
   };
-
-  // interface AudioListState {
-  //   load: boolean;
-  //   audios: Components.Schemas.AudioStoryResponseDto[];
-  // }
-
-  // const [audiosListState, setAudioListState] = useState<AudioListState>({
-  //   load: true,
-  //   audios: [],
-  // });
 
   useEffect(() => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {

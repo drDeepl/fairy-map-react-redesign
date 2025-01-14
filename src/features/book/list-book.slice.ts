@@ -42,6 +42,7 @@ const bookListSlice = createSlice({
       .addCase(fetchListBooks.fulfilled, (state, action) => {
         console.error("fetchListBooks");
         state.books = action.payload;
+        state.books.reverse();
         state.loading = false;
         state.success = true;
       })

@@ -70,7 +70,7 @@ const WelcomePage: React.FC = () => {
           <div className="flex flex-around space-x-2">
             <motion.div transition={transition} variants={variants}>
               <Button
-                className="flex flex-col mt-2 bg-orange-600  hover:bg-slate-100 hover:text-orange-600 hover:border border-orange-600 animate-jump-heart"
+                className="flex flex-col mt-2 bg-orange-600 hover:bg-slate-100 hover:text-orange-600 hover:border border-orange-600 animate-jump-heart"
                 onClick={handleOnMap}
               >
                 <div className="flex items-center space-x-2">
@@ -81,7 +81,7 @@ const WelcomePage: React.FC = () => {
             </motion.div>
           </div>
           <motion.span
-            className="inline-block place-self-end pt-6 pb-0 mb-0 text-slate-600"
+            className="inline-block place-self-end pb-0 mb-0 text-slate-600"
             transition={transition}
             variants={variants}
           >

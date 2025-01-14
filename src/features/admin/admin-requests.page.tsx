@@ -234,6 +234,23 @@ const AdminRequestsPage = () => {
           });
         }
 
+        if (editApplicationState.data.status === "SUCCESSED") {
+          const successedApplicaiton = applicationTableState.paginationData.data.find(
+            (application) =>
+              application.id === editApplicationState.data?.aplicationId
+          );
+          if (successedApplicaiton) {
+            await apiClient.paths["/api/admin/story/{storyId}/audio"].put(
+              successedApplicaiton?.storyId,
+              {
+                userAudioId: successedApplicaiton.userAudio.id,
+                userId: successedApplicaiton.user.id,
+                moderateScore: 0,
+              }
+            );
+          }
+        }
+
         await apiClient.paths[
           "/api/audio-story-request/edit/{audioStoryReqeustId}"
         ].put(editApplicationState.data.aplicationId, dto);

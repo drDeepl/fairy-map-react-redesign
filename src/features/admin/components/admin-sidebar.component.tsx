@@ -16,6 +16,12 @@ import { useNavigate } from "react-router-dom";
 import { RouteApp } from "@/pages/constants/route.enum";
 import { Separator } from "@/components/ui/separator";
 import { ExitIcon } from "@radix-ui/react-icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AdminSidebarProps {
   onClickItem: (item: ItemSidebarAdmin) => void;
@@ -38,9 +44,21 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         {/* <SidebarGroupLabel>Меню</SidebarGroupLabel> */}
 
         <SidebarMenu>
-          <Button className="size-8" variant="outline" onClick={onClickExit}>
-            <ExitIcon className="text-slate-600" />
-          </Button>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="size-8"
+                  variant="outline"
+                  onClick={onClickExit}
+                >
+                  <ExitIcon className="text-slate-600" />
+                </Button>
+              </TooltipTrigger>
+
+              <TooltipContent>выйти</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </SidebarMenu>
         <Separator />
       </SidebarHeader>

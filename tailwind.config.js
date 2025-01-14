@@ -169,8 +169,36 @@ export default {
             transform: "tranlate(0px, 0px) scale(1)",
           },
         },
+        rotate: {
+          "0%": { transform: "rotate(0deg) scale(10)" },
+          "100%": { transform: "rotate(-360deg) scale(10)" },
+        },
+        spin: {
+          "0%": "rotate(0deg)",
+          "100%": "rotate(360deg)",
+        },
+        tilt: {
+          "0%, 50%, 100%": {
+            transform: "rotate(0deg)",
+          },
+          "25%": {
+            transform: "rotate(0.5deg)",
+          },
+          "75%": {
+            transform: "rotate(-0.5deg)",
+          },
+        },
+        glowing: {
+          "0%": { "background-position": "0 0" },
+          "50%": { "background-position": "400% 0" },
+          "100%": { "background-position": "0 0" },
+        },
       },
       animation: {
+        glowing: "glowing 20s linear infinite",
+        tilt: "tilt 10s infinite linear",
+        spin: "spin 2.5s linear infinite",
+        rotate: "rotate 10s linear infinite",
         blob: "blob 1.5s infinite",
         ring: "ring 0.3s",
         "rotate-180": "rotate180 0.3s linear forwards",
