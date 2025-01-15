@@ -190,7 +190,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ visible, onSubmit, onClose }) => {
               />
             ) : null}
           </DialogDescription>
-          <TabsContent value={Tab.SignIn} className="">
+          <TabsContent value={Tab.SignIn}>
             <SignInForm
               loading={authState.loading}
               onSubmit={handleSignIn}

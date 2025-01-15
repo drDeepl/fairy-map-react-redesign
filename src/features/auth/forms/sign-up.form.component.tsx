@@ -41,7 +41,10 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
 
   return (
     <Form {...signUpForm}>
-      <form onSubmit={signUpForm.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={signUpForm.handleSubmit(onSubmit)}
+        className="gap-2 grid grid-cols-2 items-content-center justify-content-center"
+      >
         <FormField
           control={signUpForm.control}
           name="firstName"
@@ -87,7 +90,7 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>пароль</FormLabel>
+              <FormLabel className="p-0 m-0">пароль</FormLabel>
               <FormControl>
                 <Input type="password" placeholder="" {...field} />
               </FormControl>
@@ -95,11 +98,16 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
             </FormItem>
           )}
         />
-        <Button disabled={loading} className="w-full " type="submit">
+        <Button
+          disabled={loading}
+          className="w-full flex justify-between"
+          type="submit"
+        >
           {loading ? (
             <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          зарегистрироваться
+          ) : (
+            <span>зарегистрироваться</span>
+          )}
         </Button>
       </form>
     </Form>

@@ -19,7 +19,7 @@ import {
   Cross1Icon,
   EnterFullScreenIcon,
   ExclamationTriangleIcon,
-  SymbolIcon,
+  // SymbolIcon,
 } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
@@ -45,6 +45,9 @@ import { FileAudio } from "lucide-react";
 // import { AuthState } from "@/features/auth/auth.slice";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import { RootState } from "@/app/store";
+import { AuthState } from "@/features/auth/auth.slice";
+import { useSelector } from "react-redux";
 
 interface BookInfoCardProps {
   book: Components.Schemas.StoryWithImgResponseDto;
@@ -88,7 +91,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   children,
 }) => {
   const { toast } = useToast();
-  // const { user }: AuthState = useSelector((state: RootState) => state.auth);
+  const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
   const [listAudioState, setListAudioState] = useState<ListAudiosState>({
     load: true,
@@ -182,25 +185,25 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  // const handleOnClickAddAudio = () => {
-  //   if (!user) {
-  //     toast({
-  //       style: {
-  //         border: "1.5px solid var(--deep-red)",
-  //         right: "2rem",
-  //       },
-  //       title:
-  //         "подать заявку на добавление озвучки могут только авторизованные пользователи",
-  //       action: (
-  //         <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
-  //           войти
-  //         </Button>
-  //       ),
-  //     });
-  //   } else {
-  //     onClickAddAudio();
-  //   }
-  // };
+  const handleOnClickAddAudio = () => {
+    if (!user) {
+      toast({
+        style: {
+          border: "1.5px solid var(--deep-red)",
+          right: "2rem",
+        },
+        title:
+          "подать заявку на добавление озвучки могут только авторизованные пользователи",
+        action: (
+          <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
+            войти
+          </Button>
+        ),
+      });
+    } else {
+      onClickAddAudio();
+    }
+  };
 
   return (
     <Card className="border-none">
@@ -286,7 +289,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
                           <FileAudio
                             className="size-9 text-slate-700 p-2"
-                            onClick={onClickAddAudio}
+                            onClick={handleOnClickAddAudio}
                           />
                         </div>
                       </div>
