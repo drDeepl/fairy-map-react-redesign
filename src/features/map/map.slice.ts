@@ -6,20 +6,20 @@ import {
   Geometry,
   GeoJsonProperties,
 } from "geojson";
+import { feature } from "topojson";
 
 import { fetchMapData } from "./map.actions";
 import { ApiErrorResponse } from "@/api/helpers/handler-response";
 import { FeatureProperties } from "./map.interface";
-import { feature } from "topojson";
 
-export interface MapSlice {
+export interface MapState {
   loading: boolean;
   error: ApiErrorResponse | null;
   success: boolean;
   dataMap: FeatureCollection<Geometry, FeatureProperties> | null;
 }
 
-const initialState: MapSlice = {
+const initialState: MapState = {
   loading: false,
   error: null,
   success: false,

@@ -16,16 +16,20 @@ import { z } from "zod";
 
 import { AuthFormProps } from "@/types/forms/auth.form.interface";
 
-import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
-import { ReloadIcon } from "@radix-ui/react-icons";
+
 import { signInFormSchema } from "./schemas/sign-in.schema";
 
 interface SignInFormProps extends AuthFormProps {
   onSubmit: (values: Components.Schemas.SignInRequestDto) => Promise<void>;
+  children?: React.ReactNode;
 }
 
-const SignInForm: React.FC<SignInFormProps> = ({ loading, onSubmit }) => {
+const SignInForm: React.FC<SignInFormProps> = ({
+  loading,
+  onSubmit,
+  children,
+}) => {
   const signInForm = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -44,7 +48,7 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, onSubmit }) => {
             <FormItem>
               <FormLabel>Электронная почта</FormLabel>
               <FormControl>
-                <Input placeholder="" {...field} />
+                <Input disabled={loading} placeholder="" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -57,20 +61,21 @@ const SignInForm: React.FC<SignInFormProps> = ({ loading, onSubmit }) => {
             <FormItem>
               <FormLabel>Пароль</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="" {...field} />
+                <Input
+                  disabled={loading}
+                  type="password"
+                  placeholder=""
+                  {...field}
+                />
               </FormControl>
 
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <Button disabled={loading} className="w-full" type="submit">
-          {loading ? (
-            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-          ) : null}
-          войти
-        </Button>
+        <div className="flex flex-col items-center justify-center">
+          {children}
+        </div>
       </form>
     </Form>
   );

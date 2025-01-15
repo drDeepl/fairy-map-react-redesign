@@ -138,9 +138,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
-      (result) => console.log(result)
-    );
+    dispatch(
+      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    ).then((result) => console.log(result));
   };
 
   useEffect(() => {
@@ -323,4 +323,4 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-export default MapComponent;
+export default React.memo(MapComponent);

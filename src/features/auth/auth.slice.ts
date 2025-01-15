@@ -21,7 +21,6 @@ export interface JwtPayload {
 
 export interface AuthState extends BaseAppState {
   user: null | JwtPayload;
-  verifyedCaptcha: boolean;
   dataFormValid: boolean;
 }
 
@@ -30,7 +29,6 @@ const initialState: AuthState = {
   error: undefined,
   success: false,
   user: null,
-  verifyedCaptcha: false,
   dataFormValid: false,
 };
 
@@ -42,9 +40,6 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
 
-    setVerifyedCaptcha: (state: AuthState, action: PayloadAction<boolean>) => {
-      state.verifyedCaptcha = action.payload;
-    },
     setValidDataForm: (state: AuthState, action: PayloadAction<boolean>) => {
       state.dataFormValid = action.payload;
     },
@@ -81,7 +76,7 @@ const authSlice = createSlice({
           const accessToken: string = action.payload.accessToken;
           setTokenLocalStorage(accessToken);
           const user: JwtPayload = parsePayloadFromAccessToken(accessToken);
-          console.log(`token payload ${user}`);
+
           state.user = user;
           state.loading = false;
           state.success = true;
@@ -123,7 +118,6 @@ const authSlice = createSlice({
 
 export const {
   setUser,
-  setVerifyedCaptcha,
   setValidDataForm,
   setLoad,
   setError,

@@ -16,18 +16,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { AuthFormProps } from "@/types/forms/auth.form.interface";
-import { Button } from "@/components/ui/button";
 
-import { ReloadIcon } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
 
 interface SignUpFormProps extends AuthFormProps {
   onSubmit: (values: Components.Schemas.SignUpRequestDto) => Promise<void>;
+  children?: React.ReactNode;
 }
 
 const SignUpFormComponent: React.FC<SignUpFormProps> = ({
-  loading,
   onSubmit,
+  children,
 }) => {
   const signUpForm = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
@@ -98,17 +97,7 @@ const SignUpFormComponent: React.FC<SignUpFormProps> = ({
             </FormItem>
           )}
         />
-        <Button
-          disabled={loading}
-          className="w-full flex justify-between"
-          type="submit"
-        >
-          {loading ? (
-            <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <span>зарегистрироваться</span>
-          )}
-        </Button>
+        <div className="flex flex-col items-center">{children}</div>
       </form>
     </Form>
   );
