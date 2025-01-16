@@ -69,7 +69,6 @@ const AdminStoriesPage: React.FC = () => {
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
-  // const bookState = useSelector((state: RootState) => state.book);
 
   const [bookState, setBookState] = useState<SelectedBookState>({
     load: true,
