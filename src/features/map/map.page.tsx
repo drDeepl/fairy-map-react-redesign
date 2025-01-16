@@ -17,13 +17,11 @@ import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
 
-// import { LanguageListState } from "../language/language-list.slice";
-import { fetchLanguages } from "../language/language.actions";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
 import {
@@ -61,8 +59,14 @@ interface MapState {
   error: { message: string } | null;
 }
 
+interface SelectedBookState {
+  load: boolean;
+  book: Components.Schemas.StoryWithImgResponseDto | null;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+  text: string;
+}
+
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
-  // const mapState = useSelector((state: RootState) => state.map);
   const [mapState, setMapState] = useState<MapState>({
     load: true,
     dataMap: null,
@@ -70,9 +74,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   });
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
-  // const languageListState: LanguageListState = useSelector(
-  //   (state: RootState) => state.languageList
-  // );
 
   const [languageListState, setLanguageListState] = useState<LanguageListState>(
     {
@@ -83,15 +84,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    dispatch(fetchLanguages()).then((action: any) => {
-      setLanguageListState({
-        load: false,
-        languages: action.paylaod,
-      });
-    });
-  }, []);
 
   const [load, setLoad] = useState<boolean>(true);
 
@@ -145,21 +137,51 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
-  const [
-    selectedBook,
-    setSelectedBook,
-  ] = useState<Components.Schemas.StoryWithImgResponseDto | null>(null);
+  const [selectedBook, setSelectedBook] = useState<SelectedBookState>({
+    load: true,
+    book: null,
+    text: "текст не найден",
+    audios: [],
+  });
 
   const handleOnClickBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
+    setSelectedBook((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
-    setSelectedBook(book);
+    Promise.all([
+      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
+      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+        storyId: book.id,
+      }),
+    ])
+      .then((values) => {
+        console.log(values);
+        setSelectedBook((prevState) => ({
+          ...prevState,
+          text: values[0].data.text,
+          audios: values[1].data,
+          load: false,
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+        setSelectedBook((prevState) => ({
+          ...prevState,
+          load: false,
+        }));
+      });
   };
 
   const handleOnCloseBook = async () => {
     setOpenDialog(false);
-    setSelectedBook(null);
+
+    setSelectedBook({
+      load: true,
+      text: "текст не найден",
+      book: null,
+      audios: [],
+    });
   };
 
   useEffect(() => {
@@ -174,6 +196,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               dataMap: dataMap,
               error: null,
             });
+            setLoad(false);
           });
         })
         .catch(() => {
@@ -190,8 +213,22 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         error: null,
       });
     }
-    setLoad(false);
-  }, [dispatch]);
+    apiClient.paths["/api/ethnic-group/language/all"]
+      .get()
+      .then((res: any) => {
+        setLanguageListState({
+          load: false,
+          languages: res.data,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        setLanguageListState({
+          load: false,
+          languages: [],
+        });
+      });
+  }, []);
 
   const [currentTab, setCurrentTab] = useState<string>(
     BookInfoTabs.BookInfo.toString()
@@ -258,11 +295,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                     <Cross1Icon />
                   </Button>
                 </DrawerTitle>
-                {/* <DrawerDescription className="text-md">
-                  <div className="flex flex-col items-center ">
-                    <span>{selectedAudioBook}</span>
-                  </div>
-                </DrawerDescription> */}
               </DrawerHeader>
 
               <AudioBookPlayer
@@ -278,8 +310,18 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Drawer>
         ) : null}
 
-        {selectedBook ? (
+        {selectedBook.book ? (
           <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
+            <DialogTitle className="p-0 m-0 flex justify-end h-1">
+              <Button
+                onClick={handleOnCloseBook}
+                size="icon"
+                variant="ghost"
+                className="p-0 m-1 size-6"
+              >
+                <Cross1Icon />
+              </Button>
+            </DialogTitle>
             <Tabs
               defaultValue={currentTab}
               value={currentTab}
@@ -288,7 +330,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               <TabsContent value={BookInfoTabs.BookInfo.toString()}>
                 {selectedBook ? (
                   <BookInfoCardComponent
-                    book={selectedBook}
+                    load={selectedBook.load}
+                    book={selectedBook.book}
+                    audios={selectedBook.audios}
+                    text={selectedBook.text}
                     onClickRate={handleOnClickRate}
                     onClickAuth={() => {
                       setAuthFormState({ open: true, notifySuccess: false });
@@ -300,7 +345,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               </TabsContent>
               <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
                 <CreateApplicationAudioForm
-                  storyId={selectedBook ? selectedBook.id : 0}
+                  storyId={selectedBook.book ? selectedBook.book.id : 0}
                   languages={languageListState.languages}
                   userId={authState.user ? Number(authState.user.sub) : 0}
                   onClose={() =>

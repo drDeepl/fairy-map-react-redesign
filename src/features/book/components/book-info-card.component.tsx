@@ -13,14 +13,9 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import {
-  Cross1Icon,
-  EnterFullScreenIcon,
-  ExclamationTriangleIcon,
-  // SymbolIcon,
-} from "@radix-ui/react-icons";
+import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -31,26 +26,23 @@ import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-import LoadSpinner from "@/components/ui/load-spinner";
-import apiClient from "@/api/apiClient";
-
-import { AxiosError, AxiosResponse } from "axios";
-
 import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 
-// import { RootState } from "@/app/store";
 import { useToast } from "@/hooks/use-toast";
-// import { useSelector } from "react-redux";
+
 import { FileAudio } from "lucide-react";
-// import { AuthState } from "@/features/auth/auth.slice";
+
 import { Toaster } from "@/components/ui/toaster";
-import { cn } from "@/lib/utils";
+
 import { RootState } from "@/app/store";
 import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 
 interface BookInfoCardProps {
+  load: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
+  text: string;
+  audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
@@ -71,32 +63,22 @@ interface TextAction {
 
 interface InfoBookState {
   loadCover: boolean;
-  loadText: boolean;
   book: Components.Schemas.StoryWithImgResponseDto;
-  text: string | null;
-}
-
-interface ListAudiosState {
-  load: boolean;
-  audios: Components.Schemas.AudioStoryResponseDto[];
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
+  load,
   book,
+  text,
+  audios,
   onClickAuth,
   onClickRate,
-  onClose,
   onUploadCover,
   onClickAddAudio,
   children,
 }) => {
   const { toast } = useToast();
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
-
-  const [listAudioState, setListAudioState] = useState<ListAudiosState>({
-    load: true,
-    audios: [],
-  });
 
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
@@ -105,57 +87,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: false,
-    loadText: false,
     book: book,
-    text: null,
   });
-
-  const handleAxiosError = (error: AxiosError) => {
-    const msg =
-      error.code === "ERR_NETWORK" ? error.code : "что-то пошло не так";
-    toast({
-      className: cn("top-4 border border-red-500 bg-red-100 flex fixed w-80"),
-
-      action: (
-        <div className="w-full flex items-center space-x-4 text-red-500">
-          <ExclamationTriangleIcon className="size-6 self-end " />
-          <span className="font-semibold text-md">{msg}</span>
-        </div>
-      ),
-    });
-  };
-
-  useEffect(() => {
-    setInfoBookState((prevState) => ({ ...prevState, loadText: true }));
-    apiClient
-      .StoryController_getTextStoryByStoryId(book.id)
-      .then((result) => {
-        console.log(result.data);
-        const text = result.data.text
-          ? result.data.text
-          : "текст сказки не найден";
-        setInfoBookState((prevState) => ({
-          ...prevState,
-          text: text,
-          loadText: false,
-        }));
-      })
-      .catch((err: AxiosError) => {
-        handleAxiosError(err);
-      });
-
-    apiClient.paths["/api/story/{storyId}/audio/all"]
-      .get({ storyId: book.id })
-      .then(
-        (result: AxiosResponse<Components.Schemas.AudioStoryResponseDto[]>) => {
-          console.log(result);
-          setListAudioState({ load: false, audios: result.data });
-        }
-      )
-      .catch((err: AxiosError) => {
-        handleAxiosError(err);
-      });
-  }, []);
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
@@ -251,30 +184,19 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               <CardTitle>
                 <div className="flex justify-between items-center space-x-2 mb-6">
                   <span>{infoBookState.book.name}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className=""
-                    onClick={() => onClose()}
-                  >
-                    <Cross1Icon />
-                  </Button>
                 </div>
               </CardTitle>
-              <CardDescription className="-mt-2 flex">
-                {listAudioState.load ? (
-                  <div>
-                    <Skeleton className="h-24" />
-                  </div>
-                ) : (
+              {load ? (
+                <Skeleton className="w-full h-24 bg-neutral-300" />
+              ) : (
+                <CardDescription className="-mt-2 flex">
                   <div className="flex -mb-12">
-                    {listAudioState.audios.length > 0 ? (
+                    {audios.length > 0 ? (
                       <AudioBookPlayer
-                        audios={listAudioState.audios}
+                        audios={audios}
                         onClickAuth={onClickAuth}
                         onClickRate={onClickRate}
                         onClose={() => console.log("close")}
-                        // onClickAddAudio={handleOnClickAddAudio}
                         hideHeader={true}
                       />
                     ) : (
@@ -295,15 +217,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                       </div>
                     )}
                   </div>
-                )}
-              </CardDescription>
+                </CardDescription>
+              )}
             </div>
           </div>
         )}
       </CardHeader>
 
       <CardFooter>
-        {/* {className={`${textAction.fullScreen ? "" : "-mt-10"}`}} */}
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="story-text">
             <AccordionTrigger
@@ -319,13 +240,21 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               </div>
             </AccordionTrigger>
             <AccordionContent className="max-h-72 rounded-md overflow-auto mt-2">
-              {infoBookState.loadText ? (
-                <LoadSpinner />
+              {load ? (
+                // <LoadSpinner />
+                <div>
+                  {Array(3)
+                    .fill(1)
+                    .map((value) => (
+                      <Skeleton
+                        key={value}
+                        className="w-full h-4 bg-zinc-300 my-2"
+                      />
+                    ))}
+                </div>
               ) : (
                 <div className="text-base">
-                  <p className="row-span-1 flex justify-center">
-                    {infoBookState.text}
-                  </p>
+                  <p className="row-span-1 flex justify-center">{text}</p>
                   <div className="fixed -right-[5rem] bottom-7 w-1/3">
                     <Button
                       variant="secondary"

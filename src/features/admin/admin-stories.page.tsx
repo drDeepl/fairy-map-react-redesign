@@ -53,6 +53,13 @@ interface ListLanguageState {
   languages: Components.Schemas.LanguageDto[];
 }
 
+interface SelectedBookState {
+  load: boolean;
+  book: Components.Schemas.StoryWithImgResponseDto | null;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+  text: string;
+}
+
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -62,7 +69,14 @@ const AdminStoriesPage: React.FC = () => {
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
-  const bookState = useSelector((state: RootState) => state.book);
+  // const bookState = useSelector((state: RootState) => state.book);
+
+  const [bookState, setBookState] = useState<SelectedBookState>({
+    load: true,
+    book: null,
+    text: "текст не найден",
+    audios: [],
+  });
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
@@ -99,10 +113,30 @@ const AdminStoriesPage: React.FC = () => {
   const handleOnClickPreviewBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    console.log(book);
-
-    dispatch(setBook(book));
+    setBookState((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
+    Promise.all([
+      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
+      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+        storyId: book.id,
+      }),
+    ])
+      .then((values) => {
+        console.log(values);
+        setBookState((prevState) => ({
+          ...prevState,
+          text: values[0].data.text,
+          audios: values[1].data,
+          load: false,
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+        setBookState((prevState) => ({
+          ...prevState,
+          load: false,
+        }));
+      });
   };
 
   const handleCloseInfoBook = () => {
@@ -120,7 +154,7 @@ const AdminStoriesPage: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files && event.target.files.length > 0) {
-      if (bookState.selectedBook && selectedLanguage) {
+      if (bookState.book && selectedLanguage) {
         const formData = new FormData();
         formData.append("audio", event.target.files[0]);
 
@@ -128,7 +162,7 @@ const AdminStoriesPage: React.FC = () => {
           // const addedAudioResponse: any =
           await apiClient.AdminController_uploadAudioStory(
             {
-              storyId: bookState.selectedBook["id"],
+              storyId: bookState.book["id"],
               languageId: selectedLanguage.id,
             },
             formData
@@ -207,9 +241,12 @@ const AdminStoriesPage: React.FC = () => {
           toastOptions={{ className: "toast-admin-page" }}
         />
         <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in">
-          {bookState.selectedBook ? (
+          {bookState.book ? (
             <BookInfoCardComponent
-              book={bookState.selectedBook}
+              load={bookState.load}
+              book={bookState.book}
+              audios={bookState.audios}
+              text={bookState.text}
               onClose={handleCloseInfoBook}
               onUploadCover={handleOnUploadBookCover}
               onClickAddAudio={() => console.log("onClickAddAudio")}

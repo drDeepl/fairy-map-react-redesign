@@ -82,6 +82,8 @@ interface ListBookState {
 interface BookInfoState {
   load: boolean;
   book: Components.Schemas.StoryWithImgResponseDto | null;
+  audios: Components.Schemas.AudioStoryResponseDto[];
+  text: string;
 }
 
 const itemsPerPage = 10;
@@ -97,21 +99,22 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
@@ -227,15 +230,39 @@ const UserPage: React.FC = () => {
   const [bookInfoState, setBookInfoState] = useState<BookInfoState>({
     load: true,
     book: null,
+    text: "текст не найден",
+    audios: [],
   });
 
   const handleOnClickPreviewBook = async (
     book: Components.Schemas.StoryWithImgResponseDto
   ) => {
-    setBookInfoState({
-      load: false,
+    setBookInfoState((prevState) => ({
+      ...prevState,
       book: book,
-    });
+    }));
+    Promise.all([
+      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
+      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+        storyId: book.id,
+      }),
+    ])
+      .then((values) => {
+        console.log(values);
+        setBookInfoState((prevState) => ({
+          ...prevState,
+          text: values[0].data.text,
+          audios: values[1].data,
+          load: false,
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+        setBookInfoState((prevState) => ({
+          ...prevState,
+          load: false,
+        }));
+      });
   };
 
   useEffect(() => {
@@ -520,8 +547,18 @@ const UserPage: React.FC = () => {
         <Dialog open={bookInfoState.book != null}>
           <DialogContent className="[&>button]:hidden m-0 p-0">
             <BookInfoCardComponent
+              load={bookInfoState.load}
               book={bookInfoState.book}
-              onClose={() => setBookInfoState({ load: true, book: null })}
+              audios={bookInfoState.audios}
+              text={bookInfoState.text}
+              onClose={() =>
+                setBookInfoState({
+                  load: true,
+                  book: null,
+                  text: "текст не найден",
+                  audios: [],
+                })
+              }
               onClickAddAudio={() => {}}
             >
               <span></span>

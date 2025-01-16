@@ -73,6 +73,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
       ? Block.dots(".add-audio-form__container", { cssAnimationDuration: 5000 })
       : Block.remove(".add-audio-form__container");
   };
+
   useEffect(() => {
     form.reset();
     setOverlayLoad(false);
@@ -101,7 +102,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
             },
           }
         );
-        console.log(addedAudioResponse.data);
+
         await apiClient.paths["/api/audio-story-request/add"].post(null, {
           userAudioId: addedAudioResponse.data.userAudioId, // 24
           userId: userId, // 1
