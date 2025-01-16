@@ -44,7 +44,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 export interface BookInfoState {
   open: boolean;
   loadCover: boolean;
-  bookItem: Components.Schemas.StoryWithImgResponseDto;
+  bookItem: Components.Schemas.StoryBookResponseDto;
 }
 
 interface ListLanguageState {
@@ -55,9 +55,8 @@ interface ListLanguageState {
 
 interface SelectedBookState {
   load: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto | null;
+  book: Components.Schemas.StoryBookResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
-  text: string;
 }
 
 const AdminStoriesPage: React.FC = () => {
@@ -73,17 +72,14 @@ const AdminStoriesPage: React.FC = () => {
   const [bookState, setBookState] = useState<SelectedBookState>({
     load: true,
     book: null,
-    text: "текст не найден",
     audios: [],
   });
 
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [
-    selectedLanguage,
-    setSelectedLanguage,
-  ] = useState<Components.Schemas.LanguageDto | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -110,22 +106,19 @@ const AdminStoriesPage: React.FC = () => {
   };
 
   const handleOnClickPreviewBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
+    book: Components.Schemas.StoryBookResponseDto
   ) => {
     setBookState((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
-    Promise.all([
-      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
-      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+    apiClient.paths["/api/story/{storyId}/audio/all"]
+      .get({
         storyId: book.id,
-      }),
-    ])
-      .then((values) => {
-        console.log(values);
+      })
+      .then((res) => {
+        console.log(res);
         setBookState((prevState) => ({
           ...prevState,
-          text: values[0].data.text,
-          audios: values[1].data,
+          audios: res.data,
           load: false,
         }));
       })
@@ -142,7 +135,6 @@ const AdminStoriesPage: React.FC = () => {
     setBookState({
       load: true,
       book: null,
-      text: "текст не найден",
       audios: [],
     });
     setOpenDialog(false);
@@ -150,7 +142,7 @@ const AdminStoriesPage: React.FC = () => {
 
   const handleOnUploadBookCover = async (
     dto: CoverUploadDto
-  ): Promise<Components.Schemas.StoryWithImgResponseDto> => {
+  ): Promise<Components.Schemas.StoryBookResponseDto> => {
     return dispatch(uploadBookCover(dto)).unwrap();
   };
 
@@ -211,7 +203,7 @@ const AdminStoriesPage: React.FC = () => {
         <section className="mx-8">
           <ListBookCarousel
             load={listBookState.loading}
-            books={listBookState.books}
+            books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
             <Button
@@ -263,7 +255,6 @@ const AdminStoriesPage: React.FC = () => {
                 load={bookState.load}
                 book={bookState.book}
                 audios={bookState.audios}
-                text={bookState.text}
                 onClose={handleCloseInfoBook}
                 onUploadCover={handleOnUploadBookCover}
                 onClickAddAudio={() => console.log("onClickAddAudio")}

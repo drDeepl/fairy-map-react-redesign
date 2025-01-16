@@ -11,7 +11,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 
 interface PreviewBookCardProps {
-  book: Components.Schemas.StoryWithImgResponseDto;
+  book: Components.Schemas.StoryBookResponseDto;
 }
 
 export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({

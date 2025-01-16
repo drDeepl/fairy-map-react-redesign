@@ -12,9 +12,9 @@ import React from "react";
 import { Components } from "@/api/schemas/client";
 
 interface ListBookCarouselProps {
-  books: Components.Schemas.StoryWithImgResponseDto[];
+  books: Components.Schemas.StoryBookResponseDto[];
   load: boolean;
-  onClickBook: (book: Components.Schemas.StoryWithImgResponseDto) => void;
+  onClickBook: (book: Components.Schemas.StoryBookResponseDto) => void;
   children?: React.ReactNode;
 }
 
@@ -24,9 +24,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
   onClickBook,
   children,
 }) => {
-  const handleOnClickBook = (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => {
+  const handleOnClickBook = (book: Components.Schemas.StoryBookResponseDto) => {
     onClickBook(book);
   };
   return (

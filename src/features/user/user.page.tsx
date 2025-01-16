@@ -76,14 +76,13 @@ interface ApplicationTableState {
 
 interface ListBookState {
   load: boolean;
-  books: Components.Schemas.StoryWithImgResponseDto[];
+  books: Components.Schemas.StoryBookResponseDto[];
 }
 
 interface BookInfoState {
   load: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto | null;
+  book: Components.Schemas.StoryBookResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
-  text: string;
 }
 
 const itemsPerPage = 10;
@@ -99,22 +98,21 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
@@ -230,29 +228,25 @@ const UserPage: React.FC = () => {
   const [bookInfoState, setBookInfoState] = useState<BookInfoState>({
     load: true,
     book: null,
-    text: "текст не найден",
     audios: [],
   });
 
   const handleOnClickPreviewBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
+    book: Components.Schemas.StoryBookResponseDto
   ) => {
     setBookInfoState((prevState) => ({
       ...prevState,
       book: book,
     }));
-    Promise.all([
-      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
-      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+
+    apiClient.paths["/api/story/{storyId}/audio/all"]
+      .get({
         storyId: book.id,
-      }),
-    ])
-      .then((values) => {
-        console.log(values);
+      })
+      .then((res) => {
         setBookInfoState((prevState) => ({
           ...prevState,
-          text: values[0].data.text,
-          audios: values[1].data,
+          audios: res.data,
           load: false,
         }));
       })
@@ -289,9 +283,7 @@ const UserPage: React.FC = () => {
           userId: Number(user.sub),
         })
         .then(
-          (
-            res: AxiosResponse<Components.Schemas.StoryWithImgResponseDto[]>
-          ) => {
+          (res: AxiosResponse<Components.Schemas.StoryBookResponseDto[]>) => {
             setListBookState({
               load: false,
               books: res.data,
@@ -550,12 +542,11 @@ const UserPage: React.FC = () => {
               load={bookInfoState.load}
               book={bookInfoState.book}
               audios={bookInfoState.audios}
-              text={bookInfoState.text}
               onClose={() =>
                 setBookInfoState({
                   load: true,
                   book: null,
-                  text: "текст не найден",
+
                   audios: [],
                 })
               }

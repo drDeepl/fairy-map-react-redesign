@@ -62,9 +62,8 @@ interface MapState {
 
 interface SelectedBookState {
   load: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto | null;
+  book: Components.Schemas.StoryBookResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
-  text: string;
 }
 
 const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
@@ -88,9 +87,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
+    useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -118,10 +116,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
@@ -140,27 +136,23 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const [selectedBook, setSelectedBook] = useState<SelectedBookState>({
     load: true,
     book: null,
-    text: "текст не найден",
     audios: [],
   });
 
   const handleOnClickBook = async (
-    book: Components.Schemas.StoryWithImgResponseDto
+    book: Components.Schemas.StoryBookResponseDto
   ) => {
     setSelectedBook((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
-    Promise.all([
-      apiClient.paths["/api/story/text/{storyId}"].get(book.id),
-      apiClient.paths["/api/story/{storyId}/audio/all"].get({
+    apiClient.paths["/api/story/{storyId}/audio/all"]
+      .get({
         storyId: book.id,
-      }),
-    ])
-      .then((values) => {
-        console.log(values);
+      })
+      .then((res) => {
+        console.log(res);
         setSelectedBook((prevState) => ({
           ...prevState,
-          text: values[0].data.text,
-          audios: values[1].data,
+          audios: res.data,
           load: false,
         }));
       })
@@ -178,7 +170,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
     setSelectedBook({
       load: true,
-      text: "текст не найден",
       book: null,
       audios: [],
     });
@@ -272,7 +263,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   load={selectedBook.load}
                   book={selectedBook.book}
                   audios={selectedBook.audios}
-                  text={selectedBook.text}
                   onClickRate={handleOnClickRate}
                   onClickAuth={() => {
                     setAuthFormState({ open: true, notifySuccess: false });

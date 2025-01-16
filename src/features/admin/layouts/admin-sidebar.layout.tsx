@@ -21,10 +21,12 @@ const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
   return (
     <SidebarProvider
       defaultOpen={false}
-      style={{
-        "--sidebar-width": "10rem",
-        "--sidebar-width-mobile": "10rem",
-      }}
+      style={
+        {
+          "--sidebar-width": "10rem",
+          "--sidebar-width-mobile": "10rem",
+        } as any
+      }
     >
       <AdminSidebar
         onClickItem={onClickItemSidebar}

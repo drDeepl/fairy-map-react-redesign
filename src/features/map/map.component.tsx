@@ -38,14 +38,12 @@ interface MapComponentProps {
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => void;
 
-  onClickBook: (
-    book: Components.Schemas.StoryWithImgResponseDto
-  ) => Promise<void>;
+  onClickBook: (book: Components.Schemas.StoryBookResponseDto) => Promise<void>;
 }
 
 interface ListBookState {
   load: boolean;
-  books: Components.Schemas.StoryWithImgResponseDto[];
+  books: Components.Schemas.StoryBookResponseDto[];
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -138,9 +136,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(
-      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
-    ).then((result) => console.log(result));
+    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
+      (result) => console.log(result)
+    );
   };
 
   useEffect(() => {

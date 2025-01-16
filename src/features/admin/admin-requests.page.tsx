@@ -41,7 +41,6 @@ import { getDescriptionApplicationStatus } from "../application/helpers/get-desc
 import DialogForm from "./components/alert-dialog-promt.component";
 import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
 import StatusDropdownMenu from "../application/components/status-dropdown.component";
-import { Separator } from "@/components/ui/separator";
 
 interface ApplicationTableState {
   load: boolean;
@@ -67,28 +66,26 @@ interface AudioPlayerState {
 const AdminRequestsPage = () => {
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
 
-  const [editApplicationState, setEditApplicationState] = useState<
-    ApplicationEditState
-  >({
-    data: undefined,
-  });
+  const [editApplicationState, setEditApplicationState] =
+    useState<ApplicationEditState>({
+      data: undefined,
+    });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -236,10 +233,11 @@ const AdminRequestsPage = () => {
         }
 
         if (editApplicationState.data.status === "SUCCESSED") {
-          const successedApplicaiton = applicationTableState.paginationData.data.find(
-            (application) =>
-              application.id === editApplicationState.data?.aplicationId
-          );
+          const successedApplicaiton =
+            applicationTableState.paginationData.data.find(
+              (application) =>
+                application.id === editApplicationState.data?.aplicationId
+            );
 
           if (successedApplicaiton) {
             const data = {
@@ -263,14 +261,13 @@ const AdminRequestsPage = () => {
 
         showSuccessToast("статус заявки успешно изменён");
 
-        const updatedApplications = applicationTableState.paginationData.data.map(
-          (application) => {
+        const updatedApplications =
+          applicationTableState.paginationData.data.map((application) => {
             if (application.id === editApplicationState.data?.aplicationId) {
               application.status = editApplicationState.data?.status;
             }
             return application;
-          }
-        );
+          });
 
         setApplicationTableState((prevState) => ({
           ...prevState,

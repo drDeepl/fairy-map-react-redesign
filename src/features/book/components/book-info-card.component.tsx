@@ -40,13 +40,13 @@ import { useSelector } from "react-redux";
 
 interface BookInfoCardProps {
   load: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto;
-  text: string;
+  book: Components.Schemas.StoryBookResponseDto;
+
   audios: Components.Schemas.AudioStoryResponseDto[];
   onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
-  ) => Promise<Components.Schemas.StoryWithImgResponseDto>;
+  ) => Promise<Components.Schemas.StoryBookResponseDto>;
 
   onClickAddAudio: () => void;
   onClickAuth?: () => void;
@@ -63,13 +63,12 @@ interface TextAction {
 
 interface InfoBookState {
   loadCover: boolean;
-  book: Components.Schemas.StoryWithImgResponseDto;
+  book: Components.Schemas.StoryBookResponseDto;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   load,
   book,
-  text,
   audios,
   onClickAuth,
   onClickRate,
@@ -254,7 +253,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 </div>
               ) : (
                 <div className="text-base">
-                  <p className="row-span-1 flex justify-center">{text}</p>
+                  <p className="row-span-1 flex justify-center">{book.text}</p>
                   <div className="fixed -right-[5rem] bottom-7 w-1/3">
                     <Button
                       variant="secondary"

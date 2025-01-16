@@ -4,7 +4,7 @@ import { Components } from "@/api/schemas/client";
 import { fetchAudiosByBookId } from "./book.actions";
 
 export interface BookState extends BaseAppState {
-  selectedBook: Components.Schemas.StoryWithImgResponseDto | null;
+  selectedBook: Components.Schemas.StoryBookResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
 }
 
@@ -22,7 +22,7 @@ const bookSlice = createSlice({
   reducers: {
     setBook: (
       state,
-      action: PayloadAction<Components.Schemas.StoryWithImgResponseDto | null>
+      action: PayloadAction<Components.Schemas.StoryBookResponseDto | null>
     ) => {
       state.selectedBook = action.payload as any;
     },
