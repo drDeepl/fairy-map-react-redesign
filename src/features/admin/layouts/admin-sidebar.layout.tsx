@@ -19,7 +19,13 @@ const AdminSidebarLayout: React.FC<AdminSidebarLayoutProps> = ({
   children,
 }) => {
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      defaultOpen={false}
+      style={{
+        "--sidebar-width": "10rem",
+        "--sidebar-width-mobile": "10rem",
+      }}
+    >
       <AdminSidebar
         onClickItem={onClickItemSidebar}
         onClickExit={onClickExit}

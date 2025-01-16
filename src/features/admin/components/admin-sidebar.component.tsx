@@ -39,7 +39,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   };
 
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="inset" collapsible="icon">
       <SidebarHeader>
         {/* <SidebarGroupLabel>Меню</SidebarGroupLabel> */}
 
@@ -68,25 +68,39 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Button variant="outline" onClick={() => onClickItem(item)}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Button>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <Button
+                          variant="outline"
+                          onClick={() => onClickItem(item)}
+                          className="flex justify-start"
+                        >
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Button>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{item.title}</TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
               ))}
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Button
-                    variant="outline"
-                    onClick={handleOnClickMapBtn}
-                    className="animate-shimmer border border-ghost bg-[linear-gradient(110deg,#FCFAF6,45%,#D4E6FA,55%,#FCFAF6)] bg-[length:200%_100%] px-6 font-medium "
-                  >
-                    <MapPinnedIcon />
-                    <span>карта</span>
-                  </Button>
-                </SidebarMenuButton>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SidebarMenuButton asChild>
+                      <Button
+                        variant="outline"
+                        onClick={handleOnClickMapBtn}
+                        className="flex justify-start animate-shimmer border border-ghost bg-[linear-gradient(110deg,#FCFAF6,45%,#D4E6FA,55%,#FCFAF6)] bg-[length:200%_100%] font-medium "
+                      >
+                        <MapPinnedIcon />
+                        <span>карта</span>
+                      </Button>
+                    </SidebarMenuButton>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">карта</TooltipContent>
+                </Tooltip>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

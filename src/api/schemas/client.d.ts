@@ -3627,7 +3627,7 @@ export interface PathsDictionary {
     /**
      * AdminController_setUserAudioToStory - добавление озвучки к сказке
      */
-    'put'(
+    'post'(
       parameters?: Parameters<Paths.AdminControllerSetUserAudioToStory.PathParameters & Paths.AdminControllerSetUserAudioToStory.HeaderParameters> | null,
       data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
       config?: AxiosRequestConfig  

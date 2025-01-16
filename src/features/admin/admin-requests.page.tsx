@@ -247,9 +247,10 @@ const AdminRequestsPage = () => {
               moderateScore: 0,
             };
 
-            console.log(data);
-            await apiClient.paths["/api/admin/story/{storyId}/audio"].put(
-              successedApplicaiton.storyId,
+            await apiClient.paths["/api/admin/story/{storyId}/audio"].post(
+              {
+                storyId: successedApplicaiton.storyId,
+              },
               data
             );
           }
