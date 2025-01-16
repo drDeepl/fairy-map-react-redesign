@@ -24,19 +24,20 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import AudioBookPlayer from "../audio-book/audio-book-player.component";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import apiClient from "@/api/apiClient";
 import { simplifyGeoJsonHelper } from "./helpers/simplify-geo-json.helper";
 import { FeatureProperties } from "./map.interface";
 import { FeatureCollection, Geometry } from "geojson";
+import NotCoverBook from "@/components/not-cover-book.component";
 
 interface MapPageProps {
   width: number;
@@ -101,7 +102,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   });
 
   const handleOnCloseAuthForm = async () => {
-    setOpenDialog(false);
     setAuthFormState((prevState) => ({ ...prevState, open: false }));
   };
 
@@ -248,12 +248,54 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   return (
     <Dialog open={openDialog}>
+      {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
+      {selectedBook.book ? (
+        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
+          <DialogTitle className="p-0 m-0 flex justify-end h-1">
+            <Button
+              onClick={handleOnCloseBook}
+              size="icon"
+              variant="ghost"
+              className="p-0 m-1 size-6"
+            >
+              <Cross1Icon />
+            </Button>
+          </DialogTitle>
+          <Tabs
+            defaultValue={currentTab}
+            value={currentTab}
+            className="m-0 size-full"
+          >
+            <TabsContent value={BookInfoTabs.BookInfo.toString()}>
+              {selectedBook ? (
+                <BookInfoCardComponent
+                  load={selectedBook.load}
+                  book={selectedBook.book}
+                  audios={selectedBook.audios}
+                  text={selectedBook.text}
+                  onClickRate={handleOnClickRate}
+                  onClickAuth={() => {
+                    setAuthFormState({ open: true, notifySuccess: false });
+                  }}
+                  onClose={() => handleOnCloseBook()}
+                  onClickAddAudio={handleOnClickAddAudio}
+                ></BookInfoCardComponent>
+              ) : null}
+            </TabsContent>
+            <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
+              <CreateApplicationAudioForm
+                storyId={selectedBook.book ? selectedBook.book.id : 0}
+                languages={languageListState.languages}
+                userId={authState.user ? Number(authState.user.sub) : 0}
+                onClose={() => setCurrentTab(BookInfoTabs.BookInfo.toString())}
+              />
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      ) : null}
       <div className="map-pag__content">
-        {authFormState.open ? (
-          <AuthForm onClose={() => handleOnCloseAuthForm()} />
-        ) : null}
         <ToastContainer containerId="mapPageToast" />
-        <div className="fixed flex items-center justify-between p-4 w-full">
+        <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full">
           <Input
             className="min-h-11 max-w-fit bg-slate-50 self-center"
             type="text"
@@ -277,84 +319,47 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         </div>
 
         {selectedAudioBook ? (
-          <Drawer
-            open={selectedAudioBook != undefined}
-            modal={true}
-            dismissible={false}
-            handleOnly={true}
-          >
-            <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
-              <DrawerHeader className="pt-0">
-                <DrawerTitle className="flex justify-between items-center text-center text-xl">
+          <Sheet open={selectedAudioBook != undefined} modal={true}>
+            <SheetContent
+              className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
+              side="bottom"
+            >
+              <SheetHeader className="w-full m-0 p-0">
+                <SheetTitle className="flex justify-between items-center m-0 p-0 text-xl">
                   <span>{selectedAudioBook.name}</span>
                   <Button
+                    className="p-0 m-0"
                     variant="secondary"
                     size="icon"
                     onClick={() => setSelectedAudioBook(null)}
                   >
                     <Cross1Icon />
                   </Button>
-                </DrawerTitle>
-              </DrawerHeader>
+                </SheetTitle>
+              </SheetHeader>
+              <div className="grid grid-cols-2 gap-3">
+                {selectedAudioBook.srcImg ? (
+                  <img
+                    src={selectedAudioBook.srcImg}
+                    alt={selectedAudioBook.name}
+                    className="rounded-t-xl w-44 h-60 object-cover"
+                  />
+                ) : (
+                  <NotCoverBook />
+                )}
 
-              <AudioBookPlayer
-                audios={selectedAudioBook.audios}
-                onClose={() => setSelectedAudioBook(null)}
-                onClickRate={handleOnClickRate}
-                onClickAuth={() => {
-                  setAuthFormState({ open: true, notifySuccess: false });
-                }}
-                hideHeader={true}
-              />
-            </DrawerContent>
-          </Drawer>
-        ) : null}
-
-        {selectedBook.book ? (
-          <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
-            <DialogTitle className="p-0 m-0 flex justify-end h-1">
-              <Button
-                onClick={handleOnCloseBook}
-                size="icon"
-                variant="ghost"
-                className="p-0 m-1 size-6"
-              >
-                <Cross1Icon />
-              </Button>
-            </DialogTitle>
-            <Tabs
-              defaultValue={currentTab}
-              value={currentTab}
-              className="m-0 size-full"
-            >
-              <TabsContent value={BookInfoTabs.BookInfo.toString()}>
-                {selectedBook ? (
-                  <BookInfoCardComponent
-                    load={selectedBook.load}
-                    book={selectedBook.book}
-                    audios={selectedBook.audios}
-                    text={selectedBook.text}
-                    onClickRate={handleOnClickRate}
-                    onClickAuth={() => {
-                      setAuthFormState({ open: true, notifySuccess: false });
-                    }}
-                    onClose={() => handleOnCloseBook()}
-                    onClickAddAudio={handleOnClickAddAudio}
-                  ></BookInfoCardComponent>
-                ) : null}
-              </TabsContent>
-              <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
-                <CreateApplicationAudioForm
-                  storyId={selectedBook.book ? selectedBook.book.id : 0}
-                  languages={languageListState.languages}
-                  userId={authState.user ? Number(authState.user.sub) : 0}
-                  onClose={() =>
-                    setCurrentTab(BookInfoTabs.BookInfo.toString())
-                  }
+                <AudioBookPlayer
+                  audios={selectedAudioBook.audios}
+                  onClose={() => setSelectedAudioBook(null)}
+                  onClickRate={handleOnClickRate}
+                  onClickAuth={() => {
+                    setAuthFormState({ open: true, notifySuccess: false });
+                  }}
+                  hideHeader={true}
                 />
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
+              </div>
+            </SheetContent>
+          </Sheet>
         ) : null}
 
         {mapState.dataMap ? (

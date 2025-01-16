@@ -32,11 +32,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { setBook } from "../book/book.slice";
+
 import apiClient from "@/api/apiClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Toaster, toast } from "sonner";
-import { UploadIcon } from "@radix-ui/react-icons";
+import { Cross1Icon, UploadIcon } from "@radix-ui/react-icons";
 
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -140,7 +140,12 @@ const AdminStoriesPage: React.FC = () => {
   };
 
   const handleCloseInfoBook = () => {
-    dispatch(setBook(null));
+    setBookState({
+      load: true,
+      book: null,
+      text: "текст не найден",
+      audios: [],
+    });
     setOpenDialog(false);
   };
 
@@ -240,79 +245,97 @@ const AdminStoriesPage: React.FC = () => {
           richColors
           toastOptions={{ className: "toast-admin-page" }}
         />
-        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in">
+        <DialogContent
+          className={`[&>button]:hidden m-0 p-0 ${
+            bookState.book ? "animate-zoom-in" : "animate-zoom-out"
+          }`}
+        >
           {bookState.book ? (
-            <BookInfoCardComponent
-              load={bookState.load}
-              book={bookState.book}
-              audios={bookState.audios}
-              text={bookState.text}
-              onClose={handleCloseInfoBook}
-              onUploadCover={handleOnUploadBookCover}
-              onClickAddAudio={() => console.log("onClickAddAudio")}
-              onClickAuth={() => {}}
-            >
-              <Popover
-                open={languageListState.open}
-                onOpenChange={(open) => {
-                  setLanguageListState((prevState) => ({
-                    ...prevState,
-                    open,
-                  }));
-                }}
+            <div>
+              <Button
+                className="absolute top-1 right-1"
+                size="icon"
+                variant="ghost"
+                onClick={handleCloseInfoBook}
               >
-                <TooltipProvider delayDuration={500}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <PopoverTrigger
-                        asChild
-                        onClick={() =>
-                          setLanguageListState((prevState) => ({
-                            ...prevState,
-                            open: true,
-                          }))
-                        }
-                      >
-                        <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
-                      </PopoverTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      загрузить озвучку
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Cross1Icon />
+              </Button>
+              <BookInfoCardComponent
+                load={bookState.load}
+                book={bookState.book}
+                audios={bookState.audios}
+                text={bookState.text}
+                onClose={handleCloseInfoBook}
+                onUploadCover={handleOnUploadBookCover}
+                onClickAddAudio={() => console.log("onClickAddAudio")}
+                onClickAuth={() => {}}
+              >
+                <Popover
+                  open={languageListState.open}
+                  onOpenChange={(open) => {
+                    setLanguageListState((prevState) => ({
+                      ...prevState,
+                      open,
+                    }));
+                  }}
+                >
+                  <TooltipProvider delayDuration={500}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <PopoverTrigger
+                          asChild
+                          onClick={() =>
+                            setLanguageListState((prevState) => ({
+                              ...prevState,
+                              open: true,
+                            }))
+                          }
+                        >
+                          <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
+                        </PopoverTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        загрузить озвучку
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
-                <PopoverContent>
-                  <Command>
-                    <p className="self-center font-semibold">
-                      выберите язык для озвучки
-                    </p>
-                    <CommandInput
-                      placeholder="начните поиск..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>языки для озвучки не найдены</CommandEmpty>
-                      <CommandGroup>
-                        {languageListState.load ? (
-                          <Skeleton className="w-full h-16" />
-                        ) : (
-                          languageListState.languages.map((language) => (
-                            <CommandItem
-                              key={`lang_${language.id}`}
-                              value={language.name}
-                              onSelect={() => handleOnSelectLanguage(language)}
-                            >
-                              {language.name}
-                            </CommandItem>
-                          ))
-                        )}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </BookInfoCardComponent>
+                  <PopoverContent>
+                    <Command>
+                      <p className="self-center font-semibold">
+                        выберите язык для озвучки
+                      </p>
+                      <CommandInput
+                        placeholder="начните поиск..."
+                        className="h-9"
+                      />
+                      <CommandList>
+                        <CommandEmpty>
+                          языки для озвучки не найдены
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {languageListState.load ? (
+                            <Skeleton className="w-full h-16" />
+                          ) : (
+                            languageListState.languages.map((language) => (
+                              <CommandItem
+                                key={`lang_${language.id}`}
+                                value={language.name}
+                                onSelect={() =>
+                                  handleOnSelectLanguage(language)
+                                }
+                              >
+                                {language.name}
+                              </CommandItem>
+                            ))
+                          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </BookInfoCardComponent>
+            </div>
           ) : null}
           <Input
             id="upload-audio__input"
