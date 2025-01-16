@@ -193,8 +193,30 @@ export default {
           "50%": { "background-position": "400% 0" },
           "100%": { "background-position": "0 0" },
         },
+        "flip-in-y": {
+          "0%": {
+            opacity: "0",
+            transform: "rotateX(90deg)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "rotateX(0deg)",
+          },
+        },
+        "slide-up-fade": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(50px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
       },
       animation: {
+        "slide-up-fade": "slide-up-fade 0.6s ease-out",
+        "flip-in-y": "flip-in-y 0.6s ease-out",
         glowing: "glowing 20s linear infinite",
         tilt: "tilt 10s infinite linear",
         spin: "spin 2.5s linear infinite",

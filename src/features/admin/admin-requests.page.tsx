@@ -41,6 +41,7 @@ import { getDescriptionApplicationStatus } from "../application/helpers/get-desc
 import DialogForm from "./components/alert-dialog-promt.component";
 import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
 import StatusDropdownMenu from "../application/components/status-dropdown.component";
+import { Separator } from "@/components/ui/separator";
 
 interface ApplicationTableState {
   load: boolean;
@@ -310,110 +311,123 @@ const AdminRequestsPage = () => {
           onCancel={handleCancelChangeStatusApplication}
         />
       </DialogForm>
-      <div className="flex flex-col p-3 space-y-2">
-        {applicationTableState.load ? (
-          <Skeleton className="w-full h-80 m-2" />
-        ) : (
-          <DataTableApplicationAdmin
-            columns={columns}
-            data={applicationTableState.paginationData.data}
-          />
-        )}
-
+      <div className="flex flex-col p-3 space-y-2 animate-flip-in-y rounded-md border border-slate-500">
         {applicationTableState.paginationData.data.length > 0 ? (
-          <Pagination>
-            <PaginationContent>
-              {applicationTableState.paginationData.meta.hasPreviousPage ? (
-                <PaginationItem>
-                  <PaginationPrevious
-                    isActive={
-                      applicationTableState.paginationData.meta.hasPreviousPage
-                    }
-                    className="cursor-pointer"
-                    onClick={() =>
-                      applicationTableState.paginationData.meta.hasPreviousPage
-                        ? handleOnClickPage(
-                            applicationTableState.paginationData.meta.page - 1
-                          )
-                        : null
-                    }
-                  />
-                </PaginationItem>
-              ) : null}
-              {applicationTableState.paginationData.meta.pageCount > 5
-                ? Array(5)
-                    .fill(1)
-                    .map((_, index) => {
-                      return (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            className="cursor-pointer"
-                            isActive={
-                              index + 1 ===
-                              applicationTableState.paginationData.meta.page
-                            }
-                            onClick={() => handleOnClickPage(index + 1)}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })
-                : Array(applicationTableState.paginationData.meta.pageCount)
-                    .fill(1)
-                    .map((_, index) => {
-                      return (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            className="cursor-pointer"
-                            isActive={
-                              index + 1 ===
-                              applicationTableState.paginationData.meta.page
-                            }
-                            onClick={() => handleOnClickPage(index + 1)}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      );
-                    })}
+          <div className="flex justify-center">
+            <Pagination>
+              <PaginationContent className="shadow-md p-2 rounded-md">
+                {applicationTableState.paginationData.meta.hasPreviousPage ? (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      isActive={
+                        applicationTableState.paginationData.meta
+                          .hasPreviousPage
+                      }
+                      className="cursor-pointer"
+                      onClick={() =>
+                        applicationTableState.paginationData.meta
+                          .hasPreviousPage
+                          ? handleOnClickPage(
+                              applicationTableState.paginationData.meta.page - 1
+                            )
+                          : null
+                      }
+                    />
+                  </PaginationItem>
+                ) : null}
+                {applicationTableState.paginationData.meta.pageCount > 5
+                  ? Array(5)
+                      .fill(1)
+                      .map((_, index) => {
+                        return (
+                          <PaginationItem key={index}>
+                            <PaginationLink
+                              className="cursor-pointer"
+                              isActive={
+                                index + 1 ===
+                                applicationTableState.paginationData.meta.page
+                              }
+                              onClick={() => handleOnClickPage(index + 1)}
+                            >
+                              {index + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })
+                  : Array(applicationTableState.paginationData.meta.pageCount)
+                      .fill(1)
+                      .map((_, index) => {
+                        return (
+                          <PaginationItem key={index}>
+                            <PaginationLink
+                              className="cursor-pointer"
+                              isActive={
+                                index + 1 ===
+                                applicationTableState.paginationData.meta.page
+                              }
+                              onClick={() => handleOnClickPage(index + 1)}
+                            >
+                              {index + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      })}
 
-              {applicationTableState.paginationData.meta.hasNextPage ? (
-                <PaginationItem>
-                  <PaginationNext
-                    className="cursor-pointer"
-                    onClick={() =>
-                      applicationTableState.paginationData.meta.hasPreviousPage
-                        ? handleOnClickPage(
-                            applicationTableState.paginationData.meta.page + 1
-                          )
-                        : null
-                    }
+                {applicationTableState.paginationData.meta.hasNextPage ? (
+                  <PaginationItem>
+                    <PaginationNext
+                      className="cursor-pointer"
+                      onClick={() =>
+                        applicationTableState.paginationData.meta.hasNextPage
+                          ? handleOnClickPage(
+                              applicationTableState.paginationData.meta.page + 1
+                            )
+                          : null
+                      }
+                    />
+                  </PaginationItem>
+                ) : null}
+                <PaginationItem className="flex items-center space-x-2">
+                  <Input
+                    ref={pageInputRef}
+                    type="number"
+                    min={0}
+                    className="w-10 text-center"
+                    placeholder={`${applicationTableState.paginationData.meta.page}`}
                   />
+                  <span>из</span>
+                  <span>
+                    {applicationTableState.paginationData.meta.pageCount}
+                  </span>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleOnApplyInputPage()}
+                  >
+                    перейти
+                  </Button>
                 </PaginationItem>
-              ) : null}
-              <PaginationItem className="flex items-center space-x-2">
-                <Input
-                  ref={pageInputRef}
-                  type="number"
-                  min={0}
-                  className="w-10 text-center"
-                  placeholder={`${applicationTableState.paginationData.meta.page}`}
-                />
-                <span>из</span>
-                <span>
-                  {applicationTableState.paginationData.meta.pageCount}
-                </span>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleOnApplyInputPage()}
-                >
-                  перейти
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
+              </PaginationContent>
+            </Pagination>
+          </div>
         ) : null}
+
+        <div className="animate-flip-in-y">
+          {applicationTableState.load ? (
+            <Skeleton
+              className={`w-full h-80 m-2 ${
+                applicationTableState.load
+                  ? "animate-flip-in-y"
+                  : "animate-zoom-out"
+              }`}
+            />
+          ) : (
+            <DataTableApplicationAdmin
+              columns={columns}
+              data={applicationTableState.paginationData.data}
+            />
+          )}
+        </div>
+
         {audioPlayerState.applicationAudio ? (
           <Drawer
             open={audioPlayerState.applicationAudio != null}

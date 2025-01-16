@@ -28,7 +28,7 @@ export function DataTableApplicationAdmin<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <div className="rounded-md border">
+    <div className="animate-slide-up-fade">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
