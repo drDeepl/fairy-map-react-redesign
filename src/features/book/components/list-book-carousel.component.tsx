@@ -47,9 +47,9 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
                   return (
                     <CarouselItem
                       key={`load_${idx}`}
-                      className="pl-1 w-40 h-70 lg:basis-1/5 md:basis-1/3"
+                      className="pl-1 w-44 h-72 lg:basis-1/5 md:basis-1/3"
                     >
-                      <Card className="w-40 h-64 p-0 m-0 border-none">
+                      <Card className="w-44 h-72 p-2 m-0 border-none">
                         <Skeleton className="w-full h-full bg-primary/10" />
                       </Card>
                     </CarouselItem>

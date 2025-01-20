@@ -11,7 +11,9 @@ import {
 import { Components } from "@/api/schemas/client";
 
 export interface ListBookState extends BaseAppState {
-  books: Components.Schemas.PageResponseDto;
+  books: Components.Schemas.PageResponseDto<
+    Components.Schemas.StoryBookResponseDto
+  >;
 }
 
 export const initialState: ListBookState = {

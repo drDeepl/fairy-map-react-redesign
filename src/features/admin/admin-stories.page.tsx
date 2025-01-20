@@ -5,12 +5,16 @@ import { BookPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { createBook, uploadBookCover } from "../book/book.actions";
+import {
+  createBook,
+  fetchListBooks,
+  uploadBookCover,
+} from "../book/book.actions";
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 import AddBookForm from "../book/components/forms/add-book.form";
 import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
-// import { ListBookState } from "../book/list-book.slice";
+import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
 
 import {
@@ -40,6 +44,7 @@ import { Cross1Icon, UploadIcon } from "@radix-ui/react-icons";
 
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import PaginationBox from "@/components/pagination.component";
 
 export interface BookInfoState {
   open: boolean;
@@ -53,12 +58,12 @@ interface ListLanguageState {
   languages: Components.Schemas.LanguageDto[];
 }
 
-interface ListBookState {
-  load: boolean;
-  books: Components.Schemas.PageResponseDto<
-    Components.Schemas.StoryBookResponseDto
-  >;
-}
+// interface ListBookState {
+//   load: boolean;
+//   books: Components.Schemas.PageResponseDto<
+//     Components.Schemas.StoryBookResponseDto
+//   >;
+// }
 
 interface SelectedBookState {
   load: boolean;
@@ -69,24 +74,24 @@ interface SelectedBookState {
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // const listBookState: ListBookState = useSelector(
-  //   (state: RootState) => state.listBook
-  // );
+  const listBookState: ListBookState = useSelector(
+    (state: RootState) => state.listBook
+  );
 
-  const [listBookState, setListBookState] = useState<ListBookState>({
-    load: true,
-    books: {
-      data: [],
-      meta: {
-        page: 1,
-        take: 10,
-        itemCount: 0,
-        pageCount: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-      },
-    },
-  });
+  // const [listBookState, setListBookState] = useState<ListBookState>({
+  //   load: true,
+  //   books: {
+  //     data: [],
+  //     meta: {
+  //       page: 1,
+  //       take: 10,
+  //       itemCount: 0,
+  //       pageCount: 1,
+  //       hasPreviousPage: false,
+  //       hasNextPage: false,
+  //     },
+  //   },
+  // });
 
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
@@ -113,6 +118,18 @@ const AdminStoriesPage: React.FC = () => {
       languages: [],
     }
   );
+
+  const handleOnClickPage = async (page: number) => {
+    try {
+      if (page === listBookState.books.meta.page) {
+        return;
+      }
+      dispatch(fetchListBooks({ page: page, take: 10 }));
+    } catch (error) {
+      console.log(error);
+      toast.error("Произошла ошибка при загрузке книг");
+    }
+  };
 
   const handleOnClickAddBook = () => {
     setOpenAddBookForm(true);
@@ -238,7 +255,7 @@ const AdminStoriesPage: React.FC = () => {
           open={openAddBookForm}
           errors={null}
           ethnicGroups={ethnicGroupListState.ethnicGroups}
-          loading={listBookState.load}
+          loading={listBookState.loading}
           onSubmit={(values) => {
             toast.promise(handleOnSubmitAddBook(values), {
               loading: "добавляю сказку",
@@ -249,9 +266,9 @@ const AdminStoriesPage: React.FC = () => {
         />
       ) : null}
       <div>
-        <section className="mx-8">
+        <section className="mx-8 flex flex-col  space-y-2">
           <ListBookCarousel
-            load={listBookState.load}
+            load={listBookState.loading}
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
@@ -264,6 +281,10 @@ const AdminStoriesPage: React.FC = () => {
               <BookPlus />
             </Button>
           </ListBookCarousel>
+          <PaginationBox
+            meta={listBookState.books.meta}
+            onApplyPage={handleOnClickPage}
+          />
         </section>
         <Toaster
           position="top-center"

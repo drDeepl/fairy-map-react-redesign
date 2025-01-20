@@ -3,7 +3,7 @@ import {
   handleApiErrorResponse,
 } from "@/api/helpers/handler-response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Components } from "@/api/schemas/client";
+import { Components, Paths } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
 import { CoverUploadDto } from "./interfaces/cover-upload.dto";
@@ -25,9 +25,12 @@ export const createBook = createAsyncThunk(
 
 export const fetchListBooks = createAsyncThunk(
   "book/getBooks",
-  async (_, thunkApi) => {
+  async (
+    params: Paths.StoryControllerGetAllStories.QueryParameters,
+    thunkApi
+  ) => {
     try {
-      const res = await apiClient.StoryController_getAllStories();
+      const res = await apiClient.paths["/api/story/all"].get(params);
 
       return thunkApi.fulfillWithValue(res.data);
     } catch (err) {
