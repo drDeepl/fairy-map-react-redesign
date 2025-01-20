@@ -98,21 +98,22 @@ const UserPage: React.FC = () => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
   });
@@ -263,8 +264,6 @@ const UserPage: React.FC = () => {
     if (!user) {
       navigate(-1);
     } else {
-      console.error("todo: fetch StoryWithImgResponseDto by authorId");
-      console.log(user);
       apiClient.paths["/api/user/story/audio/request/my"]
         .get({ take: itemsPerPage })
         .then((result) => {
@@ -536,8 +535,20 @@ const UserPage: React.FC = () => {
       ) : null}
 
       {bookInfoState.book != null ? (
-        <Dialog open={bookInfoState.book != null}>
-          <DialogContent className="[&>button]:hidden m-0 p-0">
+        <Dialog
+          open={bookInfoState.book != null}
+          onOpenChange={(open: boolean) => {
+            if (!open) {
+              setBookInfoState({
+                load: true,
+                book: null,
+
+                audios: [],
+              });
+            }
+          }}
+        >
+          <DialogContent className="m-0 p-0">
             <BookInfoCardComponent
               load={bookInfoState.load}
               book={bookInfoState.book}

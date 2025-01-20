@@ -855,8 +855,8 @@ declare namespace Components {
        */
       hasNextPage: boolean;
     }
-    export interface PageResponseDto {
-      data: any[];
+    export interface PageResponseDto<T> {
+      data: T[];
       /**
        * информация о странице
        */
@@ -1521,8 +1521,7 @@ declare namespace Paths {
     }
     export type RequestBody = Components.Schemas.EditAudioStoryApplicaitonDto;
     namespace Responses {
-      export type $200 =
-        Components.Schemas.AudioApplicationWithUserAudioResponseDto;
+      export type $200 = Components.Schemas.AudioApplicationWithUserAudioResponseDto;
       export interface $400 {}
       export interface $401 {}
     }
@@ -1725,8 +1724,7 @@ declare namespace Paths {
     namespace Parameters {
       export type Authorization = string;
     }
-    export type RequestBody =
-      Components.Schemas.DeleteEthnicGroupToConstituentDto;
+    export type RequestBody = Components.Schemas.DeleteEthnicGroupToConstituentDto;
     namespace Responses {
       export type $200 = Components.Schemas.EthnicGroupToConstituentDto;
       export interface $400 {}
@@ -1894,8 +1892,7 @@ declare namespace Paths {
       name: Parameters.Name;
     }
     namespace Responses {
-      export type $200 =
-        Components.Schemas.EthnicGroupMapPointEntityWithConstituents[];
+      export type $200 = Components.Schemas.EthnicGroupMapPointEntityWithConstituents[];
     }
   }
   namespace MapControllerGetEthnicalGroupPoints {
@@ -2184,6 +2181,54 @@ declare namespace Paths {
       export interface $400 {}
     }
   }
+  namespace StoryControllerSearchStoryByName {
+    namespace Parameters {
+      export type Name = string;
+      export type Page = number;
+      export type Take = number;
+    }
+    export interface QueryParameters {
+      name?: Parameters.Name;
+      page?: Parameters.Page;
+      take?: Parameters.Take;
+    }
+    namespace Responses {
+      export interface $200 {
+        data: Components.Schemas.StoryBookResponseDto[];
+        /**
+         * информация о странице
+         */
+        meta: {
+          /**
+           * номер текущей страницы
+           */
+          page: number;
+          /**
+           * количество элементов на странице
+           */
+          take: number;
+          /**
+           * количество элементов всего
+           */
+          itemCount: number;
+          /**
+           * количество страниц
+           */
+          pageCount: number;
+          /**
+           * есть предыдущая страница
+           */
+          hasPreviousPage: boolean;
+          /**
+           * есть следующая страница
+           */
+          hasNextPage: boolean;
+        };
+      }
+      export interface $400 {}
+      export interface $401 {}
+    }
+  }
   namespace UserControllerFindUserById {
     export interface HeaderParameters {
       authorization?: Parameters.Authorization;
@@ -2323,7 +2368,9 @@ export interface OperationMethods {
    * AuthController_refresh - обновление access token
    */
   "AuthController_refresh"(
-    parameters?: Parameters<Paths.AuthControllerRefresh.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AuthControllerRefresh.HeaderParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.AuthControllerRefresh.Responses.$200>;
@@ -2339,7 +2386,9 @@ export interface OperationMethods {
    * UserController_getCurrentUserInfo - получение информации о текущем пользователе
    */
   "UserController_getCurrentUserInfo"(
-    parameters?: Parameters<Paths.UserControllerGetCurrentUserInfo.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.UserControllerGetCurrentUserInfo.HeaderParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.UserControllerGetCurrentUserInfo.Responses.$200>;
@@ -2347,10 +2396,14 @@ export interface OperationMethods {
    * UserController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
    */
   "UserController_getApprovedUserAudiosCurrentUser"(
-    parameters?: Parameters<Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200
+  >;
   /**
    * UserController_findUserById - получение информации о пользователе по его id
    *
@@ -2387,15 +2440,31 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200
+  >;
   /**
    * StoryController_getAllStories - получение всех сказок
    */
   "StoryController_getAllStories"(
-    parameters?: Parameters<Paths.StoryControllerGetAllStories.QueryParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetAllStories.QueryParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>;
+  /**
+   * StoryController_searchStoryByName - поиск сказки по имени
+   *
+   * для работы с websockets используется событие searchStoryByName для отправления запроса и searchResultStoryByName для получения результатов
+   */
+  "StoryController_searchStoryByName"(
+    parameters?: Parameters<
+      Paths.StoryControllerSearchStoryByName.QueryParameters
+    > | null,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): OperationResponse<Paths.StoryControllerSearchStoryByName.Responses.$200>;
   /**
    * StoryController_getStoriesByEthnicGroupId - получение всех сказок выбранной этнической группы
    */
@@ -2406,20 +2475,28 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200
+  >;
   /**
    * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
    */
   "StoryController_getStoriesByAuthorAudioStory"(
-    parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200
+  >;
   /**
    * StoryController_getStoryByName - получение сказок в которых есть подстрока name
    */
   "StoryController_getStoryByName"(
-    parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetStoryByName.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>;
@@ -2427,7 +2504,9 @@ export interface OperationMethods {
    * StoryController_getStoryById - получение общей информации о выбранной сказке
    */
   "StoryController_getStoryById"(
-    parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetStoryById.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>;
@@ -2435,7 +2514,9 @@ export interface OperationMethods {
    * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
    */
   "StoryController_getAudiosByStoryId"(
-    parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetAudiosByStoryId.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>;
@@ -2443,17 +2524,23 @@ export interface OperationMethods {
    * StoryController_getTextStoryByStoryId - получение текста сказки
    */
   "StoryController_getTextStoryByStoryId"(
-    parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetTextStoryByStoryId.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerGetTextStoryByStoryId.Responses.$200
+  >;
   /**
    * StoryController_getAudioStoryById - получение одобренной озвучки по audioId
    *
    * возвращает StreamableFile
    */
   "StoryController_getAudioStoryById"(
-    parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetAudioStoryById.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>;
@@ -2461,15 +2548,21 @@ export interface OperationMethods {
    * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
    */
   "StoryController_getAudioStoryByEthnicGroup"(
-    parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200
+  >;
   /**
    * StoryController_getImgStoryById - получение обложки для сказки по storyId
    */
   "StoryController_getImgStoryById"(
-    parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetImgStoryById.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>;
@@ -2477,7 +2570,9 @@ export interface OperationMethods {
    * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
    */
   "StoryController_getRatingByAudioId"(
-    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetRatingByAudioId.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>;
@@ -2485,18 +2580,26 @@ export interface OperationMethods {
    * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
    */
   "StoryController_getRatingByAudioIdForCurrentUser"(
-    parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200
+  >;
   /**
    * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
    */
   "StoryController_addRatingForStoryByCurrentUser"(
-    parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters
+    > | null,
     data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200
+  >;
   /**
    * AudioStoryRequestController_getAllAudioStoryRequests - получение всех заявок на озвучки
    *
@@ -2509,7 +2612,9 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>;
+  ): OperationResponse<
+    Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200
+  >;
   /**
    * AudioStoryRequestController_getAllAudioStoryReqeustsByUserId - получение всех заявок на озвучки для выбранного пользователя.
    *
@@ -2523,15 +2628,21 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>;
+  ): OperationResponse<
+    Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200
+  >;
   /**
    * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
    */
   "AudioStoryRequestController_createAddAudioRequest"(
-    parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters
+    > | null,
     data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>;
+  ): OperationResponse<
+    Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200
+  >;
   /**
    * AudioStoryRequestController_editAudioStoryRequest - редактирование заявки на проверку озвучки
    *
@@ -2544,7 +2655,9 @@ export interface OperationMethods {
     > | null,
     data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>;
+  ): OperationResponse<
+    Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200
+  >;
   /**
    * AudioStoryRequestController_deleteAudioStoryRequestBydId - удаление заявки на проверку озвучки
    *
@@ -2557,45 +2670,63 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>;
+  ): OperationResponse<
+    Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200
+  >;
   /**
    * ConstituentsController_addConstituent - добавление субъекта РФ
    *
    * необходима роль администратора
    */
   "ConstituentsController_addConstituent"(
-    parameters?: Parameters<Paths.ConstituentsControllerAddConstituent.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.ConstituentsControllerAddConstituent.HeaderParameters
+    > | null,
     data?: Paths.ConstituentsControllerAddConstituent.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerAddConstituent.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerAddConstituent.Responses.$200
+  >;
   /**
    * ConstituentsController_addEthnicGroupToConstituent - добавление этнической группы к субъекту рф
    *
    * небходима роль администратора
    */
   "ConstituentsController_addEthnicGroupToConstituent"(
-    parameters?: Parameters<Paths.ConstituentsControllerAddEthnicGroupToConstituent.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.ConstituentsControllerAddEthnicGroupToConstituent.HeaderParameters
+    > | null,
     data?: Paths.ConstituentsControllerAddEthnicGroupToConstituent.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerAddEthnicGroupToConstituent.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerAddEthnicGroupToConstituent.Responses.$200
+  >;
   /**
    * ConstituentsController_deleteEthnicGroupFromConstituent - удаление этнической группы у субъекта рф
    *
    * необходима роль администратора
    */
   "ConstituentsController_deleteEthnicGroupFromConstituent"(
-    parameters?: Parameters<Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.HeaderParameters
+    > | null,
     data?: Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.Responses.$200
+  >;
   /**
    * ConstituentsController_getEthnicGroupByConstituentId - получение этнической группы, принадлежащей субъекту рф
    */
   "ConstituentsController_getEthnicGroupByConstituentId"(
-    parameters?: Parameters<Paths.ConstituentsControllerGetEthnicGroupByConstituentId.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.ConstituentsControllerGetEthnicGroupByConstituentId.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerGetEthnicGroupByConstituentId.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerGetEthnicGroupByConstituentId.Responses.$200
+  >;
   /**
    * ConstituentsController_getConstituents - получение всех субъектов
    */
@@ -2603,17 +2734,23 @@ export interface OperationMethods {
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerGetConstituents.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerGetConstituents.Responses.$200
+  >;
   /**
    * ConstituentsController_editConstituent - редактирование субъекта
    *
    * небходима роль администратора
    */
   "ConstituentsController_editConstituent"(
-    parameters?: Parameters<Paths.ConstituentsControllerEditConstituent.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.ConstituentsControllerEditConstituent.HeaderParameters
+    > | null,
     data?: Paths.ConstituentsControllerEditConstituent.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerEditConstituent.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerEditConstituent.Responses.$200
+  >;
   /**
    * ConstituentsController_deleteConstituentById - удаление данных субъекта
    *
@@ -2626,17 +2763,23 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.ConstituentsControllerDeleteConstituentById.Responses.$200>;
+  ): OperationResponse<
+    Paths.ConstituentsControllerDeleteConstituentById.Responses.$200
+  >;
   /**
    * EthnicGroupController_addEthnicGroup - добавление этнической группы
    *
    * необходима роль администратора
    */
   "EthnicGroupController_addEthnicGroup"(
-    parameters?: Parameters<Paths.EthnicGroupControllerAddEthnicGroup.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.EthnicGroupControllerAddEthnicGroup.HeaderParameters
+    > | null,
     data?: Paths.EthnicGroupControllerAddEthnicGroup.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerAddEthnicGroup.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerAddEthnicGroup.Responses.$200
+  >;
   /**
    * EthnicGroupController_ethnicGroups - получение списка этнических групп
    */
@@ -2649,10 +2792,14 @@ export interface OperationMethods {
    * EthnicGroupController_getEthnicGroupById - получение этнической группы по ethnicGroupId
    */
   "EthnicGroupController_getEthnicGroupById"(
-    parameters?: Parameters<Paths.EthnicGroupControllerGetEthnicGroupById.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.EthnicGroupControllerGetEthnicGroupById.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerGetEthnicGroupById.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerGetEthnicGroupById.Responses.$200
+  >;
   /**
    * EthnicGroupController_editEthnicGroup - редактирование этнической группы
    *
@@ -2665,7 +2812,9 @@ export interface OperationMethods {
     > | null,
     data?: Paths.EthnicGroupControllerEditEthnicGroup.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerEditEthnicGroup.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerEditEthnicGroup.Responses.$200
+  >;
   /**
    * EthnicGroupController_deleteEthnicGroup - удаление этнической группы
    *
@@ -2678,14 +2827,18 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerDeleteEthnicGroup.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerDeleteEthnicGroup.Responses.$200
+  >;
   /**
    * EthnicGroupController_addLanguage - добавление языка этнической группы
    *
    * необходима роль администратора
    */
   "EthnicGroupController_addLanguage"(
-    parameters?: Parameters<Paths.EthnicGroupControllerAddLanguage.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.EthnicGroupControllerAddLanguage.HeaderParameters
+    > | null,
     data?: Paths.EthnicGroupControllerAddLanguage.RequestBody,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.EthnicGroupControllerAddLanguage.Responses.$200>;
@@ -2696,7 +2849,9 @@ export interface OperationMethods {
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerGetAllLanguage.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerGetAllLanguage.Responses.$200
+  >;
   /**
    * EthnicGroupController_deleteLanguageById - удаление языка по id
    *
@@ -2709,7 +2864,9 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.EthnicGroupControllerDeleteLanguageById.Responses.$200>;
+  ): OperationResponse<
+    Paths.EthnicGroupControllerDeleteLanguageById.Responses.$200
+  >;
   /**
    * MapController_getMapTopojson - получить данные для отрисовки карты
    */
@@ -2725,23 +2882,33 @@ export interface OperationMethods {
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.MapControllerGetEthnicalGroupPoints.Responses.$200>;
+  ): OperationResponse<
+    Paths.MapControllerGetEthnicalGroupPoints.Responses.$200
+  >;
   /**
    * MapController_getEthnicalGroupPointsByConstituentId - получение точек этнических групп по номеру региона
    */
   "MapController_getEthnicalGroupPointsByConstituentId"(
-    parameters?: Parameters<Paths.MapControllerGetEthnicalGroupPointsByConstituentId.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.MapControllerGetEthnicalGroupPointsByConstituentId.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.MapControllerGetEthnicalGroupPointsByConstituentId.Responses.$200>;
+  ): OperationResponse<
+    Paths.MapControllerGetEthnicalGroupPointsByConstituentId.Responses.$200
+  >;
   /**
    * MapController_getEthnicGroupPointsByName - получение точек этнических групп по названию этнической группы
    */
   "MapController_getEthnicGroupPointsByName"(
-    parameters?: Parameters<Paths.MapControllerGetEthnicGroupPointsByName.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.MapControllerGetEthnicGroupPointsByName.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.MapControllerGetEthnicGroupPointsByName.Responses.$200>;
+  ): OperationResponse<
+    Paths.MapControllerGetEthnicGroupPointsByName.Responses.$200
+  >;
   /**
    * MapController_deleteEthnicalGroupPoint - удаление точки этнической группы
    *
@@ -2754,7 +2921,9 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.MapControllerDeleteEthnicalGroupPoint.Responses.$200>;
+  ): OperationResponse<
+    Paths.MapControllerDeleteEthnicalGroupPoint.Responses.$200
+  >;
   /**
    * MapController_getPercentsFilledStoriesByConstituentId - получение списка субъектов и их заполненности озвучками
    */
@@ -2762,7 +2931,9 @@ export interface OperationMethods {
     parameters?: Parameters<UnknownParamsObject> | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>;
+  ): OperationResponse<
+    Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200
+  >;
   /**
    * RequestController_getStatuses - получение существующих статусов для заявок
    */
@@ -2791,15 +2962,21 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestAll.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerGetAddStoryRequestAll.Responses.$200
+  >;
   /**
    * AddStoryRequestController_getAddStoryRequestForCurrentUser - получение всех заявок на добавление сказки от текущего пользователя
    */
   "AddStoryRequestController_getAddStoryRequestForCurrentUser"(
-    parameters?: Parameters<Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.HeaderParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.Responses.$200
+  >;
   /**
    * AddStoryRequestController_getAddStoryRequestByUserId - получение всех заявок на добавление сказки для выбранного пользователя
    *
@@ -2812,15 +2989,21 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestByUserId.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerGetAddStoryRequestByUserId.Responses.$200
+  >;
   /**
    * AddStoryRequestController_createAddStoryRequestForCurrentUser - создание заявки на добавление сказки
    */
   "AddStoryRequestController_createAddStoryRequestForCurrentUser"(
-    parameters?: Parameters<Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.HeaderParameters
+    > | null,
     data?: Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.Responses.$200
+  >;
   /**
    * AddStoryRequestController_editStatusAddStoryReqeust - обновление заявки
    *
@@ -2833,7 +3016,9 @@ export interface OperationMethods {
     > | null,
     data?: Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.Responses.$200
+  >;
   /**
    * AddStoryRequestController_deleteAddStoryRequestById - удаление заявки
    *
@@ -2846,7 +3031,9 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200>;
+  ): OperationResponse<
+    Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200
+  >;
   /**
    * AdminController_addEthnicalGroupPoint - добавление точки этнической группы на карту
    *
@@ -2859,7 +3046,9 @@ export interface OperationMethods {
     > | null,
     data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>;
+  ): OperationResponse<
+    Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200
+  >;
   /**
    * AdminController_deleteEthnicalGroupPoint - удаление точки этнической группы
    *
@@ -2872,12 +3061,16 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>;
+  ): OperationResponse<
+    Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200
+  >;
   /**
    * AdminController_addStory - добавление сказки
    */
   "AdminController_addStory"(
-    parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AdminControllerAddStory.HeaderParameters
+    > | null,
     data?: Paths.AdminControllerAddStory.RequestBody,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>;
@@ -2907,7 +3100,9 @@ export interface OperationMethods {
    * AdminController_addTextStory - добавление текста сказки
    */
   "AdminController_addTextStory"(
-    parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
+    parameters?: Parameters<
+      Paths.AdminControllerAddTextStory.HeaderParameters
+    > | null,
     data?: Paths.AdminControllerAddTextStory.RequestBody,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>;
@@ -2954,7 +3149,9 @@ export interface OperationMethods {
     > | null,
     data?: any,
     config?: AxiosRequestConfig
-  ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>;
+  ): OperationResponse<
+    Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200
+  >;
   /**
    * AdminController_deleteUserAudioById - удаление озвучки пользователя
    *
@@ -2974,7 +3171,9 @@ export interface OperationMethods {
    * необходима роль администратора
    */
   "AdminController_deleteUser"(
-    parameters?: Parameters<Paths.AdminControllerDeleteUser.PathParameters> | null,
+    parameters?: Parameters<
+      Paths.AdminControllerDeleteUser.PathParameters
+    > | null,
     data?: any,
     config?: AxiosRequestConfig
   ): OperationResponse<Paths.AdminControllerDeleteUser.Responses.$200>;
@@ -3006,7 +3205,9 @@ export interface PathsDictionary {
      * AuthController_refresh - обновление access token
      */
     "post"(
-      parameters?: Parameters<Paths.AuthControllerRefresh.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AuthControllerRefresh.HeaderParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.AuthControllerRefresh.Responses.$200>;
@@ -3016,7 +3217,9 @@ export interface PathsDictionary {
      * AuthController_logout - выход из системы
      */
     "post"(
-      parameters?: Parameters<Paths.AuthControllerLogout.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AuthControllerLogout.HeaderParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.AuthControllerLogout.Responses.$200>;
@@ -3026,7 +3229,9 @@ export interface PathsDictionary {
      * UserController_getCurrentUserInfo - получение информации о текущем пользователе
      */
     "get"(
-      parameters?: Parameters<Paths.UserControllerGetCurrentUserInfo.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.UserControllerGetCurrentUserInfo.HeaderParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.UserControllerGetCurrentUserInfo.Responses.$200>;
@@ -3036,10 +3241,14 @@ export interface PathsDictionary {
      * UserController_getApprovedUserAudiosCurrentUser - получение одобренных озвучек текущего пользователя
      */
     "get"(
-      parameters?: Parameters<Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.UserControllerGetApprovedUserAudiosCurrentUser.HeaderParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.UserControllerGetApprovedUserAudiosCurrentUser.Responses.$200
+    >;
   };
   ["/api/user/{userId}"]: {
     /**
@@ -3082,17 +3291,35 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.UserControllerGetAllAudioStoryRequestsCurrentUser.Responses.$200
+    >;
   };
   ["/api/story/all"]: {
     /**
      * StoryController_getAllStories - получение всех сказок
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetAllStories.QueryParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetAllStories.QueryParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.StoryControllerGetAllStories.Responses.$200>;
+  };
+  ["/api/story/search"]: {
+    /**
+     * StoryController_searchStoryByName - поиск сказки по имени
+     *
+     * для работы с websockets используется событие searchStoryByName для отправления запроса и searchResultStoryByName для получения результатов
+     */
+    "get"(
+      parameters?: Parameters<
+        Paths.StoryControllerSearchStoryByName.QueryParameters
+      > | null,
+      data?: any,
+      config?: AxiosRequestConfig
+    ): OperationResponse<Paths.StoryControllerSearchStoryByName.Responses.$200>;
   };
   ["/api/story/ethnic-group/{ethnicGroupId}"]: {
     /**
@@ -3105,24 +3332,32 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetStoriesByEthnicGroupId.Responses.$200
+    >;
   };
   ["/api/story/audio/user/{userId}"]: {
     /**
      * StoryController_getStoriesByAuthorAudioStory - получение сказок, которые озвучил пользователь
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetStoriesByAuthorAudioStory.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetStoriesByAuthorAudioStory.Responses.$200
+    >;
   };
   ["/api/story/by-name/{name}"]: {
     /**
      * StoryController_getStoryByName - получение сказок в которых есть подстрока name
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetStoryByName.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetStoryByName.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.StoryControllerGetStoryByName.Responses.$200>;
@@ -3132,7 +3367,9 @@ export interface PathsDictionary {
      * StoryController_getStoryById - получение общей информации о выбранной сказке
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetStoryById.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetStoryById.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.StoryControllerGetStoryById.Responses.$200>;
@@ -3142,20 +3379,28 @@ export interface PathsDictionary {
      * StoryController_getAudiosByStoryId - получение одобренных озвучек для выбранной сказки
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetAudiosByStoryId.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetAudiosByStoryId.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetAudiosByStoryId.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetAudiosByStoryId.Responses.$200
+    >;
   };
   ["/api/story/text/{storyId}"]: {
     /**
      * StoryController_getTextStoryByStoryId - получение текста сказки
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetTextStoryByStoryId.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetTextStoryByStoryId.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetTextStoryByStoryId.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetTextStoryByStoryId.Responses.$200
+    >;
   };
   ["/api/story/audio/{storyAudioId}"]: {
     /**
@@ -3164,7 +3409,9 @@ export interface PathsDictionary {
      * возвращает StreamableFile
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetAudioStoryById.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetAudioStoryById.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.StoryControllerGetAudioStoryById.Responses.$200>;
@@ -3174,17 +3421,23 @@ export interface PathsDictionary {
      * StoryController_getAudioStoryByEthnicGroup - получение аудиокниг для выбранной этнической группы
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetAudioStoryByEthnicGroup.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetAudioStoryByEthnicGroup.Responses.$200
+    >;
   };
   ["/api/story/{storyId}/image/{filename}"]: {
     /**
      * StoryController_getImgStoryById - получение обложки для сказки по storyId
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetImgStoryById.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetImgStoryById.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.StoryControllerGetImgStoryById.Responses.$200>;
@@ -3194,30 +3447,42 @@ export interface PathsDictionary {
      * StoryController_getRatingByAudioId - получение оценки для выбранной озвучки
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioId.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetRatingByAudioId.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetRatingByAudioId.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetRatingByAudioId.Responses.$200
+    >;
   };
   ["/api/story/rating/my/{userAudioId}"]: {
     /**
      * StoryController_getRatingByAudioIdForCurrentUser - получение оценки для выбранной озвучки для текущего пользователя
      */
     "get"(
-      parameters?: Parameters<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerGetRatingByAudioIdForCurrentUser.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerGetRatingByAudioIdForCurrentUser.Responses.$200
+    >;
   };
   ["/api/story/rating/add"]: {
     /**
      * StoryController_addRatingForStoryByCurrentUser - добавление текущим пользователем оценки к озвучке по audioId
      */
     "post"(
-      parameters?: Parameters<Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.StoryControllerAddRatingForStoryByCurrentUser.HeaderParameters
+      > | null,
       data?: Paths.StoryControllerAddRatingForStoryByCurrentUser.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.StoryControllerAddRatingForStoryByCurrentUser.Responses.$200
+    >;
   };
   ["/api/audio-story-request/all"]: {
     /**
@@ -3232,7 +3497,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200>;
+    ): OperationResponse<
+      Paths.AudioStoryRequestControllerGetAllAudioStoryRequests.Responses.$200
+    >;
   };
   ["/api/audio-story-request/by-user/{userId}"]: {
     /**
@@ -3248,17 +3515,23 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200>;
+    ): OperationResponse<
+      Paths.AudioStoryRequestControllerGetAllAudioStoryReqeustsByUserId.Responses.$200
+    >;
   };
   ["/api/audio-story-request/add"]: {
     /**
      * AudioStoryRequestController_createAddAudioRequest - Создание заявки на проверку озвучки
      */
     "post"(
-      parameters?: Parameters<Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AudioStoryRequestControllerCreateAddAudioRequest.HeaderParameters
+      > | null,
       data?: Paths.AudioStoryRequestControllerCreateAddAudioRequest.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200>;
+    ): OperationResponse<
+      Paths.AudioStoryRequestControllerCreateAddAudioRequest.Responses.$200
+    >;
   };
   ["/api/audio-story-request/edit/{audioStoryReqeustId}"]: {
     /**
@@ -3273,7 +3546,9 @@ export interface PathsDictionary {
       > | null,
       data?: Paths.AudioStoryRequestControllerEditAudioStoryRequest.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200>;
+    ): OperationResponse<
+      Paths.AudioStoryRequestControllerEditAudioStoryRequest.Responses.$200
+    >;
   };
   ["/api/audio-story-request/delete/{audioStoryRequestId}"]: {
     /**
@@ -3288,7 +3563,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200>;
+    ): OperationResponse<
+      Paths.AudioStoryRequestControllerDeleteAudioStoryRequestBydId.Responses.$200
+    >;
   };
   ["/api/constituent/add"]: {
     /**
@@ -3297,10 +3574,14 @@ export interface PathsDictionary {
      * необходима роль администратора
      */
     "post"(
-      parameters?: Parameters<Paths.ConstituentsControllerAddConstituent.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.ConstituentsControllerAddConstituent.HeaderParameters
+      > | null,
       data?: Paths.ConstituentsControllerAddConstituent.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerAddConstituent.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerAddConstituent.Responses.$200
+    >;
   };
   ["/api/constituent/add/ethnic-group"]: {
     /**
@@ -3309,10 +3590,14 @@ export interface PathsDictionary {
      * небходима роль администратора
      */
     "post"(
-      parameters?: Parameters<Paths.ConstituentsControllerAddEthnicGroupToConstituent.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.ConstituentsControllerAddEthnicGroupToConstituent.HeaderParameters
+      > | null,
       data?: Paths.ConstituentsControllerAddEthnicGroupToConstituent.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerAddEthnicGroupToConstituent.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerAddEthnicGroupToConstituent.Responses.$200
+    >;
   };
   ["/api/constituent/ethnic-group/delete"]: {
     /**
@@ -3321,20 +3606,28 @@ export interface PathsDictionary {
      * необходима роль администратора
      */
     "delete"(
-      parameters?: Parameters<Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.HeaderParameters
+      > | null,
       data?: Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerDeleteEthnicGroupFromConstituent.Responses.$200
+    >;
   };
   ["/api/constituent/ethnic-group/{constituentId}"]: {
     /**
      * ConstituentsController_getEthnicGroupByConstituentId - получение этнической группы, принадлежащей субъекту рф
      */
     "get"(
-      parameters?: Parameters<Paths.ConstituentsControllerGetEthnicGroupByConstituentId.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.ConstituentsControllerGetEthnicGroupByConstituentId.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerGetEthnicGroupByConstituentId.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerGetEthnicGroupByConstituentId.Responses.$200
+    >;
   };
   ["/api/constituent/all"]: {
     /**
@@ -3344,7 +3637,9 @@ export interface PathsDictionary {
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerGetConstituents.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerGetConstituents.Responses.$200
+    >;
   };
   ["/api/constituent/edit/{id}"]: {
     /**
@@ -3353,10 +3648,14 @@ export interface PathsDictionary {
      * небходима роль администратора
      */
     "put"(
-      parameters?: Parameters<Paths.ConstituentsControllerEditConstituent.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.ConstituentsControllerEditConstituent.HeaderParameters
+      > | null,
       data?: Paths.ConstituentsControllerEditConstituent.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerEditConstituent.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerEditConstituent.Responses.$200
+    >;
   };
   ["/api/constituent/{id}"]: {
     /**
@@ -3371,7 +3670,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.ConstituentsControllerDeleteConstituentById.Responses.$200>;
+    ): OperationResponse<
+      Paths.ConstituentsControllerDeleteConstituentById.Responses.$200
+    >;
   };
   ["/api/ethnic-group/add"]: {
     /**
@@ -3380,10 +3681,14 @@ export interface PathsDictionary {
      * необходима роль администратора
      */
     "post"(
-      parameters?: Parameters<Paths.EthnicGroupControllerAddEthnicGroup.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.EthnicGroupControllerAddEthnicGroup.HeaderParameters
+      > | null,
       data?: Paths.EthnicGroupControllerAddEthnicGroup.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerAddEthnicGroup.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerAddEthnicGroup.Responses.$200
+    >;
   };
   ["/api/ethnic-group/all"]: {
     /**
@@ -3393,17 +3698,23 @@ export interface PathsDictionary {
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerEthnicGroups.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerEthnicGroups.Responses.$200
+    >;
   };
   ["/api/ethnic-group/{ethnicGroupId}"]: {
     /**
      * EthnicGroupController_getEthnicGroupById - получение этнической группы по ethnicGroupId
      */
     "get"(
-      parameters?: Parameters<Paths.EthnicGroupControllerGetEthnicGroupById.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.EthnicGroupControllerGetEthnicGroupById.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerGetEthnicGroupById.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerGetEthnicGroupById.Responses.$200
+    >;
   };
   ["/api/ethnic-group/edit/{id}"]: {
     /**
@@ -3418,7 +3729,9 @@ export interface PathsDictionary {
       > | null,
       data?: Paths.EthnicGroupControllerEditEthnicGroup.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerEditEthnicGroup.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerEditEthnicGroup.Responses.$200
+    >;
   };
   ["/api/ethnic-group/{id}"]: {
     /**
@@ -3433,7 +3746,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerDeleteEthnicGroup.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerDeleteEthnicGroup.Responses.$200
+    >;
   };
   ["/api/ethnic-group/language/add"]: {
     /**
@@ -3442,7 +3757,9 @@ export interface PathsDictionary {
      * необходима роль администратора
      */
     "post"(
-      parameters?: Parameters<Paths.EthnicGroupControllerAddLanguage.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.EthnicGroupControllerAddLanguage.HeaderParameters
+      > | null,
       data?: Paths.EthnicGroupControllerAddLanguage.RequestBody,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.EthnicGroupControllerAddLanguage.Responses.$200>;
@@ -3455,7 +3772,9 @@ export interface PathsDictionary {
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerGetAllLanguage.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerGetAllLanguage.Responses.$200
+    >;
   };
   ["/api/ethnic-group/language/{id}"]: {
     /**
@@ -3470,7 +3789,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.EthnicGroupControllerDeleteLanguageById.Responses.$200>;
+    ): OperationResponse<
+      Paths.EthnicGroupControllerDeleteLanguageById.Responses.$200
+    >;
   };
   ["/api/map"]: {
     /**
@@ -3490,27 +3811,37 @@ export interface PathsDictionary {
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.MapControllerGetEthnicalGroupPoints.Responses.$200>;
+    ): OperationResponse<
+      Paths.MapControllerGetEthnicalGroupPoints.Responses.$200
+    >;
   };
   ["/api/map/ethnic-groups/{constituentId}"]: {
     /**
      * MapController_getEthnicalGroupPointsByConstituentId - получение точек этнических групп по номеру региона
      */
     "get"(
-      parameters?: Parameters<Paths.MapControllerGetEthnicalGroupPointsByConstituentId.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.MapControllerGetEthnicalGroupPointsByConstituentId.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.MapControllerGetEthnicalGroupPointsByConstituentId.Responses.$200>;
+    ): OperationResponse<
+      Paths.MapControllerGetEthnicalGroupPointsByConstituentId.Responses.$200
+    >;
   };
   ["/api/map/ethnic-groups/{name}"]: {
     /**
      * MapController_getEthnicGroupPointsByName - получение точек этнических групп по названию этнической группы
      */
     "get"(
-      parameters?: Parameters<Paths.MapControllerGetEthnicGroupPointsByName.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.MapControllerGetEthnicGroupPointsByName.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.MapControllerGetEthnicGroupPointsByName.Responses.$200>;
+    ): OperationResponse<
+      Paths.MapControllerGetEthnicGroupPointsByName.Responses.$200
+    >;
   };
   ["/api/map/ethnic-groups/{pointId}"]: {
     /**
@@ -3525,7 +3856,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.MapControllerDeleteEthnicalGroupPoint.Responses.$200>;
+    ): OperationResponse<
+      Paths.MapControllerDeleteEthnicalGroupPoint.Responses.$200
+    >;
   };
   ["/api/map/constituents/filled"]: {
     /**
@@ -3535,7 +3868,9 @@ export interface PathsDictionary {
       parameters?: Parameters<UnknownParamsObject> | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200>;
+    ): OperationResponse<
+      Paths.MapControllerGetPercentsFilledStoriesByConstituentId.Responses.$200
+    >;
   };
   ["/api/request/status"]: {
     /**
@@ -3570,17 +3905,23 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestAll.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerGetAddStoryRequestAll.Responses.$200
+    >;
   };
   ["/api/add-story-request/my-requests"]: {
     /**
      * AddStoryRequestController_getAddStoryRequestForCurrentUser - получение всех заявок на добавление сказки от текущего пользователя
      */
     "get"(
-      parameters?: Parameters<Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.HeaderParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerGetAddStoryRequestForCurrentUser.Responses.$200
+    >;
   };
   ["/api/add-story-request/by-user/{userId}"]: {
     /**
@@ -3595,17 +3936,23 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerGetAddStoryRequestByUserId.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerGetAddStoryRequestByUserId.Responses.$200
+    >;
   };
   ["/api/add-story-request/create"]: {
     /**
      * AddStoryRequestController_createAddStoryRequestForCurrentUser - создание заявки на добавление сказки
      */
     "post"(
-      parameters?: Parameters<Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.HeaderParameters
+      > | null,
       data?: Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerCreateAddStoryRequestForCurrentUser.Responses.$200
+    >;
   };
   ["/api/add-story-request/edit/{addStoryRequestId}"]: {
     /**
@@ -3620,7 +3967,9 @@ export interface PathsDictionary {
       > | null,
       data?: Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerEditStatusAddStoryReqeust.Responses.$200
+    >;
   };
   ["/api/add-story-request/delete/{addStoryRequestId}"]: {
     /**
@@ -3635,7 +3984,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200>;
+    ): OperationResponse<
+      Paths.AddStoryRequestControllerDeleteAddStoryRequestById.Responses.$200
+    >;
   };
   ["/api/admin/ethnic-groups/{ethnicGroupId}/constituents/{constituentId}"]: {
     /**
@@ -3650,7 +4001,9 @@ export interface PathsDictionary {
       > | null,
       data?: Paths.AdminControllerAddEthnicalGroupPoint.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200>;
+    ): OperationResponse<
+      Paths.AdminControllerAddEthnicalGroupPoint.Responses.$200
+    >;
   };
   ["/api/admin/ethnic-groups/{pointId}"]: {
     /**
@@ -3665,14 +4018,18 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200>;
+    ): OperationResponse<
+      Paths.AdminControllerDeleteEthnicalGroupPoint.Responses.$200
+    >;
   };
   ["/api/admin/story/add"]: {
     /**
      * AdminController_addStory - добавление сказки
      */
     "post"(
-      parameters?: Parameters<Paths.AdminControllerAddStory.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AdminControllerAddStory.HeaderParameters
+      > | null,
       data?: Paths.AdminControllerAddStory.RequestBody,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.AdminControllerAddStory.Responses.$200>;
@@ -3708,7 +4065,9 @@ export interface PathsDictionary {
      * AdminController_addTextStory - добавление текста сказки
      */
     "post"(
-      parameters?: Parameters<Paths.AdminControllerAddTextStory.HeaderParameters> | null,
+      parameters?: Parameters<
+        Paths.AdminControllerAddTextStory.HeaderParameters
+      > | null,
       data?: Paths.AdminControllerAddTextStory.RequestBody,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.AdminControllerAddTextStory.Responses.$200>;
@@ -3724,7 +4083,9 @@ export interface PathsDictionary {
       > | null,
       data?: Paths.AdminControllerSetUserAudioToStory.RequestBody,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AdminControllerSetUserAudioToStory.Responses.$200>;
+    ): OperationResponse<
+      Paths.AdminControllerSetUserAudioToStory.Responses.$200
+    >;
   };
   ["/api/admin/story/{storyId}/language/{languageId}/audio/upload"]: {
     /**
@@ -3763,7 +4124,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200>;
+    ): OperationResponse<
+      Paths.AdminControllerDeleteStoryImgByStoryId.Responses.$200
+    >;
   };
   ["/api/admin/audio//delete/{userAudioId}"]: {
     /**
@@ -3778,7 +4141,9 @@ export interface PathsDictionary {
       > | null,
       data?: any,
       config?: AxiosRequestConfig
-    ): OperationResponse<Paths.AdminControllerDeleteUserAudioById.Responses.$200>;
+    ): OperationResponse<
+      Paths.AdminControllerDeleteUserAudioById.Responses.$200
+    >;
   };
   ["/api/admin/user/delete/{userId}"]: {
     /**
@@ -3787,7 +4152,9 @@ export interface PathsDictionary {
      * необходима роль администратора
      */
     "delete"(
-      parameters?: Parameters<Paths.AdminControllerDeleteUser.PathParameters> | null,
+      parameters?: Parameters<
+        Paths.AdminControllerDeleteUser.PathParameters
+      > | null,
       data?: any,
       config?: AxiosRequestConfig
     ): OperationResponse<Paths.AdminControllerDeleteUser.Responses.$200>;

@@ -10,7 +10,7 @@ import BookInfoCardComponent from "../book/components/book-info-card.component";
 import AddBookForm from "../book/components/forms/add-book.form";
 import ListBookCarousel from "../book/components/list-book-carousel.component";
 import { CoverUploadDto } from "../book/interfaces/cover-upload.dto";
-import { ListBookState } from "../book/list-book.slice";
+// import { ListBookState } from "../book/list-book.slice";
 import { EthnicGroupListState } from "../ethnic-group/ethnic-group-list.slice";
 
 import {
@@ -53,6 +53,13 @@ interface ListLanguageState {
   languages: Components.Schemas.LanguageDto[];
 }
 
+interface ListBookState {
+  load: boolean;
+  books: Components.Schemas.PageResponseDto<
+    Components.Schemas.StoryBookResponseDto
+  >;
+}
+
 interface SelectedBookState {
   load: boolean;
   book: Components.Schemas.StoryBookResponseDto | null;
@@ -62,9 +69,25 @@ interface SelectedBookState {
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const listBookState: ListBookState = useSelector(
-    (state: RootState) => state.listBook
-  );
+  // const listBookState: ListBookState = useSelector(
+  //   (state: RootState) => state.listBook
+  // );
+
+  const [listBookState, setListBookState] = useState<ListBookState>({
+    load: true,
+    books: {
+      data: [],
+      meta: {
+        page: 1,
+        take: 10,
+        itemCount: 0,
+        pageCount: 1,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      },
+    },
+  });
+
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
   );
@@ -78,8 +101,10 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -156,13 +181,22 @@ const AdminStoriesPage: React.FC = () => {
 
         try {
           // const addedAudioResponse: any =
-          await apiClient.AdminController_uploadAudioStory(
+          await apiClient.paths[
+            "/api/admin/story/{storyId}/language/{languageId}/audio/upload"
+          ].post(
             {
-              storyId: bookState.book["id"],
+              storyId: bookState.book.id,
               languageId: selectedLanguage.id,
             },
             formData
           );
+          // await apiClient.AdminController_uploadAudioStory(
+          //   {
+          //     storyId: bookState.book["id"],
+          //     languageId: selectedLanguage.id,
+          //   },
+          //   formData
+          // );
         } catch (error) {
           console.error(error);
           toast.error("Ошибка при загрузке аудио");
@@ -199,10 +233,25 @@ const AdminStoriesPage: React.FC = () => {
   }, []);
   return (
     <Dialog open={openDialog}>
+      {openAddBookForm ? (
+        <AddBookForm
+          open={openAddBookForm}
+          errors={null}
+          ethnicGroups={ethnicGroupListState.ethnicGroups}
+          loading={listBookState.load}
+          onSubmit={(values) => {
+            toast.promise(handleOnSubmitAddBook(values), {
+              loading: "добавляю сказку",
+              success: "сказка успешно добавлена",
+            });
+          }}
+          onCancel={handleOnCloseAddBookForm}
+        />
+      ) : null}
       <div>
         <section className="mx-8">
           <ListBookCarousel
-            load={listBookState.loading}
+            load={listBookState.load}
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
@@ -215,21 +264,6 @@ const AdminStoriesPage: React.FC = () => {
               <BookPlus />
             </Button>
           </ListBookCarousel>
-          {openAddBookForm ? (
-            <AddBookForm
-              open={openAddBookForm}
-              errors={null}
-              ethnicGroups={ethnicGroupListState.ethnicGroups}
-              loading={listBookState.loading}
-              onSubmit={(values) => {
-                toast.promise(handleOnSubmitAddBook(values), {
-                  loading: "добавляю сказку",
-                  success: "сказка успешно добавлена",
-                });
-              }}
-              onCancel={handleOnCloseAddBookForm}
-            />
-          ) : null}
         </section>
         <Toaster
           position="top-center"

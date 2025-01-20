@@ -28,7 +28,7 @@ export function DataTableApplicationAdmin<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <div className="animate-slide-up-fade">
+    <div className="animate-fadeIn">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

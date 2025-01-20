@@ -214,7 +214,18 @@ export default {
           },
         },
       },
+      "fade-in-down": {
+        "0%": {
+          opacity: 0,
+          transform: "translate3d(0, -100%, 0)",
+        },
+        "100%": {
+          opacity: 1,
+          transform: "translate3d(0, 0, 0)",
+        },
+      },
       animation: {
+        fadeindown: "fade-in-down 1s ease-in 0.25s 1",
         "slide-up-fade": "slide-up-fade 0.6s ease-out",
         "flip-in-y": "flip-in-y 0.6s ease-out",
         glowing: "glowing 20s linear infinite",
