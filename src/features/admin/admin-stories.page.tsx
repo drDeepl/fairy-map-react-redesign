@@ -45,6 +45,7 @@ import { Cross1Icon, UploadIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import PaginationBox from "@/components/pagination.component";
+import SearchBookBox from "../book/components/search-book-box.component";
 
 export interface BookInfoState {
   open: boolean;
@@ -272,14 +273,17 @@ const AdminStoriesPage: React.FC = () => {
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
-            <Button
-              variant="outline"
-              onClick={handleOnClickAddBook}
-              className="w-42 border border-ghost text-md"
-            >
-              <span className="">добавить сказку</span>
-              <BookPlus />
-            </Button>
+            <div className="flex jsutify-center space-x-2">
+              <Button
+                variant="outline"
+                onClick={handleOnClickAddBook}
+                className="w-42 border border-ghost text-md"
+              >
+                <span className="">добавить сказку</span>
+                <BookPlus />
+              </Button>
+              <SearchBookBox onClickBook={handleOnClickPreviewBook} />
+            </div>
           </ListBookCarousel>
           <PaginationBox
             meta={listBookState.books.meta}
