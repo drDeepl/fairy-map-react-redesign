@@ -38,6 +38,7 @@ import { simplifyGeoJsonHelper } from "./helpers/simplify-geo-json.helper";
 import { FeatureProperties } from "./map.interface";
 import { FeatureCollection, Geometry } from "geojson";
 import NotCoverBook from "@/components/not-cover-book.component";
+import SearchBookBox from "../book/components/search-book-box.component";
 
 interface MapPageProps {
   width: number;
@@ -285,17 +286,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       ) : null}
       <div className="map-pag__content">
         <ToastContainer containerId="mapPageToast" />
-        <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full">
-          <Input
-            className="min-h-11 max-w-fit bg-slate-50 self-center"
-            type="text"
-            placeholder="введите название этнической группы"
-            value={ethnicGroupInputValue}
-            onChange={handleInputChange}
-          />
-
+        <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full text-slate-600">
+          <SearchBookBox onClickBook={handleOnClickBook} />
           <Button
-            className="rounded-full bg-slate-50 self-center size-11"
+            className="rounded-full bg-slate-50 self-center size-12"
             variant="ghost"
             size="icon"
             onClick={handleOnClickAvatar}

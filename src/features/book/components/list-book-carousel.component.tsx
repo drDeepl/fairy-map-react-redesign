@@ -28,20 +28,23 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
     onClickBook(book);
   };
   return (
-    <div className="shadow bg-neutral-50 rounded-xl">
+    <div className="my-4 shadow bg-neutral-50 rounded-xl mx-14">
       {books.length > 0 ? (
         <Carousel
           opts={{
             align: "start",
+            skipSnaps: true,
+            containScroll: "trimSnaps",
+            slidesToScroll: 3,
           }}
           className="flex flex-col justify-center"
         >
-          <div className="relative self-center my-6">
-            {children}
-            <CarouselNext className="border border-zinc-600" />
-            <CarouselPrevious className="border border-zinc-600" />
+          <div className="flex flex-col self-center my-6">
+            <div className="px-4">{children}</div>
+            <CarouselNext className="border border-zinc-600 lg:size-12" />
+            <CarouselPrevious className="border border-zinc-600 lg:size-12" />
           </div>
-          <CarouselContent className="px-2">
+          <CarouselContent className="px-4">
             {load
               ? Array.from({ length: 5 }).map((_, idx) => {
                   return (

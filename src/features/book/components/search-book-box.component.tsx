@@ -1,7 +1,6 @@
 import { Components } from "@/api/schemas/client";
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -26,6 +25,7 @@ import {
 import { socket } from "@/api/sockets/sockets";
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 
 interface SearchBookBoxProps {
   onClickBook: (
@@ -34,9 +34,7 @@ interface SearchBookBoxProps {
 }
 interface ListBookState {
   load: boolean;
-  books: Components.Schemas.PageResponseDto<
-    Components.Schemas.StoryBookResponseDto
-  >;
+  books: Components.Schemas.PageResponseDto<Components.Schemas.StoryBookResponseDto>;
 }
 
 const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
@@ -47,14 +45,6 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
-
-  const handleStoryNameInput = (name: string) => {
-    setValueSearch(name);
-  };
-
-  const handleStorySearch = () => {
-    socket.emit("searchStoryByName", { name: valueSearch, take: 10 });
-  };
 
   const [listBookState, setListBookState] = useState<ListBookState>({
     load: false,
@@ -70,6 +60,34 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
       },
     },
   });
+
+  const handleOpenPopover = (open: boolean) => {
+    setOpen(open);
+    if (!open) {
+      setListBookState({
+        load: false,
+        books: {
+          data: [],
+          meta: {
+            page: 1,
+            take: 10,
+            itemCount: 0,
+            pageCount: 1,
+            hasPreviousPage: false,
+            hasNextPage: false,
+          },
+        },
+      });
+    }
+  };
+
+  const handleStoryNameInput = (name: string) => {
+    setValueSearch(name);
+  };
+
+  const handleStorySearch = () => {
+    socket.emit("searchStoryByName", { name: valueSearch, take: 10 });
+  };
 
   useEffect(() => {
     if (valueSearch) {
@@ -97,9 +115,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
     };
 
     const onBookResults = (
-      books: Components.Schemas.PageResponseDto<
-        Components.Schemas.StoryBookResponseDto
-      >
+      books: Components.Schemas.PageResponseDto<Components.Schemas.StoryBookResponseDto>
     ) => {
       console.log("onBookResults");
       console.log(books);
@@ -122,61 +138,88 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
   }, []);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <TooltipProvider delayDuration={0}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                size="icon"
-                className="rounded-full border border-baby-blue-500"
-              >
-                <MagnifyingGlassIcon />
-              </Button>
-            </PopoverTrigger>
-          </TooltipTrigger>
-          <TooltipContent>поиск книги по названию</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <PopoverContent className="w-60 p-0">
-        <Command>
-          <CommandInput
-            onValueChange={(e) => handleStoryNameInput(e)}
-            placeholder="введите название книги..."
-            className="h-9"
-          />
-          <CommandList className="px-2">
-            {isTyping ? null : <CommandEmpty>Книги не найдены.</CommandEmpty>}
-            {isTyping ? (
-              Array(3)
-                .fill(1)
-                .map((_, idx) => (
-                  <Skeleton
-                    key={idx}
-                    className="w-5/6 h-4 bg-neutral-300 my-2 mx-4"
-                  />
-                ))
-            ) : (
-              <CommandGroup>
-                {listBookState.books.data.map((book) => (
-                  <CommandItem
-                    className="cursor-pointer font-semibold text-center"
-                    key={book.name}
-                    value={book.name}
-                    onSelect={() => onClickBook(book)}
-                  >
-                    {book.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div>
+      <Popover open={open} onOpenChange={handleOpenPopover}>
+        <TooltipProvider delayDuration={0}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  size="icon"
+                  className="rounded-full border border-baby-blue-500 lg:size-12"
+                >
+                  <MagnifyingGlassIcon className="text-slate-700" />
+                </Button>
+              </PopoverTrigger>
+            </TooltipTrigger>
+            <TooltipContent>найти книгу</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <PopoverContent className="w-60 p-0 space-y-4" side="right">
+          {/* <div className="px-2">
+            <div className="z-50">
+              <MagnifyingGlassIcon className="absolute top-[0.8vh] left-[1vw] size-6 text-slate-400" />
+              <Input
+                placeholder="введите название книги..."
+                className="focus-visible:ring-0 ring-0 border-0 shadow-none ml-5"
+                onChange={(e) => {
+                  handleStoryNameInput(e.target.value);
+                }}
+              />
+            </div>
+            <div className="absolute">
+              {isTyping
+                ? Array(3)
+                    .fill(1)
+                    .map((_, idx) => (
+                      <Skeleton
+                        key={idx}
+                        className="w-5/6 h-4 bg-neutral-300 my-2 mx-4"
+                      />
+                    ))
+                : null}
+            </div>
+          </div> */}
+          <Command>
+            <CommandInput
+              onValueChange={(e) => handleStoryNameInput(e)}
+              placeholder="введите название книги..."
+              className="h-9"
+            />
+            <CommandList>
+              {/* {isTyping ? null : <CommandEmpty>Книги не найдены.</CommandEmpty>} */}
+              {isTyping ? (
+                Array(3)
+                  .fill(1)
+                  .map((_, idx) => (
+                    <Skeleton
+                      key={idx}
+                      className="w-5/6 h-4 bg-neutral-300 my-2 mx-4"
+                    />
+                  ))
+              ) : (
+                <CommandGroup>
+                  {listBookState.books.data.map((book) => (
+                    <CommandItem
+                      className="cursor-pointer font-semibold text-center"
+                      key={book.name}
+                      value={book.name}
+                      onSelect={() => onClickBook(book)}
+                    >
+                      {book.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 };
 

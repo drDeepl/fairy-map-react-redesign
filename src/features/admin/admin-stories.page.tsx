@@ -107,10 +107,8 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [
-    selectedLanguage,
-    setSelectedLanguage,
-  ] = useState<Components.Schemas.LanguageDto | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -273,16 +271,19 @@ const AdminStoriesPage: React.FC = () => {
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
-            <div className="flex jsutify-center space-x-2">
+            <div className="flex jsutify-center items-center space-x-2">
               <Button
                 variant="outline"
                 onClick={handleOnClickAddBook}
-                className="w-42 border border-ghost text-md"
+                className="w-42 border border-ghost text-md lg:h-12"
               >
                 <span className="">добавить сказку</span>
                 <BookPlus />
               </Button>
-              <SearchBookBox onClickBook={handleOnClickPreviewBook} />
+              <SearchBookBox
+                onClickBook={handleOnClickPreviewBook}
+                variant="icon"
+              />
             </div>
           </ListBookCarousel>
           <PaginationBox

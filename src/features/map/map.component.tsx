@@ -111,7 +111,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     d3.selectAll(`circle`).style("visibility", "hidden");
 
-    d3.selectAll("path").attr("class", "fill-stone-100");
+    d3.selectAll("path.region").attr("class", "fill-stone-100");
 
     const g = svg.select(`#region_${d.properties.id}`);
     g.selectChildren("path").attr("class", "fill-orange-500");
@@ -169,6 +169,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 key={feature.properties.id}
               >
                 <path
+                  className="region"
                   stroke="#82A9FD"
                   strokeWidth="0.3"
                   onClick={() => {
