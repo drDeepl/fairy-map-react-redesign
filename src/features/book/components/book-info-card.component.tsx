@@ -1,5 +1,6 @@
 import {
   Card,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -37,6 +38,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { RootState } from "@/app/store";
 import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 
 interface BookInfoCardProps {
   load: boolean;
@@ -76,6 +78,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   onClickAddAudio,
   children,
 }) => {
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+
   const { toast } = useToast();
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
@@ -137,8 +141,131 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
+  if (isMobile) {
+    return (
+      <Card className="absolute w-full bottom-[8vh] border-none flex flex-col justify-center shadow-none">
+        <CardHeader className="flex flex-col items-center justify-center w-full">
+          <CardTitle className="w-full text-center text-2xl py-3 m-0">
+            {book.name}
+          </CardTitle>
+          <CardDescription className="p-0 m-0">
+            <div className="flex justify-items-center justify-center">
+              {infoBookState.loadCover ? (
+                <div>
+                  <Skeleton className="bg-neutral-300" />
+                </div>
+              ) : (
+                <Label
+                  htmlFor="picture"
+                  className={`${onUploadCover ? "cursor-pointer" : ""}`}
+                >
+                  {infoBookState.book.srcImg ? (
+                    <img
+                      src={infoBookState.book.srcImg}
+                      alt={infoBookState.book.name}
+                      className="size-44 rounded-t-xl object-cover"
+                    />
+                  ) : (
+                    <div className="size-40 rounded-xl animate-shimmer">
+                      <NotCoverBook />
+                    </div>
+                  )}
+                </Label>
+              )}
+              {onUploadCover ? (
+                <Input
+                  className="hidden"
+                  id="picture"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUploadFile}
+                />
+              ) : null}
+            </div>
+            <Accordion
+              type="single"
+              collapsible
+              className="w-screen px-4 text-xl"
+            >
+              <AccordionItem value="story-text">
+                <AccordionTrigger
+                  className="text-base outline-none px-24"
+                  onClick={() => {
+                    handleShowText(!textAction.show);
+                  }}
+                >
+                  <div className="">
+                    <span className="animate-in text-lg">
+                      {!textAction.show ? "показать текст" : "скрыть текст"}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="max-h-96 rounded-md overflow-auto mt-2">
+                  {load ? (
+                    <div>
+                      {Array(3)
+                        .fill(1)
+                        .map((value) => (
+                          <Skeleton
+                            key={value}
+                            className="w-full h-4 bg-zinc-300 my-2"
+                          />
+                        ))}
+                    </div>
+                  ) : (
+                    <div className="text-lg">
+                      <p className="row-span-1 flex justify-center">
+                        {book.text}
+                      </p>
+                    </div>
+                  )}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardDescription>
+        </CardHeader>
+        {!textAction.show && !textAction.fullScreen ? (
+          <CardContent className="flex flex-col items-center space-y-2 text-xl">
+            {audios.length > 0 ? (
+              <AudioBookPlayer
+                audios={audios}
+                onClickAuth={onClickAuth}
+                onClickRate={onClickRate}
+                onClose={() => console.log("close")}
+                hideHeader={true}
+              />
+            ) : (
+              <p className="self-center">аудиокниги не найдены</p>
+            )}
+            {children ? (
+              <div className="flex items-center cursor-pointer size-10">
+                {children}
+              </div>
+            ) : (
+              <div>
+                {/* <div className="flex items-center m-2 cursor-pointer border border-ghost rounded-md shadow-md justify-center">
+                  <span>добавить свою озвучку</span>
+                  <FileAudio className="size-12 text-slate-700 p-2" />
+                </div> */}
+                <Button
+                  onClick={handleOnClickAddAudio}
+                  variant="secondary"
+                  size="icon"
+                  className="border border-ghost text-lg flex items-center h-14 w-full px-4 [&_svg]:size-8 text-slate-800 my-4"
+                >
+                  <span>добавить свою озвучку</span>
+                  <FileAudio className="text-slate-600" />
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        ) : null}
+      </Card>
+    );
+  }
+
   return (
-    <Card className="border-none">
+    <Card className="border-none shadow-none">
       <Toaster />
       <CardHeader className="m-0 py-0 w-full">
         {textAction.fullScreen ? null : (
@@ -146,7 +273,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             <div className="w-44 h-56 flex justify-items-center justify-center">
               {infoBookState.loadCover ? (
                 <div>
-                  {/* <LoadSpinner /> */}
                   <Skeleton className="w-44 h-60 bg-neutral-300" />
                 </div>
               ) : (
@@ -240,7 +366,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </AccordionTrigger>
             <AccordionContent className="max-h-72 rounded-md overflow-auto mt-2">
               {load ? (
-                // <LoadSpinner />
                 <div>
                   {Array(3)
                     .fill(1)

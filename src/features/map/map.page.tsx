@@ -88,8 +88,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const [load, setLoad] = useState<boolean>(true);
 
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] =
-    useState<string>("");
+  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
+    ""
+  );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEthnicGroupInputValue(event.target.value);
@@ -117,8 +118,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
@@ -242,7 +245,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     <Dialog open={openDialog}>
       {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
       {selectedBook.book ? (
-        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content">
+        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
           <DialogTitle className="p-0 m-0 flex justify-end h-1">
             <Button
               onClick={handleOnCloseBook}
