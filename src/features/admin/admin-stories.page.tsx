@@ -46,6 +46,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import PaginationBox from "@/components/pagination.component";
 import SearchBookBox from "../book/components/search-book-box.component";
+import { useMediaQuery } from "react-responsive";
 
 export interface BookInfoState {
   open: boolean;
@@ -198,7 +199,6 @@ const AdminStoriesPage: React.FC = () => {
         formData.append("audio", event.target.files[0]);
 
         try {
-          // const addedAudioResponse: any =
           await apiClient.paths[
             "/api/admin/story/{storyId}/language/{languageId}/audio/upload"
           ].post(
@@ -208,13 +208,6 @@ const AdminStoriesPage: React.FC = () => {
             },
             formData
           );
-          // await apiClient.AdminController_uploadAudioStory(
-          //   {
-          //     storyId: bookState.book["id"],
-          //     languageId: selectedLanguage.id,
-          //   },
-          //   formData
-          // );
         } catch (error) {
           console.error(error);
           toast.error("Ошибка при загрузке аудио");
@@ -249,6 +242,7 @@ const AdminStoriesPage: React.FC = () => {
       });
     });
   }, []);
+
   return (
     <Dialog open={openDialog}>
       {openAddBookForm ? (

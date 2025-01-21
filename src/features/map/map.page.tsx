@@ -20,7 +20,7 @@ import CreateApplicationAudioForm from "../application/forms/schemas/create-appl
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { BookInfoTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
@@ -87,14 +87,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const navigate = useNavigate();
 
   const [load, setLoad] = useState<boolean>(true);
-
-  const [ethnicGroupInputValue, setEthnicGroupInputValue] = useState<string>(
-    ""
-  );
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEthnicGroupInputValue(event.target.value);
-  };
 
   const [authFormState, setAuthFormState] = useState<AuthFormState>({
     open: false,

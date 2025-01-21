@@ -284,7 +284,7 @@ const AdminRequestsPage = () => {
           onCancel={handleCancelChangeStatusApplication}
         />
       </DialogForm>
-      <div className="flex flex-col p-3 space-y-2 shadow-md">
+      <div className="flex flex-col items-center p-3 space-y-2 shadow-md">
         {applicationTableState.paginationData.data.length > 0 ? (
           <PaginationBox
             meta={applicationTableState.paginationData.meta}

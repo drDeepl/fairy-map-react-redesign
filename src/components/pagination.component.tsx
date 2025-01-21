@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useMediaQuery } from "react-responsive";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 interface PaginationProps {
   meta: PageMetaDto;
@@ -17,6 +19,8 @@ interface PaginationProps {
 }
 
 const PaginationBox: React.FC<PaginationProps> = ({ meta, onApplyPage }) => {
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+
   const pageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleOnApplyInputPage = async () => {
@@ -38,6 +42,55 @@ const PaginationBox: React.FC<PaginationProps> = ({ meta, onApplyPage }) => {
     }
     onApplyPage(page);
   };
+
+  if (isMobile) {
+    return (
+      <div className="flex items-center">
+        <Pagination>
+          <PaginationContent className="flex flex-col shadow-md p-2 rounded-md">
+            <PaginationItem className="flex items-center space-x-2">
+              <Input
+                ref={pageInputRef}
+                type="number"
+                min={0}
+                className="w-10 text-center"
+                placeholder={`${meta.page}`}
+              />
+              <span>из</span>
+              <span>{meta.pageCount}</span>
+              <Button
+                variant="secondary"
+                onClick={() => handleOnApplyInputPage()}
+              >
+                перейти
+              </Button>
+            </PaginationItem>
+            <div className="flex mt-4">
+              <PaginationItem>
+                <PaginationPrevious
+                  isActive={meta.hasPreviousPage}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    meta.hasPreviousPage
+                      ? handleOnClickPage(meta.page - 1)
+                      : null
+                  }
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  className="cursor-pointer"
+                  onClick={() =>
+                    meta.hasNextPage ? handleOnClickPage(meta.page + 1) : null
+                  }
+                />
+              </PaginationItem>
+            </div>
+          </PaginationContent>
+        </Pagination>
+      </div>
+    );
+  }
 
   return (
     <div className="flex justify-center">

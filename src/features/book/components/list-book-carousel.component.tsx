@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import PreviewBookCardComponent from "./book-card.component";
 import React from "react";
 import { Components } from "@/api/schemas/client";
+import { useMediaQuery } from "react-responsive";
 
 interface ListBookCarouselProps {
   books: Components.Schemas.StoryBookResponseDto[];
@@ -24,11 +25,18 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
   onClickBook,
   children,
 }) => {
+  const isMobile = useMediaQuery({ maxWidth: 767 });
+
   const handleOnClickBook = (book: Components.Schemas.StoryBookResponseDto) => {
     onClickBook(book);
   };
+
   return (
-    <div className="my-4 shadow bg-neutral-50 rounded-xl mx-14">
+    <div
+      className={`items-center my-4 shadow bg-neutral-50 rounded-xl mx-14 ${
+        isMobile ? "flex flex-col items-center" : ""
+      }`}
+    >
       {books.length > 0 ? (
         <Carousel
           opts={{
@@ -37,7 +45,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
             containScroll: "trimSnaps",
             slidesToScroll: 3,
           }}
-          className="flex flex-col justify-center"
+          className={`flex flex-col justify-center ${isMobile ? "w-56" : ""}`}
         >
           <div className="flex flex-col self-center my-6">
             <div className="px-4">{children}</div>
@@ -63,7 +71,7 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
                     <CarouselItem
                       key={book.id}
                       onClick={() => handleOnClickBook(book)}
-                      className="basis-1/5 my-4 w-44 h-72 cursor-pointer"
+                      className="my-4 w-44 h-72 cursor-pointer sm:basis-1/5"
                     >
                       <PreviewBookCardComponent book={book} />
                     </CarouselItem>

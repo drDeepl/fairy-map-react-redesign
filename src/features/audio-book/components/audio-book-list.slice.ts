@@ -63,6 +63,7 @@ const audioBookListSlice = createSlice({
         addRatingAudio.fulfilled,
         (state, action: PayloadAction<any>) => {
           audioBookListSlice.actions.updateAudio(action.payload);
+
           state.loading = false;
         }
       )

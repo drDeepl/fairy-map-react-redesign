@@ -30,7 +30,7 @@ export const addRatingAudio = createAsyncThunk(
         null,
         dto
       );
-      console.log(res.data);
+
       return res.data;
     } catch (err) {
       const errorResposne: ApiErrorResponse = handleApiErrorResponse(err);

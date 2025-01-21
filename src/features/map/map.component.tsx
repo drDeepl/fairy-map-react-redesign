@@ -133,7 +133,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
         ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
       })
       .then((result: any) => {
-        setListBookState({ load: false, books: result.data });
+        console.warn(result.data);
+        setListBookState({ load: false, books: result.data.data });
       })
       .catch((error: AxiosError) => {
         toast.error(error.message);

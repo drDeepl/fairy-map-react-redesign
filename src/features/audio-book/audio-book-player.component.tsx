@@ -67,6 +67,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
         rating: value,
         audioId: playlistState.currentAudio.id,
       });
+
       if (addedRatingDto !== undefined) {
         setPlaylistState((prevState) => ({
           ...prevState,

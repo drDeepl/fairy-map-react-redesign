@@ -29,10 +29,8 @@ async function initApiClient() {
     async (error: AxiosError) => {
       const originalRequest: InternalAxiosRequestConfig = error.config!;
 
-      const accessToken = localStorage.getItem("accessToken");
-      console.log(accessToken);
       console.error("interceptors error", error);
-      console.log(error.status);
+
       if (error.status === 401 && !originalRequest?.headers["X-Retry"]) {
         originalRequest.headers["X-Retry"] = "true";
 
