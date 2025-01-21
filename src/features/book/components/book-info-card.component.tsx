@@ -16,7 +16,10 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useState } from "react";
 
-import { EnterFullScreenIcon } from "@radix-ui/react-icons";
+import {
+  EnterFullScreenIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -29,16 +32,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
 
-import { useToast } from "@/hooks/use-toast";
-
 import { FileAudio } from "lucide-react";
-
-import { Toaster } from "@/components/ui/toaster";
 
 import { RootState } from "@/app/store";
 import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
+import { ToastContainer, toast } from "react-toastify";
 
 interface BookInfoCardProps {
   load: boolean;
@@ -80,7 +80,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  const { toast } = useToast();
+  // const { toast } = useToast();
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
   const [textAction, setTextAction] = useState<TextAction>({
@@ -122,19 +122,29 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   };
 
   const handleOnClickAddAudio = () => {
+    const sheetToast = () => (
+      <div className="flex items-center">
+        <span className="font-normal ">
+          подать заявку на добавление озвучку могут только авторизованные
+          пользователи
+        </span>
+        <Button
+          variant="outline"
+          className="border border-slate-500"
+          onClick={onClickAuth}
+        >
+          войти
+        </Button>
+      </div>
+    );
     if (!user) {
-      toast({
-        style: {
-          border: "1.5px solid var(--deep-red)",
-          right: "2rem",
-        },
-        title:
-          "подать заявку на добавление озвучки могут только авторизованные пользователи",
-        action: (
-          <Button onClick={() => (onClickAuth ? onClickAuth() : null)}>
-            войти
-          </Button>
-        ),
+      toast.info(sheetToast, {
+        closeButton: false,
+        position: "bottom-center",
+        containerId: "bookInfoCardToast",
+        className: "border border-red-500 text-slate-800",
+        icon: <ExclamationTriangleIcon className="size-24 text-red-500" />,
+        progressClassName: "bg-red-500",
       });
     } else {
       onClickAddAudio();
@@ -144,6 +154,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   if (isMobile) {
     return (
       <Card className="absolute w-full bottom-[8vh] border-none flex flex-col justify-center shadow-none">
+        <ToastContainer
+          containerId="bookInfoCardToast"
+          className="w-full p-4"
+        />
         <CardHeader className="flex flex-col items-center justify-center w-full">
           <CardTitle className="w-full text-center text-2xl py-3 m-0">
             {book.name}
@@ -266,7 +280,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   return (
     <Card className="border-none shadow-none">
-      <Toaster />
+      <ToastContainer containerId="bookInfoCardToast" className="w-full p-4" />
       <CardHeader className="m-0 py-0 w-full">
         {textAction.fullScreen ? null : (
           <div className="w-full flex my-4 animate-out gap-4">
