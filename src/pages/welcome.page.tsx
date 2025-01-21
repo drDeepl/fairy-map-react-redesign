@@ -26,7 +26,7 @@ const WelcomePage: React.FC = () => {
 
   return (
     <motion.div
-      className={`bg-[url(/welcome-page-bg.png)] bg-center bg-scroll`}
+      className={`bg-[url(/welcome-page-bg.png)] bg-cover bg-center bg-scroll`}
       initial="hidden"
       whileInView="visible"
       transition={{ staggerChildren: 0.04 }}
@@ -44,7 +44,7 @@ const WelcomePage: React.FC = () => {
           >
             <QuoteIcon className="size-14" />
           </motion.span>
-          <h1 className="flex text-slate-600 text-3xl font-bold mb-4">
+          <h1 className="flex flex-col text-slate-600 text-3xl font-bold mb-4 sm:flex-row px-4">
             {words.map((word, index) => (
               <React.Fragment key={index}>
                 <motion.span
