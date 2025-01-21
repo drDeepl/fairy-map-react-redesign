@@ -109,16 +109,20 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const handleClickPath = useCallback((d: any, pointsClass: string) => {
     const svg = d3.select(svgRef.current);
 
+    const defaultRegionClass = "region fill-stone-100";
+    const selectedRegionClass = "region fill-orange-500";
+
     d3.selectAll(`circle`).style("visibility", "hidden");
 
-    d3.selectAll("path.region").attr("class", "fill-stone-100");
+    d3.selectAll("path.region").attr("class", defaultRegionClass);
 
     const g = svg.select(`#region_${d.properties.id}`);
-    g.selectChildren("path").attr("class", "fill-orange-500");
 
-    const circle = g.selectChildren(`circle.${pointsClass}`);
+    g.selectChildren("path").attr("class", selectedRegionClass);
 
-    circle.style("visibility", "visible");
+    g.selectChildren();
+
+    g.selectChildren(`circle.${pointsClass}`).style("visibility", "visible");
 
     zoomedPath(svg, d);
   }, []);
@@ -136,9 +140,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
-      (result) => console.log(result)
-    );
+    dispatch(
+      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    ).then((result) => console.log(result));
   };
 
   useEffect(() => {
@@ -165,11 +169,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
             const d = pathGenerator(feature);
             return (
               <g
-                id={`region_${feature.properties.id}`}
                 key={feature.properties.id}
+                id={`region_${feature.properties.id}`}
               >
                 <path
-                  className="region"
+                  className="region fill-stone-100"
                   stroke="#82A9FD"
                   strokeWidth="0.3"
                   onClick={() => {

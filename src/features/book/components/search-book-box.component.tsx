@@ -26,6 +26,16 @@ import { socket } from "@/api/sockets/sockets";
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import NotCoverBook from "@/components/not-cover-book.component";
 
 interface SearchBookBoxProps {
   onClickBook: (
@@ -34,7 +44,9 @@ interface SearchBookBoxProps {
 }
 interface ListBookState {
   load: boolean;
-  books: Components.Schemas.PageResponseDto<Components.Schemas.StoryBookResponseDto>;
+  books: Components.Schemas.PageResponseDto<
+    Components.Schemas.StoryBookResponseDto
+  >;
 }
 
 const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
@@ -115,7 +127,9 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
     };
 
     const onBookResults = (
-      books: Components.Schemas.PageResponseDto<Components.Schemas.StoryBookResponseDto>
+      books: Components.Schemas.PageResponseDto<
+        Components.Schemas.StoryBookResponseDto
+      >
     ) => {
       console.log("onBookResults");
       console.log(books);
@@ -160,38 +174,14 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
         </TooltipProvider>
 
         <PopoverContent className="w-60 p-0 space-y-4" side="right">
-          {/* <div className="px-2">
-            <div className="z-50">
-              <MagnifyingGlassIcon className="absolute top-[0.8vh] left-[1vw] size-6 text-slate-400" />
-              <Input
-                placeholder="введите название книги..."
-                className="focus-visible:ring-0 ring-0 border-0 shadow-none ml-5"
-                onChange={(e) => {
-                  handleStoryNameInput(e.target.value);
-                }}
-              />
-            </div>
-            <div className="absolute">
-              {isTyping
-                ? Array(3)
-                    .fill(1)
-                    .map((_, idx) => (
-                      <Skeleton
-                        key={idx}
-                        className="w-5/6 h-4 bg-neutral-300 my-2 mx-4"
-                      />
-                    ))
-                : null}
-            </div>
-          </div> */}
           <Command>
             <CommandInput
               onValueChange={(e) => handleStoryNameInput(e)}
               placeholder="введите название книги..."
-              className="h-9"
+              className="h-9 relative"
             />
-            <CommandList>
-              {/* {isTyping ? null : <CommandEmpty>Книги не найдены.</CommandEmpty>} */}
+            <Separator />
+            <CommandList className="absolute top-8 right-[0.5px] rounded-[inherit] bg-white w-60">
               {isTyping ? (
                 Array(3)
                   .fill(1)
@@ -210,7 +200,23 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                       value={book.name}
                       onSelect={() => onClickBook(book)}
                     >
-                      {book.name}
+                      <div className="flex justify-center items-center space-x-2">
+                        <div className="self-center size-8 ">
+                          {book.srcImg ? (
+                            <img src={book.srcImg} alt="" />
+                          ) : (
+                            <NotCoverBook />
+                          )}
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <span className="text-start line-clamp-1">
+                            {book.name}
+                          </span>
+                          <small className="text-slate-500 lowercase">
+                            {book.ethnicGroup.name}
+                          </small>
+                        </div>
+                      </div>
                     </CommandItem>
                   ))}
                 </CommandGroup>

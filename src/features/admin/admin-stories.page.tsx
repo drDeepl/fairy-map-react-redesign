@@ -107,8 +107,10 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -280,10 +282,7 @@ const AdminStoriesPage: React.FC = () => {
                 <span className="">добавить сказку</span>
                 <BookPlus />
               </Button>
-              <SearchBookBox
-                onClickBook={handleOnClickPreviewBook}
-                variant="icon"
-              />
+              <SearchBookBox onClickBook={handleOnClickPreviewBook} />
             </div>
           </ListBookCarousel>
           <PaginationBox
