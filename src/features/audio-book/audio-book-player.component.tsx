@@ -4,20 +4,14 @@ import React, { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import ReactAudioPlayer from "react-audio-player";
-import { toast } from "sonner";
 
 import { Separator } from "@/components/ui/separator";
 import StarRating from "@/components/rating.component";
 import AudioBookPlaylist from "./components/audio-book-playlist.component";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { CaretDownIcon, Cross1Icon } from "@radix-ui/react-icons";
+import { CaretDownIcon } from "@radix-ui/react-icons";
 import { LanguagesIcon } from "lucide-react";
 
 interface PlaylistState {
@@ -28,21 +22,16 @@ interface PlaylistState {
 
 interface AudioBookPlayerProps {
   audios: Components.Schemas.AudioResponseDto[];
-  onClickRate?: (
+  onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
-  hideHeader: boolean;
-  onClickAuth?: () => void;
-  onClose: () => void;
+  onError: (msg: string) => void;
 }
 
 const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   audios,
   onClickRate,
-  onClose,
-  onClickAuth,
-
-  hideHeader,
+  onError,
 }) => {
   const [playlistState, setPlaylistState] = useState<PlaylistState>({
     open: false,
@@ -50,8 +39,8 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
     currentAudio: audios[0],
   });
 
-  const handleOnError = () => {
-    toast.error("произошла ошибка при загрузки аудиозаписи");
+  const handleOnError = (msg: string) => {
+    onError(msg);
   };
 
   const handleOnClickAudio = (audio: Components.Schemas.AudioResponseDto) => {
@@ -59,9 +48,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
   };
 
   const handleOnClickRate = async (value: number) => {
-    if (!onClickRate) {
-      return;
-    }
+    console.log("AudioBookPlayer: handleOnClickRate");
     try {
       const addedRatingDto = await onClickRate({
         rating: value,
@@ -76,26 +63,16 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
             moderateScore: addedRatingDto.ratingAudioStory,
           },
         }));
-      } else {
-        toast.error("что-то пошло не так...");
       }
     } catch (error) {
       console.log(error);
-      toast.error("что-то пошло не так");
+      handleOnError("что-то пошло не так");
     }
   };
 
   return (
     <Card className="w-full border-none shadow-none">
       <CardHeader className="p-0">
-        {hideHeader ? null : (
-          <CardTitle className="flex justify-between">
-            <div>{playlistState.currentAudio.language.name}</div>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <Cross1Icon />
-            </Button>
-          </CardTitle>
-        )}
         <div className="flex justify-between items-center">
           <AudioBookPlaylist audios={audios} onClickAudio={handleOnClickAudio}>
             <Button
@@ -115,15 +92,13 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
 
         <CardDescription className="text-slate-700 text-lg text-center">
           <div className="flex flex-col justify-center items-center space-y-1 mb-2 -mr-2 animate-zoom-in">
-            <div>
+            <div className="text-xl sm:text-md">
               <small className="text-slate-500 mr-1">озвучил:</small>
               <small className="text-slate-500">{`${playlistState.currentAudio.author.firstName} ${playlistState.currentAudio.author.lastName}`}</small>
             </div>
-
             <StarRating
               commonRating={playlistState.currentAudio.moderateScore}
-              onClickRate={onClickRate ? handleOnClickRate : undefined}
-              onClickAuth={onClickAuth}
+              onClickRate={handleOnClickRate}
             />
           </div>
           <Separator className="my-2" />
@@ -137,7 +112,9 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
                   controls
                   controlsList="nodownload noplaybackrate foobar"
                   src={playlistState.currentAudio.srcAudio}
-                  onError={handleOnError}
+                  onError={() =>
+                    handleOnError("произошла ошибка при загрузки аудиозаписи")
+                  }
                 />
               </div>
             )}

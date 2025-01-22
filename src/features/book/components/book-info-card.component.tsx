@@ -39,22 +39,18 @@ import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 import { ToastContainer, toast } from "react-toastify";
-import apiClient from "@/api/apiClient";
-import axios, { AxiosError } from "axios";
 
 interface BookInfoCardProps {
   load: boolean;
   book: Components.Schemas.StoryBookResponseDto;
-
   audios: Components.Schemas.AudioStoryResponseDto[];
-  onClose: () => void;
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryBookResponseDto>;
 
   onClickAddAudio: () => void;
-  onClickAuth?: () => void;
-  onClickRate?: (
+  onClickAuth: () => void;
+  onClickRate: (
     dto: Components.Schemas.AddRatingAudioStoryDto
   ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   children?: React.ReactNode;
@@ -82,11 +78,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
-  // const { toast } = useToast();
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
-
-  const imgRef = useRef<HTMLImageElement | null>(null);
-  const [srcImg, setSrcImg] = useState<string>("true");
 
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
@@ -126,86 +118,103 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  const handleOnClickAddAudio = () => {
-    const sheetToast = () => (
+  const createActionToast = (
+    msg: string,
+    btnText: string,
+    onAction: () => void
+  ) => {
+    toast.info(
       <div className="flex items-center">
-        <span className="font-normal ">
-          подать заявку на добавление озвучку могут только авторизованные
-          пользователи
-        </span>
+        <span className="font-normal ">{msg}</span>
         <Button
           variant="outline"
           className="border border-slate-500"
-          onClick={onClickAuth}
+          onClick={onAction}
         >
-          войти
+          {btnText}
         </Button>
-      </div>
-    );
-    if (!user) {
-      toast.info(sheetToast, {
+      </div>,
+      {
         closeButton: false,
         position: "bottom-center",
         containerId: "bookInfoCardToast",
         className: "border border-red-500 text-slate-800",
         icon: <ExclamationTriangleIcon className="size-24 text-red-500" />,
         progressClassName: "bg-red-500",
-      });
+      }
+    );
+  };
+
+  const createErrorToast = (msg: string) => {
+    toast.error(msg, {
+      closeButton: true,
+      position: "top-center",
+      containerId: "bookInfoCardToast",
+      className: "border border-red-500 text-slate-800",
+      icon: <ExclamationTriangleIcon className="size-12 text-red-500" />,
+      progressClassName: "bg-red-500",
+    });
+  };
+
+  const handleError = (msg: string) => {
+    createErrorToast(msg);
+  };
+
+  const handleOnClickRate = async (
+    dto: Components.Schemas.AddRatingAudioStoryDto
+  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
+    console.log("BookInfoCardComponent: handleOnClickRate");
+    if (!user) {
+      console.log("NO USER");
+
+      createActionToast(
+        "оценить озвучку могут только авторизованные пользователи",
+        "войти",
+        () => {
+          onClickAuth();
+        }
+      );
+
+      return undefined;
+    } else {
+      return await onClickRate(dto);
+    }
+  };
+
+  const handleOnClickAddAudio = () => {
+    if (!user) {
+      createActionToast(
+        "подать заявку на добавление озвучку могут только авторизованные пользователи",
+        "войти",
+        () => {
+          onClickAuth();
+        }
+      );
     } else {
       onClickAddAudio();
     }
   };
 
   useEffect(() => {
-    console.log(srcImg);
-    setInfoBookState((prevState) => ({
-      ...prevState,
-      loadCover: false,
-    }));
-  }, [srcImg]);
-
-  useEffect(() => {
-    if (book.srcImg) {
-      axios
-        .get(book.srcImg, {
-          responseType: "blob",
-        })
-        .then((res) => {
-          console.log(res);
-          const imgUrl = URL.createObjectURL(res.data);
-          setSrcImg(imgUrl);
-        })
-        .catch((error) => {
-          setInfoBookState((prevState) => ({
-            ...prevState,
-            book: { ...prevState.book, srcImg: null },
-          }));
-          setSrcImg("");
-        });
-    } else {
-      setInfoBookState((prevState) => ({
-        ...prevState,
-        loadCover: false,
-      }));
-    }
+    setInfoBookState((prevState) => ({ ...prevState, loadCover: false }));
   }, []);
 
   if (isMobile) {
     return (
-      <Card className="card-book absolute w-full bottom-[8vh] border-none flex flex-col justify-center shadow-none">
+      <Card className="absolute w-full bottom-[5%] top-[10%] border-none flex flex-col justify-center shadow-none">
         <ToastContainer
           containerId="bookInfoCardToast"
           className="w-full p-4"
         />
         <CardHeader className="flex flex-col items-center justify-center w-full">
-          <CardTitle className="w-full text-center text-2xl py-3 m-0">
+          <CardTitle className="w-full text-center text-xl py-3 m-0">
             {book.name}
           </CardTitle>
           <CardDescription className="p-0 m-0">
             <div className="flex justify-items-center justify-center">
               {infoBookState.loadCover ? (
                 <div>
-                  <Skeleton className="bg-neutral-300" />
+                  <Skeleton className="bg-neutral-300 size-44" />
                 </div>
               ) : (
                 <Label
@@ -214,8 +223,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 >
                   {infoBookState.book.srcImg ? (
                     <img
-                      ref={imgRef}
-                      src={srcImg}
+                      src={infoBookState.book.srcImg}
                       alt={infoBookState.book.name}
                       className="size-44 rounded-t-xl object-cover"
                     />
@@ -283,10 +291,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             {audios.length > 0 ? (
               <AudioBookPlayer
                 audios={audios}
-                onClickAuth={onClickAuth}
-                onClickRate={onClickRate}
-                onClose={() => console.log("close")}
-                hideHeader={true}
+                onClickRate={handleOnClickRate}
+                onError={handleError}
               />
             ) : (
               <p className="self-center">аудиокниги не найдены</p>
@@ -369,10 +375,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     {audios.length > 0 ? (
                       <AudioBookPlayer
                         audios={audios}
-                        onClickAuth={onClickAuth}
                         onClickRate={onClickRate}
-                        onClose={() => console.log("close")}
-                        hideHeader={true}
+                        onError={handleError}
                       />
                     ) : (
                       <p className="self-center">аудиокниги не найдены</p>

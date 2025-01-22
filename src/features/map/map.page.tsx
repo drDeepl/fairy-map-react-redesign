@@ -39,6 +39,7 @@ import { FeatureProperties } from "./map.interface";
 import { FeatureCollection, Geometry } from "geojson";
 import NotCoverBook from "@/components/not-cover-book.component";
 import SearchBookBox from "../book/components/search-book-box.component";
+import { useMediaQuery } from "react-responsive";
 
 interface MapPageProps {
   width: number;
@@ -75,6 +76,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   });
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
+  const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const [languageListState, setLanguageListState] = useState<LanguageListState>(
     {
@@ -120,6 +122,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => {
+    setOpenDialog(true);
     setSelectedAudioBook(audio);
   };
 
@@ -162,8 +165,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
 
   const handleOnCloseBook = async () => {
+    console.log("handleOnCloseBook");
     setOpenDialog(false);
-
     setSelectedBook({
       load: true,
       book: null,
@@ -243,7 +246,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               onClick={handleOnCloseBook}
               size="icon"
               variant="ghost"
-              className="p-0 m-1 size-6"
+              className="p-0 m-1 "
             >
               <Cross1Icon />
             </Button>
@@ -254,19 +257,16 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             className="m-0 size-full"
           >
             <TabsContent value={BookInfoTabs.BookInfo.toString()}>
-              {selectedBook ? (
-                <BookInfoCardComponent
-                  load={selectedBook.load}
-                  book={selectedBook.book}
-                  audios={selectedBook.audios}
-                  onClickRate={handleOnClickRate}
-                  onClickAuth={() => {
-                    setAuthFormState({ open: true, notifySuccess: false });
-                  }}
-                  onClose={() => handleOnCloseBook()}
-                  onClickAddAudio={handleOnClickAddAudio}
-                ></BookInfoCardComponent>
-              ) : null}
+              <BookInfoCardComponent
+                load={selectedBook.load}
+                book={selectedBook.book}
+                audios={selectedBook.audios}
+                onClickRate={handleOnClickRate}
+                onClickAuth={() => {
+                  setAuthFormState({ open: true, notifySuccess: false });
+                }}
+                onClickAddAudio={handleOnClickAddAudio}
+              ></BookInfoCardComponent>
             </TabsContent>
             <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
               <CreateApplicationAudioForm
@@ -329,12 +329,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
                 <AudioBookPlayer
                   audios={selectedAudioBook.audios}
-                  onClose={() => setSelectedAudioBook(null)}
                   onClickRate={handleOnClickRate}
-                  onClickAuth={() => {
-                    setAuthFormState({ open: true, notifySuccess: false });
-                  }}
-                  hideHeader={true}
+                  onError={(msg) => console.error(msg)}
                 />
               </div>
             </SheetContent>

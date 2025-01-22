@@ -1,17 +1,12 @@
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RootState } from "@/app/store";
 
-import { useSelector } from "react-redux";
-
-import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 
 interface StarRatingProps {
   commonRating: number;
-  onClickRate?: (value: number) => Promise<void>;
-  onClickAuth?: () => void;
+  onClickRate: (value: number) => Promise<void>;
 }
 
 const filledColorClass = "text-orange-500";
@@ -19,11 +14,7 @@ const filledColorClass = "text-orange-500";
 const StarRating: React.FC<StarRatingProps> = ({
   commonRating,
   onClickRate,
-  onClickAuth,
 }) => {
-  const { toast } = useToast();
-  const { user } = useSelector((state: RootState) => state.auth);
-
   const [load, setLoad] = useState<boolean>(false);
 
   const replaceFilledIcon = (toReplace: string, end: number) => {
@@ -54,24 +45,15 @@ const StarRating: React.FC<StarRatingProps> = ({
   };
 
   const handleOnClickRate = async (value: number) => {
-    if (!user && onClickAuth) {
-      toast({
-        style: {
-          border: "1.5px solid var(--deep-red)",
-          right: "2rem",
-        },
-        title: "поставить оценку могу только авторизованные пользователи",
-        action: <Button onClick={() => onClickAuth()}>войти</Button>,
-      });
-    } else {
+    try {
       loadIcons(true);
       setLoad(true);
-      if (onClickRate) {
-        onClickRate(value + 1).then(() => {
-          setLoad(false);
-          loadIcons(false);
-        });
-      }
+      await onClickRate(value + 1);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoad(false);
+      loadIcons(false);
     }
   };
 
@@ -99,9 +81,9 @@ const StarRating: React.FC<StarRatingProps> = ({
                 <Button
                   variant="link"
                   className="p-1"
-                  onClick={() => (onClickRate ? handleOnClickRate(value) : {})}
+                  onClick={() => handleOnClickRate(value)}
                   onMouseOver={() => {
-                    if (!load && onClickRate) {
+                    if (!load) {
                       replaceFilledIcon("text-slate-50", 4);
                       replaceFilledIcon("text-orange-500", value);
                     }

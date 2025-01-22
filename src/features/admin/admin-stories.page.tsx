@@ -68,6 +68,7 @@ interface SelectedBookState {
 
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
+import { addRatingAudio } from "../audio-book/audio-book.actions";
 
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -218,6 +219,12 @@ const AdminStoriesPage: React.FC = () => {
     }
   };
 
+  const handleOnClickRate = async (
+    dto: Components.Schemas.AddRatingAudioStoryDto
+  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
+    return await dispatch(addRatingAudio(dto)).unwrap();
+  };
+
   useEffect(() => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {
       setLanguageListState({
@@ -254,10 +261,10 @@ const AdminStoriesPage: React.FC = () => {
               load={bookState.load}
               book={bookState.book}
               audios={bookState.audios}
-              onClose={handleCloseInfoBook}
               onUploadCover={handleOnUploadBookCover}
               onClickAddAudio={() => console.log("onClickAddAudio")}
               onClickAuth={() => {}}
+              onClickRate={handleOnClickRate}
             >
               <span></span>
             </BookInfoCardComponent>
@@ -426,7 +433,6 @@ const AdminStoriesPage: React.FC = () => {
                     success: "сказка успешно добавлена",
                   });
                 }}
-                onCancel={handleOnCloseAddBookForm}
               />
             </div>
           ) : null}
@@ -445,10 +451,10 @@ const AdminStoriesPage: React.FC = () => {
                 load={bookState.load}
                 book={bookState.book}
                 audios={bookState.audios}
-                onClose={handleCloseInfoBook}
                 onUploadCover={handleOnUploadBookCover}
                 onClickAddAudio={() => console.log("onClickAddAudio")}
                 onClickAuth={() => {}}
+                onClickRate={handleOnClickRate}
               >
                 <Popover
                   open={languageListState.open}
