@@ -40,10 +40,10 @@ const ListBookCarousel: React.FC<ListBookCarouselProps> = ({
       {books.length > 0 ? (
         <Carousel
           opts={{
-            align: "start",
+            align: isMobile ? "center" : "start",
             skipSnaps: true,
             containScroll: "trimSnaps",
-            slidesToScroll: 3,
+            slidesToScroll: isMobile ? 1 : 3,
           }}
           className={`flex flex-col justify-center ${isMobile ? "w-56" : ""}`}
         >

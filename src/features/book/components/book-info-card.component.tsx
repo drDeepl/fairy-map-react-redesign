@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   EnterFullScreenIcon,
@@ -39,6 +39,8 @@ import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 import { ToastContainer, toast } from "react-toastify";
+import apiClient from "@/api/apiClient";
+import axios, { AxiosError } from "axios";
 
 interface BookInfoCardProps {
   load: boolean;
@@ -83,13 +85,16 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   // const { toast } = useToast();
   const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const [srcImg, setSrcImg] = useState<string>("true");
+
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
     fullScreen: false,
   });
 
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
-    loadCover: false,
+    loadCover: true,
     book: book,
   });
 
@@ -151,9 +156,43 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
+  useEffect(() => {
+    console.log(srcImg);
+    setInfoBookState((prevState) => ({
+      ...prevState,
+      loadCover: false,
+    }));
+  }, [srcImg]);
+
+  useEffect(() => {
+    if (book.srcImg) {
+      axios
+        .get(book.srcImg, {
+          responseType: "blob",
+        })
+        .then((res) => {
+          console.log(res);
+          const imgUrl = URL.createObjectURL(res.data);
+          setSrcImg(imgUrl);
+        })
+        .catch((error) => {
+          setInfoBookState((prevState) => ({
+            ...prevState,
+            book: { ...prevState.book, srcImg: null },
+          }));
+          setSrcImg("");
+        });
+    } else {
+      setInfoBookState((prevState) => ({
+        ...prevState,
+        loadCover: false,
+      }));
+    }
+  }, []);
+
   if (isMobile) {
     return (
-      <Card className="absolute w-full bottom-[8vh] border-none flex flex-col justify-center shadow-none">
+      <Card className="card-book absolute w-full bottom-[8vh] border-none flex flex-col justify-center shadow-none">
         <ToastContainer
           containerId="bookInfoCardToast"
           className="w-full p-4"
@@ -175,7 +214,8 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                 >
                   {infoBookState.book.srcImg ? (
                     <img
-                      src={infoBookState.book.srcImg}
+                      ref={imgRef}
+                      src={srcImg}
                       alt={infoBookState.book.name}
                       className="size-44 rounded-t-xl object-cover"
                     />
@@ -257,10 +297,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               </div>
             ) : (
               <div>
-                {/* <div className="flex items-center m-2 cursor-pointer border border-ghost rounded-md shadow-md justify-center">
-                  <span>добавить свою озвучку</span>
-                  <FileAudio className="size-12 text-slate-700 p-2" />
-                </div> */}
                 <Button
                   onClick={handleOnClickAddAudio}
                   variant="secondary"

@@ -60,18 +60,14 @@ interface ListLanguageState {
   languages: Components.Schemas.LanguageDto[];
 }
 
-// interface ListBookState {
-//   load: boolean;
-//   books: Components.Schemas.PageResponseDto<
-//     Components.Schemas.StoryBookResponseDto
-//   >;
-// }
-
 interface SelectedBookState {
   load: boolean;
   book: Components.Schemas.StoryBookResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
 }
+
+import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
+import { Separator } from "@/components/ui/separator";
 
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -80,20 +76,7 @@ const AdminStoriesPage: React.FC = () => {
     (state: RootState) => state.listBook
   );
 
-  // const [listBookState, setListBookState] = useState<ListBookState>({
-  //   load: true,
-  //   books: {
-  //     data: [],
-  //     meta: {
-  //       page: 1,
-  //       take: 10,
-  //       itemCount: 0,
-  //       pageCount: 1,
-  //       hasPreviousPage: false,
-  //       hasNextPage: false,
-  //     },
-  //   },
-  // });
+  const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const ethnicGroupListState: EthnicGroupListState = useSelector(
     (state: RootState) => state.ethnicGroupList
@@ -135,6 +118,7 @@ const AdminStoriesPage: React.FC = () => {
 
   const handleOnClickAddBook = () => {
     setOpenAddBookForm(true);
+    setOpenDialog(true);
   };
 
   const handleOnSubmitAddBook = async (
@@ -147,6 +131,7 @@ const AdminStoriesPage: React.FC = () => {
 
   const handleOnCloseAddBookForm = () => {
     setOpenAddBookForm(false);
+    setOpenDialog(false);
   };
 
   const handleOnClickPreviewBook = async (
@@ -243,23 +228,149 @@ const AdminStoriesPage: React.FC = () => {
     });
   }, []);
 
+  if (isMobile) {
+    return (
+      <Drawer open={openDialog} handleOnly={false} dismissible={false}>
+        <DrawerContent className="min-w-full min-h-full">
+          <div className="absolute bottom-[15%] px-4 w-full">
+            {openAddBookForm ? (
+              <AddBookForm
+                open={openAddBookForm}
+                errors={null}
+                ethnicGroups={ethnicGroupListState.ethnicGroups}
+                loading={listBookState.loading}
+                onSubmit={(values) => {
+                  toast.promise(handleOnSubmitAddBook(values), {
+                    loading: "добавляю сказку",
+                    success: "сказка успешно добавлена",
+                  });
+                }}
+              />
+            ) : null}
+          </div>
+
+          {bookState.book ? (
+            <BookInfoCardComponent
+              load={bookState.load}
+              book={bookState.book}
+              audios={bookState.audios}
+              onClose={handleCloseInfoBook}
+              onUploadCover={handleOnUploadBookCover}
+              onClickAddAudio={() => console.log("onClickAddAudio")}
+              onClickAuth={() => {}}
+            >
+              <span></span>
+            </BookInfoCardComponent>
+          ) : null}
+
+          <DrawerFooter>
+            <Separator />
+            <div className="flex justify-between">
+              <Button
+                variant="outline"
+                className="w-24 border border-baby-blue-800  bg-slate-200 text-slate-800 text-md"
+                onClick={handleCloseInfoBook}
+              >
+                закрыть
+              </Button>
+              {bookState.book ? (
+                <Popover
+                  open={languageListState.open}
+                  onOpenChange={(open) => {
+                    setLanguageListState((prevState) => ({
+                      ...prevState,
+                      open,
+                    }));
+                  }}
+                >
+                  <PopoverTrigger
+                    asChild
+                    onClick={() =>
+                      setLanguageListState((prevState) => ({
+                        ...prevState,
+                        open: true,
+                      }))
+                    }
+                  >
+                    <Button
+                      variant="outline"
+                      className="bg-slate-100 border border-slate-800 place-self-center [&_svg]:size-6 text-md"
+                    >
+                      <span>загрузить озвучку</span>
+                      <UploadIcon className="text-slate-800" />
+                    </Button>
+                  </PopoverTrigger>
+
+                  <PopoverContent className="px-0">
+                    <Command>
+                      <p className="w-full font-semibold text-md text-center">
+                        выберите язык для озвучки
+                      </p>
+                      <CommandInput
+                        placeholder="начните поиск..."
+                        className="h-9"
+                      />
+                      <CommandList className="px-0">
+                        <CommandEmpty className="text-md text-center">
+                          языки для озвучки не найдены
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {languageListState.load ? (
+                            <Skeleton className="w-full h-16" />
+                          ) : (
+                            languageListState.languages.map((language) => (
+                              <CommandItem
+                                key={`lang_${language.id}`}
+                                value={language.name}
+                                onSelect={() =>
+                                  handleOnSelectLanguage(language)
+                                }
+                                className="text-md flex flex-col items-start"
+                              >
+                                <Separator />
+                                <span>{language.name}</span>
+                              </CommandItem>
+                            ))
+                          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              ) : null}
+            </div>
+          </DrawerFooter>
+        </DrawerContent>
+
+        <section className="flex flex-col  space-y-2">
+          <ListBookCarousel
+            load={listBookState.loading}
+            books={listBookState.books.data}
+            onClickBook={handleOnClickPreviewBook}
+          >
+            <div className="flex jsutify-center items-center space-x-2">
+              <Button
+                variant="outline"
+                onClick={handleOnClickAddBook}
+                className="w-42 border border-ghost text-md lg:h-12"
+              >
+                <span className="">добавить сказку</span>
+                <BookPlus />
+              </Button>
+              <SearchBookBox onClickBook={handleOnClickPreviewBook} />
+            </div>
+          </ListBookCarousel>
+          <PaginationBox
+            meta={listBookState.books.meta}
+            onApplyPage={handleOnClickPage}
+          />
+        </section>
+      </Drawer>
+    );
+  }
+
   return (
     <Dialog open={openDialog}>
-      {openAddBookForm ? (
-        <AddBookForm
-          open={openAddBookForm}
-          errors={null}
-          ethnicGroups={ethnicGroupListState.ethnicGroups}
-          loading={listBookState.loading}
-          onSubmit={(values) => {
-            toast.promise(handleOnSubmitAddBook(values), {
-              loading: "добавляю сказку",
-              success: "сказка успешно добавлена",
-            });
-          }}
-          onCancel={handleOnCloseAddBookForm}
-        />
-      ) : null}
       <div>
         <section className="mx-8 flex flex-col  space-y-2">
           <ListBookCarousel
@@ -294,6 +405,32 @@ const AdminStoriesPage: React.FC = () => {
             bookState.book ? "animate-zoom-in" : "animate-zoom-out"
           }`}
         >
+          {openAddBookForm ? (
+            <div className="px-4 py-6">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-slate-500 absolute top-[1%] right-[1%]"
+                onClick={handleOnCloseAddBookForm}
+              >
+                <Cross1Icon />
+              </Button>
+              <AddBookForm
+                open={openAddBookForm}
+                errors={null}
+                ethnicGroups={ethnicGroupListState.ethnicGroups}
+                loading={listBookState.loading}
+                onSubmit={(values) => {
+                  toast.promise(handleOnSubmitAddBook(values), {
+                    loading: "добавляю сказку",
+                    success: "сказка успешно добавлена",
+                  });
+                }}
+                onCancel={handleOnCloseAddBookForm}
+              />
+            </div>
+          ) : null}
+
           {bookState.book ? (
             <div>
               <Button
