@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { AudioBookListState } from "../audio-book/components/audio-book-list.slice";
 import { Separator } from "@/components/ui/separator";
+import { motion, AnimationProps } from "framer-motion";
 
 interface MapComponentProps {
   features: any;
@@ -141,9 +142,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(
-      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
-    ).then((result) => console.log(result));
+    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
+      (result) => console.log(result)
+    );
   };
 
   useEffect(() => {
@@ -153,6 +154,15 @@ const MapComponent: React.FC<MapComponentProps> = ({
         .select<SVGSVGElement, unknown>(svgRef.current)
         .style("background-color", "#82A9FD");
       svg.call(zoom);
+      // const tooltip = d3
+      //   .select("body")
+      //   .append("div")
+      //   .attr("id", "tooltip")
+      //   .attr(
+      //     "class",
+      //     ``
+      //   )
+      //   .style("display", "none");
     }
   }, []);
 
@@ -192,130 +202,164 @@ const MapComponent: React.FC<MapComponentProps> = ({
                       ethnicGroupPoint.longitude,
                       ethnicGroupPoint.latitude,
                     ]);
-                    return (
-                      <DropdownMenu
-                        key={ethnicGroupPoint.idPoint}
-                        modal={false}
-                        onOpenChange={(open: boolean) => {
-                          setListBookState({ load: true, books: [] });
+                    if (point) {
+                      const cx = point[0];
+                      const cy = point[1];
+                      return (
+                        <circle
+                          onClick={(e) => {
+                            const circle: SVGCircleElement =
+                              e.target as SVGCircleElement;
+                            circle.style.fill = "red";
+                            const tooltip = d3.select("#tooltip");
 
-                          let color = "#82A9FD";
-                          if (open) {
-                            color = "red";
-                          }
-                          d3.select(
-                            `circle#circle-${ethnicGroupPoint.idPoint}`
-                          ).attr("fill", color);
-                        }}
-                      >
-                        {point ? (
-                          <DropdownMenuTrigger
-                            asChild
-                            onClick={() => {
-                              handleClickPoint(ethnicGroupPoint);
-                            }}
-                          >
-                            <circle
-                              id={`circle-${ethnicGroupPoint.idPoint}`}
-                              className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
-                              fill="#82A9FD"
-                              stroke="#FFFFFF"
-                              strokeWidth="0.5"
-                              cx={point[0]}
-                              cy={point[1]}
-                              r="4"
-                            />
-                          </DropdownMenuTrigger>
-                        ) : null}
-                        <DropdownMenuContent className="flex flex-col pb-5 px-8">
-                          <DropdownMenuLabel className="text-center text-lg">
-                            <p>{ethnicGroupPoint.ethnicGroupName}</p>
-                            <p className="text-sm lowercase text-zinc-500 self-center font-normal">
-                              {feature.properties.name}
-                            </p>
-                          </DropdownMenuLabel>
-                          {listBookState.load ? (
-                            <Skeleton className="flex self-center w-48 h-8 bg-neutral-300" />
-                          ) : (
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-                                <LibraryBig className="stroke-gray-600" />
-                                <span className="text-sm">книги</span>
-                                <span className="">
-                                  {listBookState.books.length}
-                                </span>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                  {listBookState.books.length > 0 ? (
-                                    listBookState.books.map((book) => (
-                                      <DropdownMenuItem
-                                        key={book.id}
-                                        className="flex flex-col hover:bg-slate-100"
-                                        onClick={() => onClickBook(book)}
-                                      >
-                                        <Separator />
-                                        <span className="font-semibold p-2 cursor-pointer">
-                                          {book.name}
-                                        </span>
-                                      </DropdownMenuItem>
-                                    ))
-                                  ) : (
-                                    <DropdownMenuItem>
-                                      книги не найдены
-                                    </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuSubContent>
-                              </DropdownMenuPortal>
-                            </DropdownMenuSub>
-                          )}
-                          {audioBookListState.loading ? (
-                            <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
-                          ) : (
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-                                <BookHeadphones className="stroke-gray-600" />
-                                <span className="text-sm ">аудиокниги</span>
-                                <span>
-                                  {audioBookListState.audioStories.length}
-                                </span>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                  {audioBookListState.audioStories.length >
-                                  0 ? (
-                                    audioBookListState.audioStories.map(
-                                      (
-                                        storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
-                                      ) => {
-                                        return (
-                                          <DropdownMenuItem
-                                            className="flex flex-col items-center hover:bg-slate-100"
-                                            key={storyAudio.id}
-                                            onClick={() =>
-                                              onClickAudioBook(storyAudio)
-                                            }
-                                          >
-                                            <Separator />
-                                            <span className="font-semibold p-2 cursor-pointer">
-                                              {storyAudio.name}
-                                            </span>
-                                          </DropdownMenuItem>
-                                        );
-                                      }
-                                    )
-                                  ) : (
-                                    <DropdownMenuItem>
-                                      <span>Аудиокниги не найдены</span>
-                                    </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuSubContent>
-                              </DropdownMenuPortal>
-                            </DropdownMenuSub>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    );
+                            tooltip
+                              .style("display", "block")
+                              .style("left", `${e.pageX + 5}px`)
+                              .style("top", `${e.pageY + 10}px`);
+                            // .style("transform", "translateX(-50%)");
+
+                            console.log(point);
+
+                            console.log(e.pageX, e.pageY);
+                          }}
+                          id={`circle-${ethnicGroupPoint.idPoint}`}
+                          className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
+                          fill="#82A9FD"
+                          stroke="#FFFFFF"
+                          strokeWidth="0.5"
+                          cx={cx}
+                          cy={cy}
+                          r="4"
+                        />
+                      );
+                    }
+
+                    // return (
+                    //   <DropdownMenu
+                    //     key={ethnicGroupPoint.idPoint}
+                    //     modal={false}
+                    //     onOpenChange={(open: boolean) => {
+                    //       setListBookState({ load: true, books: [] });
+
+                    //       let color = "#82A9FD";
+                    //       if (open) {
+                    //         color = "red";
+                    //       }
+                    //       d3.select(
+                    //         `circle#circle-${ethnicGroupPoint.idPoint}`
+                    //       ).attr("fill", color);
+                    //     }}
+                    //   >
+                    //     {point ? (
+                    //       <DropdownMenuTrigger
+                    //         asChild
+                    //         onClick={() => {
+                    //           handleClickPoint(ethnicGroupPoint);
+                    //         }}
+                    //       >
+                    //         <circle
+                    //           onClick={(e) => console.log(e.target)}
+                    //           id={`circle-${ethnicGroupPoint.idPoint}`}
+                    //           className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
+                    //           fill="#82A9FD"
+                    //           stroke="#FFFFFF"
+                    //           strokeWidth="0.5"
+                    //           cx={point[0]}
+                    //           cy={point[1]}
+                    //           r="4"
+                    //         />
+                    //       </DropdownMenuTrigger>
+                    //     ) : null}
+                    //     <DropdownMenuContent className="flex flex-col pb-5 px-8">
+                    //       <DropdownMenuLabel className="text-center text-lg">
+                    //         <p>{ethnicGroupPoint.ethnicGroupName}</p>
+                    //         <p className="text-sm lowercase text-zinc-500 self-center font-normal">
+                    //           {feature.properties.name}
+                    //         </p>
+                    //       </DropdownMenuLabel>
+                    //       {listBookState.load ? (
+                    //         <Skeleton className="flex self-center w-48 h-8 bg-neutral-300" />
+                    //       ) : (
+                    //         <DropdownMenuSub>
+                    //           <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
+                    //             <LibraryBig className="stroke-gray-600" />
+                    //             <span className="text-sm">книги</span>
+                    //             <span className="">
+                    //               {listBookState.books.length}
+                    //             </span>
+                    //           </DropdownMenuSubTrigger>
+                    //           <DropdownMenuPortal>
+                    //             <DropdownMenuSubContent>
+                    //               {listBookState.books.length > 0 ? (
+                    //                 listBookState.books.map((book) => (
+                    //                   <DropdownMenuItem
+                    //                     key={book.id}
+                    //                     className="flex flex-col hover:bg-slate-100"
+                    //                     onClick={() => onClickBook(book)}
+                    //                   >
+                    //                     <Separator />
+                    //                     <span className="font-semibold p-2 cursor-pointer">
+                    //                       {book.name}
+                    //                     </span>
+                    //                   </DropdownMenuItem>
+                    //                 ))
+                    //               ) : (
+                    //                 <DropdownMenuItem>
+                    //                   книги не найдены
+                    //                 </DropdownMenuItem>
+                    //               )}
+                    //             </DropdownMenuSubContent>
+                    //           </DropdownMenuPortal>
+                    //         </DropdownMenuSub>
+                    //       )}
+                    //       {audioBookListState.loading ? (
+                    //         <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
+                    //       ) : (
+                    //         <DropdownMenuSub>
+                    //           <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
+                    //             <BookHeadphones className="stroke-gray-600" />
+                    //             <span className="text-sm ">аудиокниги</span>
+                    //             <span>
+                    //               {audioBookListState.audioStories.length}
+                    //             </span>
+                    //           </DropdownMenuSubTrigger>
+                    //           <DropdownMenuPortal>
+                    //             <DropdownMenuSubContent>
+                    //               {audioBookListState.audioStories.length >
+                    //               0 ? (
+                    //                 audioBookListState.audioStories.map(
+                    //                   (
+                    //                     storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
+                    //                   ) => {
+                    //                     return (
+                    //                       <DropdownMenuItem
+                    //                         className="flex flex-col items-center hover:bg-slate-100"
+                    //                         key={storyAudio.id}
+                    //                         onClick={() =>
+                    //                           onClickAudioBook(storyAudio)
+                    //                         }
+                    //                       >
+                    //                         <Separator />
+                    //                         <span className="font-semibold p-2 cursor-pointer">
+                    //                           {storyAudio.name}
+                    //                         </span>
+                    //                       </DropdownMenuItem>
+                    //                     );
+                    //                   }
+                    //                 )
+                    //               ) : (
+                    //                 <DropdownMenuItem>
+                    //                   <span>Аудиокниги не найдены</span>
+                    //                 </DropdownMenuItem>
+                    //               )}
+                    //             </DropdownMenuSubContent>
+                    //           </DropdownMenuPortal>
+                    //         </DropdownMenuSub>
+                    //       )}
+                    //     </DropdownMenuContent>
+                    //   </DropdownMenu>
+                    // );
                   }
                 )}
               </g>
@@ -323,6 +367,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
           })}
         </g>
       </svg>
+      <div
+        id="tooltip"
+        className="absolute bg-white px-4 py-2 border w-64 max-h-44 rounded-md -translate-x-[50%] shadow-md flex justify-center"
+      >
+        <div className="flex items-center justify-center">
+          <div className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
+            <BookHeadphones className="stroke-gray-600" />
+            <span className="text-sm ">аудиокниги</span>
+            <span>{audioBookListState.audioStories.length}</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
