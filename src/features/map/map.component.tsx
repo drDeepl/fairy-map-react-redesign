@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import * as d3 from "d3";
 
 import {
@@ -12,7 +18,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { BookHeadphones, LibraryBig } from "lucide-react";
+import { BookHeadphones, LibraryBig, MapPin, MapPinIcon } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -29,7 +35,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/store";
 import { AudioBookListState } from "../audio-book/components/audio-book-list.slice";
 import { Separator } from "@/components/ui/separator";
-import { motion, AnimationProps } from "framer-motion";
+import { motion, AnimationProps, AnimatePresence } from "framer-motion";
+import { TriangleUpIcon } from "@radix-ui/react-icons";
 
 interface MapComponentProps {
   features: any;
@@ -67,18 +74,25 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const projection = d3
-    .geoAlbers()
-    .rotate([-105, 0]) //  .rotate([-105,0])
-    .center([-10, 65])
-    .parallels([50, 70]) //.parallels([52, 64])
-    .scale(700)
-    .translate([width / 2, height / 2])
-    .precision(0.1);
+  const projection = useMemo(() => {
+    return d3
+      .geoAlbers()
+      .rotate([-105, 0]) //  .rotate([-105,0])
+      .center([-10, 65])
+      .parallels([50, 70]) //.parallels([52, 64])
+      .scale(700)
+      .translate([width / 2, height / 2])
+      .precision(0.1);
+  }, []);
+
+  const pathGenerator = useMemo(() => {
+    const path = d3.geoPath();
+    return path.projection(projection);
+  }, []);
 
   // Path
-  const path = d3.geoPath();
-  const pathGenerator = path.projection(projection);
+  // const path = d3.geoPath();
+  // const pathGenerator = path.projection(projection);
 
   const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
     if (svgRef.current) {
@@ -108,6 +122,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   }
 
   const handleClickPath = useCallback((d: any, pointsClass: string) => {
+    setTooltip((prevState) => ({ ...prevState, open: false }));
     const svg = d3.select(svgRef.current);
 
     const defaultRegionClass = "region fill-stone-100";
@@ -142,243 +157,168 @@ const MapComponent: React.FC<MapComponentProps> = ({
         setListBookState((prevState) => ({ ...prevState, load: false }));
       });
 
-    dispatch(fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)).then(
-      (result) => console.log(result)
-    );
+    dispatch(
+      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
+    ).then((result) => console.log(result));
   };
+
+  interface TooltipState {
+    open: boolean;
+    load: boolean;
+    y: number;
+    x: number;
+    title: string;
+  }
+
+  const [tooltip, setTooltip] = useState<TooltipState>({
+    open: false,
+    load: true,
+    y: 0,
+    x: 0,
+    title: "",
+  });
+
+  const handleClickCircle = async (
+    e: any,
+    ethnicGroupPoint: EthnicGroupPoint
+  ) => {
+    if (svgRef.current) {
+      d3.selectAll("circle").style("fill", "#82A9FD");
+      const circle: SVGCircleElement = e.target as SVGCircleElement;
+
+      circle.style.fill = "red";
+
+      const rect = circle.getBoundingClientRect();
+
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      setTooltip((prevState) => ({
+        ...prevState,
+        open: true,
+        x: centerX,
+        y: centerY + 10,
+        title: ethnicGroupPoint.ethnicGroupName,
+      }));
+
+      handleClickPoint(ethnicGroupPoint).then((_) => {
+        setTooltip((prevState) => ({
+          ...prevState,
+          load: false,
+        }));
+      });
+    }
+  };
+
+  const renderedFeatures = useMemo(() => {
+    return features.map((feature: any) => {
+      const d = pathGenerator(feature);
+      return (
+        <g key={feature.properties.id} id={`region_${feature.properties.id}`}>
+          <path
+            className="region fill-stone-100"
+            stroke="#82A9FD"
+            strokeWidth="0.3"
+            onClick={() =>
+              handleClickPath(
+                feature,
+                `ethnic-group-point-region-${feature.properties.id}`
+              )
+            }
+            d={d}
+            fill="#FFFFFF"
+          />
+          {feature.properties.ethnicGroupsPoints.map(
+            (ethnicGroupPoint: any) => {
+              const point = projection([
+                ethnicGroupPoint.longitude,
+                ethnicGroupPoint.latitude,
+              ]);
+              if (point) {
+                const [cx, cy] = point;
+                return (
+                  <circle
+                    key={`point-${ethnicGroupPoint.idPoint}`}
+                    id={`circle-${ethnicGroupPoint.idPoint}`}
+                    className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
+                    fill="#82A9FD"
+                    stroke="#FFFFFF"
+                    strokeWidth="0.5"
+                    cx={cx}
+                    cy={cy}
+                    r={4}
+                    onClick={(e) => handleClickCircle(e, ethnicGroupPoint)}
+                  />
+                );
+              }
+              return null;
+            }
+          )}
+        </g>
+      );
+    });
+  }, [features, pathGenerator, projection]);
 
   useEffect(() => {
     if (svgRef.current) {
-      d3.selectAll(`circle`).style("visibility", "hidden");
+      const circle = d3.selectAll(`circle`);
+      circle.style("visibility", "hidden");
+
       const svg = d3
         .select<SVGSVGElement, unknown>(svgRef.current)
         .style("background-color", "#82A9FD");
       svg.call(zoom);
-      // const tooltip = d3
-      //   .select("body")
-      //   .append("div")
-      //   .attr("id", "tooltip")
-      //   .attr(
-      //     "class",
-      //     ``
-      //   )
-      //   .style("display", "none");
     }
   }, []);
 
   return (
-    <div>
-      <Toaster richColors position="top-center" />
+    <div style={{ position: "relative" }}>
       <svg
         ref={svgRef}
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
       >
-        <g>
-          {features.map((feature: any) => {
-            const d = pathGenerator(feature);
-            return (
-              <g
-                key={feature.properties.id}
-                id={`region_${feature.properties.id}`}
-              >
-                <path
-                  className="region fill-stone-100"
-                  stroke="#82A9FD"
-                  strokeWidth="0.3"
-                  onClick={() => {
-                    handleClickPath(
-                      feature,
-                      `ethnic-group-point-region-${feature.properties.id}`
-                    );
-                  }}
-                  d={`${d}`}
-                  fill="#FFFFFF"
-                />
-                {feature.properties.ethnicGroupsPoints.map(
-                  (ethnicGroupPoint: EthnicGroupPoint) => {
-                    const point = projection([
-                      ethnicGroupPoint.longitude,
-                      ethnicGroupPoint.latitude,
-                    ]);
-                    if (point) {
-                      const cx = point[0];
-                      const cy = point[1];
-                      return (
-                        <circle
-                          onClick={(e) => {
-                            const circle: SVGCircleElement =
-                              e.target as SVGCircleElement;
-                            circle.style.fill = "red";
-                            const tooltip = d3.select("#tooltip");
-
-                            tooltip
-                              .style("display", "block")
-                              .style("left", `${e.pageX + 5}px`)
-                              .style("top", `${e.pageY + 10}px`);
-                            // .style("transform", "translateX(-50%)");
-
-                            console.log(point);
-
-                            console.log(e.pageX, e.pageY);
-                          }}
-                          id={`circle-${ethnicGroupPoint.idPoint}`}
-                          className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
-                          fill="#82A9FD"
-                          stroke="#FFFFFF"
-                          strokeWidth="0.5"
-                          cx={cx}
-                          cy={cy}
-                          r="4"
-                        />
-                      );
-                    }
-
-                    // return (
-                    //   <DropdownMenu
-                    //     key={ethnicGroupPoint.idPoint}
-                    //     modal={false}
-                    //     onOpenChange={(open: boolean) => {
-                    //       setListBookState({ load: true, books: [] });
-
-                    //       let color = "#82A9FD";
-                    //       if (open) {
-                    //         color = "red";
-                    //       }
-                    //       d3.select(
-                    //         `circle#circle-${ethnicGroupPoint.idPoint}`
-                    //       ).attr("fill", color);
-                    //     }}
-                    //   >
-                    //     {point ? (
-                    //       <DropdownMenuTrigger
-                    //         asChild
-                    //         onClick={() => {
-                    //           handleClickPoint(ethnicGroupPoint);
-                    //         }}
-                    //       >
-                    //         <circle
-                    //           onClick={(e) => console.log(e.target)}
-                    //           id={`circle-${ethnicGroupPoint.idPoint}`}
-                    //           className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
-                    //           fill="#82A9FD"
-                    //           stroke="#FFFFFF"
-                    //           strokeWidth="0.5"
-                    //           cx={point[0]}
-                    //           cy={point[1]}
-                    //           r="4"
-                    //         />
-                    //       </DropdownMenuTrigger>
-                    //     ) : null}
-                    //     <DropdownMenuContent className="flex flex-col pb-5 px-8">
-                    //       <DropdownMenuLabel className="text-center text-lg">
-                    //         <p>{ethnicGroupPoint.ethnicGroupName}</p>
-                    //         <p className="text-sm lowercase text-zinc-500 self-center font-normal">
-                    //           {feature.properties.name}
-                    //         </p>
-                    //       </DropdownMenuLabel>
-                    //       {listBookState.load ? (
-                    //         <Skeleton className="flex self-center w-48 h-8 bg-neutral-300" />
-                    //       ) : (
-                    //         <DropdownMenuSub>
-                    //           <DropdownMenuSubTrigger className="w-48 self-center flex justify-center items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-                    //             <LibraryBig className="stroke-gray-600" />
-                    //             <span className="text-sm">книги</span>
-                    //             <span className="">
-                    //               {listBookState.books.length}
-                    //             </span>
-                    //           </DropdownMenuSubTrigger>
-                    //           <DropdownMenuPortal>
-                    //             <DropdownMenuSubContent>
-                    //               {listBookState.books.length > 0 ? (
-                    //                 listBookState.books.map((book) => (
-                    //                   <DropdownMenuItem
-                    //                     key={book.id}
-                    //                     className="flex flex-col hover:bg-slate-100"
-                    //                     onClick={() => onClickBook(book)}
-                    //                   >
-                    //                     <Separator />
-                    //                     <span className="font-semibold p-2 cursor-pointer">
-                    //                       {book.name}
-                    //                     </span>
-                    //                   </DropdownMenuItem>
-                    //                 ))
-                    //               ) : (
-                    //                 <DropdownMenuItem>
-                    //                   книги не найдены
-                    //                 </DropdownMenuItem>
-                    //               )}
-                    //             </DropdownMenuSubContent>
-                    //           </DropdownMenuPortal>
-                    //         </DropdownMenuSub>
-                    //       )}
-                    //       {audioBookListState.loading ? (
-                    //         <Skeleton className="w-48 flex self-center h-8 mt-3 bg-neutral-300" />
-                    //       ) : (
-                    //         <DropdownMenuSub>
-                    //           <DropdownMenuSubTrigger className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-                    //             <BookHeadphones className="stroke-gray-600" />
-                    //             <span className="text-sm ">аудиокниги</span>
-                    //             <span>
-                    //               {audioBookListState.audioStories.length}
-                    //             </span>
-                    //           </DropdownMenuSubTrigger>
-                    //           <DropdownMenuPortal>
-                    //             <DropdownMenuSubContent>
-                    //               {audioBookListState.audioStories.length >
-                    //               0 ? (
-                    //                 audioBookListState.audioStories.map(
-                    //                   (
-                    //                     storyAudio: Components.Schemas.PreviewAudioStoryResponseDto
-                    //                   ) => {
-                    //                     return (
-                    //                       <DropdownMenuItem
-                    //                         className="flex flex-col items-center hover:bg-slate-100"
-                    //                         key={storyAudio.id}
-                    //                         onClick={() =>
-                    //                           onClickAudioBook(storyAudio)
-                    //                         }
-                    //                       >
-                    //                         <Separator />
-                    //                         <span className="font-semibold p-2 cursor-pointer">
-                    //                           {storyAudio.name}
-                    //                         </span>
-                    //                       </DropdownMenuItem>
-                    //                     );
-                    //                   }
-                    //                 )
-                    //               ) : (
-                    //                 <DropdownMenuItem>
-                    //                   <span>Аудиокниги не найдены</span>
-                    //                 </DropdownMenuItem>
-                    //               )}
-                    //             </DropdownMenuSubContent>
-                    //           </DropdownMenuPortal>
-                    //         </DropdownMenuSub>
-                    //       )}
-                    //     </DropdownMenuContent>
-                    //   </DropdownMenu>
-                    // );
-                  }
-                )}
-              </g>
-            );
-          })}
-        </g>
+        <g>{renderedFeatures}</g>
       </svg>
-      <div
-        id="tooltip"
-        className="absolute bg-white px-4 py-2 border w-64 max-h-44 rounded-md -translate-x-[50%] shadow-md flex justify-center"
+
+      <motion.div
+        className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-50 bg-white -translate-x-[50%]`}
+        initial={{ width: 0 }}
+        animate={{
+          width: tooltip.open ? "25dvw" : 0,
+          opacity: tooltip.open ? 1 : 0,
+        }}
+        transition={{ duration: 0.2 }}
+        exit={{ opacity: 0 }}
+        style={{
+          left: tooltip.x,
+          top: tooltip.y,
+        }}
       >
-        <div className="flex items-center justify-center">
-          <div className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-            <BookHeadphones className="stroke-gray-600" />
-            <span className="text-sm ">аудиокниги</span>
-            <span>{audioBookListState.audioStories.length}</span>
+        <p className="text-lg font-semibold">{tooltip.title}</p>
+        {tooltip.load ? (
+          <div>
+            {Array(3)
+              .fill(0)
+              .map((_, idx) => (
+                <Skeleton key={idx} className="bg-ghost h-4 w-full my-2" />
+              ))}
           </div>
-        </div>
-      </div>
+        ) : (
+          <div className="flex items-center justify-center px-4 py-2 ">
+            {audioBookListState.audioStories.length > 0 ? (
+              <div className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
+                <BookHeadphones className="stroke-gray-600" />
+                <span className="text-sm ">аудиокниги</span>
+                <span>{audioBookListState.audioStories.length}</span>
+              </div>
+            ) : (
+              <p className="text-slate-500">книги не найдены...</p>
+            )}
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 };
