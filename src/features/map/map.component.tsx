@@ -90,12 +90,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
     return path.projection(projection);
   }, []);
 
-  // Path
-  // const path = d3.geoPath();
-  // const pathGenerator = path.projection(projection);
+  const resetTooltip = async () => {
+    setTooltip({
+      open: false,
+      load: true,
+      y: 0,
+      x: 0,
+      title: "",
+    });
+  };
 
   const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
     if (svgRef.current) {
+      resetTooltip();
       const g = d3.select<SVGSVGElement, unknown>(svgRef.current).select("g");
       g.attr("transform", event.transform);
     }
@@ -159,7 +166,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     dispatch(
       fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
-    ).then((result) => console.log(result));
+    ).unwrap();
   };
 
   interface TooltipState {
@@ -182,6 +189,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     e: any,
     ethnicGroupPoint: EthnicGroupPoint
   ) => {
+    resetTooltip();
     if (svgRef.current) {
       d3.selectAll("circle").style("fill", "#82A9FD");
       const circle: SVGCircleElement = e.target as SVGCircleElement;

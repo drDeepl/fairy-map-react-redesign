@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/app/store";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import MapComponent from "./map.component";
 
@@ -72,7 +72,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const [mapState, setMapState] = useState<MapState>({
     load: true,
     dataMap: null,
-    error: { message: "" },
+    error: null,
   });
 
   const authState: AuthState = useSelector((state: RootState) => state.auth);
@@ -87,8 +87,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
-  const [load, setLoad] = useState<boolean>(true);
 
   const [authFormState, setAuthFormState] = useState<AuthFormState>({
     open: false,
@@ -112,10 +110,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
@@ -174,35 +170,36 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     });
   };
 
-  useEffect(() => {
+  const fetchMap = useCallback(async (): Promise<
+    FeatureCollection<Geometry, FeatureProperties>
+  > => {
     const features: string | null = localStorage.getItem("features");
     if (!features) {
-      apiClient.paths["/api/map"]
-        .get()
-        .then((response: any) => {
-          simplifyGeoJsonHelper(response.data.data).then((dataMap) => {
-            setMapState({
-              load: false,
-              dataMap: dataMap,
-              error: null,
-            });
-            setLoad(false);
-          });
-        })
-        .catch(() => {
-          setMapState({
-            load: false,
-            dataMap: null,
-            error: { message: "произошла ошибка при загрузки карты" },
-          });
-        });
+      const response = await apiClient.paths["/api/map"].get();
+      return simplifyGeoJsonHelper(response.data.data);
     } else {
-      setMapState({
-        load: false,
-        dataMap: JSON.parse(features),
-        error: null,
-      });
+      const map = JSON.parse(features);
+      return map as FeatureCollection<Geometry, FeatureProperties>;
     }
+  }, []);
+
+  useEffect(() => {
+    fetchMap()
+      .then((result) => {
+        setMapState((prevState) => ({
+          ...prevState,
+          load: false,
+          dataMap: result,
+        }));
+      })
+      .catch((error) => {
+        console.log(error);
+        setMapState((prevState) => ({
+          ...prevState,
+          error: { message: "ошибка при загрузке карты" },
+        }));
+      });
+
     apiClient.paths["/api/ethnic-group/language/all"]
       .get()
       .then((res: any) => {
@@ -228,7 +225,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     setCurrentTab(BookInfoTabs.AddApplicationAudio.toString());
   };
 
-  if (mapState.load || load) {
+  if (mapState.load) {
     return <LoadSpinner />;
   }
 
