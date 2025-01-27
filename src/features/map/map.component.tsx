@@ -63,17 +63,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const [listBookState, setListBookState] = useState<ListBookState>({
-    load: true,
-    books: [],
-  });
-
-  const audioBookListState: AudioBookListState = useSelector(
-    (state: RootState) => state.audioBookList
-  );
-
-  const dispatch = useDispatch<AppDispatch>();
-
   const projection = useMemo(() => {
     return d3
       .geoAlbers()
@@ -90,7 +79,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     return path.projection(projection);
   }, []);
 
-  const resetTooltip = async () => {
+  const resetTooltip = () => {
     setTooltip({
       open: false,
       load: true,
@@ -128,14 +117,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
       );
   }
 
-  const handleClickPath = useCallback((d: any, pointsClass: string) => {
-    setTooltip((prevState) => ({ ...prevState, open: false }));
+  const handleClickPath = (d: any, pointsClass: string) => {
+    resetTooltip();
     const svg = d3.select(svgRef.current);
 
     const defaultRegionClass = "region fill-stone-100";
     const selectedRegionClass = "region fill-orange-500";
 
-    d3.selectAll(`circle`).style("visibility", "hidden");
+    d3.selectAll(`circle`)
+      .style("visibility", "hidden")
+      .style("fill", "#82A9FD");
 
     d3.selectAll("path.region").attr("class", defaultRegionClass);
 
@@ -148,25 +139,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     g.selectChildren(`circle.${pointsClass}`).style("visibility", "visible");
 
     zoomedPath(svg, d);
-  }, []);
-
-  const handleClickPoint = async (ethnicGroupPoint: EthnicGroupPoint) => {
-    apiClient.paths["/api/story/ethnic-group/{ethnicGroupId}"]
-      .get({
-        ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
-      })
-      .then((result: any) => {
-        console.warn(result.data);
-        setListBookState({ load: false, books: result.data.data });
-      })
-      .catch((error: AxiosError) => {
-        toast.error(error.message);
-        setListBookState((prevState) => ({ ...prevState, load: false }));
-      });
-
-    dispatch(
-      fetchAudiosByEthnicGroupId(ethnicGroupPoint.ethnicGroupId)
-    ).unwrap();
   };
 
   interface TooltipState {
@@ -189,8 +161,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
     e: any,
     ethnicGroupPoint: EthnicGroupPoint
   ) => {
-    resetTooltip();
     if (svgRef.current) {
+      console.log("handleClickCircle");
       d3.selectAll("circle").style("fill", "#82A9FD");
       const circle: SVGCircleElement = e.target as SVGCircleElement;
 
@@ -201,20 +173,23 @@ const MapComponent: React.FC<MapComponentProps> = ({
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      setTooltip((prevState) => ({
-        ...prevState,
+      setTooltip({
         open: true,
+        load: true,
         x: centerX,
         y: centerY + 10,
         title: ethnicGroupPoint.ethnicGroupName,
-      }));
-
-      handleClickPoint(ethnicGroupPoint).then((_) => {
-        setTooltip((prevState) => ({
-          ...prevState,
-          load: false,
-        }));
       });
+
+      console.log(tooltip);
+
+      const res = await apiClient.paths[
+        "/api/story/ethnic-group/books/{ethnicGroupId}"
+      ].get({
+        ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
+      });
+
+      console.log(res.data);
     }
   };
 
@@ -289,12 +264,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
       >
         <g>{renderedFeatures}</g>
       </svg>
-
       <motion.div
         className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-50 bg-white -translate-x-[50%]`}
         initial={{ width: 0 }}
         animate={{
-          width: tooltip.open ? "25dvw" : 0,
+          width: tooltip.open ? "17rem" : 0,
           opacity: tooltip.open ? 1 : 0,
         }}
         transition={{ duration: 0.2 }}
@@ -304,22 +278,18 @@ const MapComponent: React.FC<MapComponentProps> = ({
           top: tooltip.y,
         }}
       >
-        <p className="text-lg font-semibold">{tooltip.title}</p>
+        <p className="text-xl font-semibold mb-2">{tooltip.title}</p>
+
         {tooltip.load ? (
-          <div>
-            {Array(3)
-              .fill(0)
-              .map((_, idx) => (
-                <Skeleton key={idx} className="bg-ghost h-4 w-full my-2" />
-              ))}
+          <div className="w-full flex justify-center">
+            <Skeleton className="bg-baby-blue-800 h-6 w-48 my-2" />
           </div>
         ) : (
           <div className="flex items-center justify-center px-4 py-2 ">
-            {audioBookListState.audioStories.length > 0 ? (
+            {tooltip.title.length > 0 ? (
               <div className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
                 <BookHeadphones className="stroke-gray-600" />
                 <span className="text-sm ">аудиокниги</span>
-                <span>{audioBookListState.audioStories.length}</span>
               </div>
             ) : (
               <p className="text-slate-500">книги не найдены...</p>
