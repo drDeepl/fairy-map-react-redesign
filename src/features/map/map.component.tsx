@@ -8,17 +8,26 @@ import React, {
 import * as d3 from "d3";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { BookHeadphones, LibraryBig, MapPin, MapPinIcon } from "lucide-react";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import {
+  BookAudioIcon,
+  BookHeadphones,
+  LibraryBig,
+  MapPin,
+  MapPinIcon,
+} from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -27,16 +36,12 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { toast, Toaster } from "sonner";
-import { AxiosError } from "axios";
-
-import { fetchAudiosByEthnicGroupId } from "../audio-book/audio-book.actions";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/app/store";
-import { AudioBookListState } from "../audio-book/components/audio-book-list.slice";
-import { Separator } from "@/components/ui/separator";
-import { motion, AnimationProps, AnimatePresence } from "framer-motion";
-import { TriangleUpIcon } from "@radix-ui/react-icons";
+import { motion } from "framer-motion";
+import { TriangleDownIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface MapComponentProps {
   features: any;
@@ -50,8 +55,10 @@ interface MapComponentProps {
 }
 
 interface ListBookState {
+  open: boolean;
   load: boolean;
-  books: Components.Schemas.StoryBookResponseDto[];
+  books: Components.Schemas.StoryBookWithAudiosResponseDto[];
+  viewBooks: Components.Schemas.StoryBookWithAudiosResponseDto[];
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -82,7 +89,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const resetTooltip = () => {
     setTooltip({
       open: false,
-      load: true,
       y: 0,
       x: 0,
       title: "",
@@ -143,7 +149,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   interface TooltipState {
     open: boolean;
-    load: boolean;
     y: number;
     x: number;
     title: string;
@@ -151,13 +156,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const [tooltip, setTooltip] = useState<TooltipState>({
     open: false,
-    load: true,
     y: 0,
     x: 0,
     title: "",
   });
 
-  const handleClickCircle = async (
+  const [listBook, setListBook] = useState<ListBookState>({
+    open: false,
+    load: true,
+    books: [],
+    viewBooks: [],
+  });
+
+  const handleClickPoint = async (
     e: any,
     ethnicGroupPoint: EthnicGroupPoint
   ) => {
@@ -175,7 +186,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
       setTooltip({
         open: true,
-        load: true,
         x: centerX,
         y: centerY + 10,
         title: ethnicGroupPoint.ethnicGroupName,
@@ -189,7 +199,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
         ethnicGroupId: ethnicGroupPoint.ethnicGroupId,
       });
 
-      console.log(res.data);
+      setListBook((prevState) => ({
+        ...prevState,
+        open: false,
+        load: false,
+        books: res.data,
+        viewBooks: res.data,
+      }));
     }
   };
 
@@ -230,7 +246,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     cx={cx}
                     cy={cy}
                     r={4}
-                    onClick={(e) => handleClickCircle(e, ethnicGroupPoint)}
+                    onClick={(e) => handleClickPoint(e, ethnicGroupPoint)}
                   />
                 );
               }
@@ -253,6 +269,31 @@ const MapComponent: React.FC<MapComponentProps> = ({
       svg.call(zoom);
     }
   }, []);
+
+  const handleOnCheckedShowAudioStory = (checked: boolean) => {
+    if (checked) {
+      setListBook((prevState) => ({
+        ...prevState,
+        viewBooks: prevState.books.filter((book) => book.audios.length > 0),
+      }));
+    } else {
+      setListBook((prevState) => ({
+        ...prevState,
+        viewBooks: prevState.books,
+      }));
+    }
+  };
+
+  const handleOpenMenuBooks = (open: boolean) => {
+    const icon: HTMLElement | null = document.getElementById("books-menu-icon");
+    if (open) {
+      icon?.setAttribute("class", "animate-rotate-180");
+    } else {
+      icon?.setAttribute("class", "animate-rotate-270");
+    }
+
+    setListBook((prevState) => ({ ...prevState, open: open }));
+  };
 
   return (
     <div style={{ position: "relative" }}>
@@ -280,17 +321,75 @@ const MapComponent: React.FC<MapComponentProps> = ({
       >
         <p className="text-xl font-semibold mb-2">{tooltip.title}</p>
 
-        {tooltip.load ? (
+        {listBook.load ? (
           <div className="w-full flex justify-center">
             <Skeleton className="bg-baby-blue-800 h-6 w-48 my-2" />
           </div>
         ) : (
-          <div className="flex items-center justify-center px-4 py-2 ">
-            {tooltip.title.length > 0 ? (
-              <div className="w-48 self-center flex justify-around items-center rounded-md bg-gray-200 text-gray-700 mt-3 h-8 p-2 cursor-pointer">
-                <BookHeadphones className="stroke-gray-600" />
-                <span className="text-sm ">аудиокниги</span>
-              </div>
+          <div className="flex items-center justify-center px-4 py-2">
+            {listBook.books.length > 0 ? (
+              <Popover open={listBook.open} onOpenChange={handleOpenMenuBooks}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-48 mt-3 h-8 p-2 self-center flex justify-center space-x-1 items-center rounded-md bg-gray-200 text-gray-700 border border-slate-300 shadow-md cursor-pointer [&_svg]:size-6"
+                    role="combobox"
+                    aria-expanded={open}
+                  >
+                    <BookHeadphones className="text-slate-600" />
+                    <div className="flex items-center space-x-1 text-md">
+                      <span className="font-semibold">книги</span>
+                      <span>{listBook.books.length}</span>
+                    </div>
+                    <TriangleDownIcon id="books-menu-icon" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[17rem] h-44 p-0" side="top">
+                  <Command>
+                    <CommandInput
+                      placeholder="введите название книги..."
+                      className="h-12"
+                    />
+                    <CommandList>
+                      <CommandEmpty>книги не найдены...</CommandEmpty>
+                      <CommandItem className="cursor-pointer w-full flex justify-around">
+                        <Label htmlFor="show-audiostory-checkbox">
+                          Показать книги с озвучками
+                        </Label>
+
+                        <Checkbox
+                          id="show-audiostory-checkbox"
+                          onCheckedChange={handleOnCheckedShowAudioStory}
+                        />
+                      </CommandItem>
+                      <CommandGroup>
+                        {listBook.viewBooks.map((book) => (
+                          <CommandItem
+                            className="[&_svg]:size-6 cursor-pointer"
+                            key={book.name}
+                            value={book.name}
+                            onSelect={() => {
+                              handleOpenMenuBooks(false);
+                            }}
+                          >
+                            <div className="w-full flex justify-between px-2">
+                              <span className="text-lg  font-semibold">
+                                {book.name}
+                              </span>
+                              <div className="flex items-center space-x-1 place-self-end">
+                                <BookAudioIcon className="size-full text-slate-600" />
+                                <span className="text-lg">
+                                  {book.audios.length}
+                                </span>
+                              </div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             ) : (
               <p className="text-slate-500">книги не найдены...</p>
             )}

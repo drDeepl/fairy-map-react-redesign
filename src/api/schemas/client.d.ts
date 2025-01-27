@@ -2305,49 +2305,12 @@ declare namespace Paths {
     namespace StoryControllerGetStoriesWithAudiosByEthnicGroupId {
         namespace Parameters {
             export type EthnicGroupId = number;
-            export type Page = number;
-            export type Take = number;
         }
         export interface PathParameters {
             ethnicGroupId: Parameters.EthnicGroupId;
         }
-        export interface QueryParameters {
-            page?: Parameters.Page;
-            take?: Parameters.Take;
-        }
         namespace Responses {
-            export interface $200 {
-                data: Components.Schemas.StoryBookWithAudiosResponseDto[];
-                /**
-                 * информация о странице
-                 */
-                meta: {
-                    /**
-                     * номер текущей страницы
-                     */
-                    page: number;
-                    /**
-                     * количество элементов на странице
-                     */
-                    take: number;
-                    /**
-                     * количество элементов всего
-                     */
-                    itemCount: number;
-                    /**
-                     * количество страниц
-                     */
-                    pageCount: number;
-                    /**
-                     * есть предыдущая страница
-                     */
-                    hasPreviousPage: boolean;
-                    /**
-                     * есть следующая страница
-                     */
-                    hasNextPage: boolean;
-                };
-            }
+            export type $200 = Components.Schemas.StoryBookWithAudiosResponseDto[];
             export interface $400 {
             }
             export interface $401 {
@@ -2683,7 +2646,7 @@ export interface OperationMethods {
    * StoryController_getStoriesWithAudiosByEthnicGroupId - получение всех сказок выбранной этнической группы и озвучек для них
    */
   'StoryController_getStoriesWithAudiosByEthnicGroupId'(
-    parameters?: Parameters<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.PathParameters & Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.QueryParameters> | null,
+    parameters?: Parameters<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.PathParameters> | null,
     data?: any,
     config?: AxiosRequestConfig  
   ): OperationResponse<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.Responses.$200>
@@ -3325,7 +3288,7 @@ export interface PathsDictionary {
      * StoryController_getStoriesWithAudiosByEthnicGroupId - получение всех сказок выбранной этнической группы и озвучек для них
      */
     'get'(
-      parameters?: Parameters<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.PathParameters & Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.QueryParameters> | null,
+      parameters?: Parameters<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.PathParameters> | null,
       data?: any,
       config?: AxiosRequestConfig  
     ): OperationResponse<Paths.StoryControllerGetStoriesWithAudiosByEthnicGroupId.Responses.$200>
