@@ -39,9 +39,10 @@ import apiClient from "@/api/apiClient";
 import { motion } from "framer-motion";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
+import { Separator } from "@/components/ui/separator";
+import SwitchMotion from "@/components/switch-motion";
 import { Label } from "@/components/ui/label";
-import { CheckedState } from "@radix-ui/react-checkbox";
 
 interface MapComponentProps {
   features: any;
@@ -57,6 +58,7 @@ interface MapComponentProps {
 interface ListBookState {
   open: boolean;
   load: boolean;
+  onlyWithAudio: boolean;
   books: Components.Schemas.StoryBookWithAudiosResponseDto[];
   viewBooks: Components.Schemas.StoryBookWithAudiosResponseDto[];
 }
@@ -165,6 +167,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     open: false,
     load: true,
     books: [],
+    onlyWithAudio: false,
     viewBooks: [],
   });
 
@@ -270,18 +273,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
     }
   }, []);
 
-  const handleOnCheckedShowAudioStory = (checked: boolean) => {
-    if (checked) {
-      setListBook((prevState) => ({
-        ...prevState,
-        viewBooks: prevState.books.filter((book) => book.audios.length > 0),
-      }));
-    } else {
-      setListBook((prevState) => ({
-        ...prevState,
-        viewBooks: prevState.books,
-      }));
-    }
+  const handleOnCheckedShowAudioStory = (isOn: boolean) => {
+    let books = isOn
+      ? listBook.books.filter((book) => book.audios.length > 0)
+      : listBook.books;
+
+    setListBook((prevState) => ({
+      ...prevState,
+      onlyWithAudio: isOn,
+      viewBooks: books,
+    }));
   };
 
   const handleOpenMenuBooks = (open: boolean) => {
@@ -307,9 +308,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
       </svg>
       <motion.div
         className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-50 bg-white -translate-x-[50%]`}
-        initial={{ width: 0 }}
+        initial={{ height: 0 }}
         animate={{
-          width: tooltip.open ? "17rem" : 0,
+          height: tooltip.open ? "8rem" : 0,
           opacity: tooltip.open ? 1 : 0,
         }}
         transition={{ duration: 0.2 }}
@@ -319,20 +320,28 @@ const MapComponent: React.FC<MapComponentProps> = ({
           top: tooltip.y,
         }}
       >
-        <p className="text-xl font-semibold mb-2">{tooltip.title}</p>
+        <motion.p className="text-xl font-semibold mb-2">
+          {tooltip.title}
+        </motion.p>
 
         {listBook.load ? (
-          <div className="w-full flex justify-center">
+          <motion.div className="w-full flex justify-center">
             <Skeleton className="bg-baby-blue-800 h-6 w-48 my-2" />
-          </div>
+          </motion.div>
         ) : (
-          <div className="flex items-center justify-center px-4 py-2">
+          <motion.div
+            className="flex items-center justify-center px-4 py-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0 }}
+          >
             {listBook.books.length > 0 ? (
               <Popover open={listBook.open} onOpenChange={handleOpenMenuBooks}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="w-48 mt-3 h-8 p-2 self-center flex justify-center space-x-1 items-center rounded-md bg-gray-200 text-gray-700 border border-slate-300 shadow-md cursor-pointer [&_svg]:size-6"
+                    className="w-48 mt-3 h-8 p-2 self-center flex justify-center space-x-1 items-center rounded-md bg-slate-100 text-gray-700 border border-slate-300 cursor-pointer [&_svg]:size-6"
                     role="combobox"
                     aria-expanded={open}
                   >
@@ -344,7 +353,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     <TriangleDownIcon id="books-menu-icon" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[17rem] h-44 p-0" side="top">
+                <PopoverContent className="min-w-[17rem] h-44 p-0" side="top">
                   <Command>
                     <CommandInput
                       placeholder="введите название книги..."
@@ -353,36 +362,41 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     <CommandList>
                       <CommandEmpty>книги не найдены...</CommandEmpty>
                       <CommandItem className="cursor-pointer w-full flex justify-around">
-                        <Label htmlFor="show-audiostory-checkbox">
-                          Показать книги с озвучками
-                        </Label>
-
-                        <Checkbox
-                          id="show-audiostory-checkbox"
-                          onCheckedChange={handleOnCheckedShowAudioStory}
-                        />
+                        <Button
+                          className="flex justify-around p-0"
+                          variant="ghost"
+                          onClick={() =>
+                            handleOnCheckedShowAudioStory(
+                              !listBook.onlyWithAudio
+                            )
+                          }
+                        >
+                          только книги с озвучками
+                          <SwitchMotion isOn={listBook.onlyWithAudio} />
+                        </Button>
                       </CommandItem>
                       <CommandGroup>
                         {listBook.viewBooks.map((book) => (
                           <CommandItem
-                            className="[&_svg]:size-6 cursor-pointer"
+                            className="flex flex-col [&_svg]:size-6 cursor-pointer"
                             key={book.name}
                             value={book.name}
                             onSelect={() => {
                               handleOpenMenuBooks(false);
                             }}
                           >
-                            <div className="w-full flex justify-between px-2">
-                              <span className="text-lg  font-semibold">
+                            <div className="w-full flex justify-between items-center px-2 ">
+                              <span className="text-md  font-semibold">
                                 {book.name}
                               </span>
-                              <div className="flex items-center space-x-1 place-self-end">
+                              <div className="flex items-center space-x-1 self-center  place-self-end">
                                 <BookAudioIcon className="size-full text-slate-600" />
                                 <span className="text-lg">
                                   {book.audios.length}
                                 </span>
                               </div>
                             </div>
+                            <Separator />
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -393,7 +407,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             ) : (
               <p className="text-slate-500">книги не найдены...</p>
             )}
-          </div>
+          </motion.div>
         )}
       </motion.div>
     </div>
