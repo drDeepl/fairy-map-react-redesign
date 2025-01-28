@@ -22,7 +22,7 @@ import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { BookInfoTabs } from "./constants/book-info-tabs.enum";
+import { MapModalTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
 
 import {
@@ -40,6 +40,8 @@ import { FeatureCollection, Geometry } from "geojson";
 import NotCoverBook from "@/components/not-cover-book.component";
 import SearchBookBox from "../book/components/search-book-box.component";
 import { useMediaQuery } from "react-responsive";
+import { motion } from "framer-motion";
+import ModalContainer from "@/components/modal-container";
 
 interface MapPageProps {
   width: number;
@@ -105,7 +107,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
       navigate(routeUserPersonalPage);
     } else {
-      setOpenDialog(true);
       setAuthFormState({ open: true, notifySuccess: true });
     }
   };
@@ -113,7 +114,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const [selectedAudioBook, setSelectedAudioBook] =
     useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
-  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [dialog, setOpenDialog] = useState<boolean>(false);
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.PreviewAudioStoryResponseDto
@@ -139,25 +140,23 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   ) => {
     setSelectedBook((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
-    apiClient.paths["/api/story/{storyId}/audio/all"]
-      .get({
+    setCurrentTab(MapModalTabs.BookInfo.toString());
+    try {
+      const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
         storyId: book.id,
-      })
-      .then((res) => {
-        console.log(res);
-        setSelectedBook((prevState) => ({
-          ...prevState,
-          audios: res.data,
-          load: false,
-        }));
-      })
-      .catch((error) => {
-        console.log(error);
-        setSelectedBook((prevState) => ({
-          ...prevState,
-          load: false,
-        }));
       });
+      setSelectedBook((prevState) => ({
+        ...prevState,
+        audios: res.data,
+        load: false,
+      }));
+    } catch (error) {
+      console.log(error);
+      setSelectedBook((prevState) => ({
+        ...prevState,
+        load: false,
+      }));
+    }
   };
 
   const handleOnCloseBook = async () => {
@@ -218,11 +217,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   }, []);
 
   const [currentTab, setCurrentTab] = useState<string>(
-    BookInfoTabs.BookInfo.toString()
+    MapModalTabs.BookInfo.toString()
   );
 
   const handleOnClickAddAudio = () => {
-    setCurrentTab(BookInfoTabs.AddApplicationAudio.toString());
+    setCurrentTab(MapModalTabs.AddApplicationAudio.toString());
   };
 
   if (mapState.load) {
@@ -234,26 +233,29 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   }
 
   return (
-    <Dialog open={openDialog}>
-      {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
-      {selectedBook.book ? (
-        <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
-          <DialogTitle className="p-0 m-0 flex justify-end h-1">
-            <Button
-              onClick={handleOnCloseBook}
-              size="icon"
-              variant="ghost"
-              className="p-0 m-1 "
-            >
-              <Cross1Icon />
-            </Button>
-          </DialogTitle>
+    <div>
+      {authFormState.open && (
+        <ModalContainer
+          title=""
+          open={authFormState.open}
+          zIndex={100}
+          onClose={handleOnCloseAuthForm}
+        >
+          <AuthForm onClose={handleOnCloseAuthForm} />
+        </ModalContainer>
+      )}
+      {selectedBook.book && (
+        <ModalContainer
+          title=""
+          open={dialog}
+          onClose={() => setOpenDialog(false)}
+        >
           <Tabs
             defaultValue={currentTab}
             value={currentTab}
             className="m-0 size-full"
           >
-            <TabsContent value={BookInfoTabs.BookInfo.toString()}>
+            <TabsContent value={MapModalTabs.BookInfo.toString()}>
               <BookInfoCardComponent
                 load={selectedBook.load}
                 book={selectedBook.book}
@@ -265,87 +267,166 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                 onClickAddAudio={handleOnClickAddAudio}
               ></BookInfoCardComponent>
             </TabsContent>
-            <TabsContent value={BookInfoTabs.AddApplicationAudio.toString()}>
-              <CreateApplicationAudioForm
-                storyId={selectedBook.book ? selectedBook.book.id : 0}
-                languages={languageListState.languages}
-                userId={authState.user ? Number(authState.user.sub) : 0}
-                onClose={() => setCurrentTab(BookInfoTabs.BookInfo.toString())}
-              />
+            <TabsContent
+              value={MapModalTabs.AddApplicationAudio.toString()}
+              className="p-0 m-0"
+            >
+              {selectedBook.book && (
+                <CreateApplicationAudioForm
+                  storyId={selectedBook.book.id}
+                  languages={languageListState.languages}
+                  userId={authState.user ? Number(authState.user.sub) : 0}
+                  onClose={() =>
+                    setCurrentTab(MapModalTabs.BookInfo.toString())
+                  }
+                />
+              )}
             </TabsContent>
           </Tabs>
-        </DialogContent>
-      ) : null}
-      <div className="map-pag__content">
-        <ToastContainer containerId="mapPageToast" />
-        <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full text-slate-600">
-          <SearchBookBox onClickBook={handleOnClickBook} />
-          <Button
-            className="rounded-full bg-slate-50 self-center size-12"
-            variant="ghost"
-            size="icon"
-            onClick={handleOnClickAvatar}
-          >
-            <span className="text-black">
-              {authState.user
-                ? authState.user.email.split("@")[0][0].toUpperCase()
-                : "?"}
-            </span>
-          </Button>
-        </div>
+        </ModalContainer>
+      )}
 
-        {selectedAudioBook ? (
-          <Sheet open={selectedAudioBook != undefined} modal={true}>
-            <SheetContent
-              className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
-              side="bottom"
-            >
-              <SheetHeader className="w-full m-0 p-0">
-                <SheetTitle className="flex justify-between items-center m-0 p-0 text-xl">
-                  <span>{selectedAudioBook.name}</span>
-                  <Button
-                    className="p-0 m-0"
-                    variant="secondary"
-                    size="icon"
-                    onClick={() => setSelectedAudioBook(null)}
-                  >
-                    <Cross1Icon />
-                  </Button>
-                </SheetTitle>
-              </SheetHeader>
-              <div className="grid grid-cols-2 gap-3">
-                {selectedAudioBook.srcImg ? (
-                  <img
-                    src={selectedAudioBook.srcImg}
-                    alt={selectedAudioBook.name}
-                    className="rounded-t-xl w-44 h-60 object-cover"
-                  />
-                ) : (
-                  <NotCoverBook />
-                )}
-
-                <AudioBookPlayer
-                  audios={selectedAudioBook.audios}
-                  onClickRate={handleOnClickRate}
-                  onError={(msg) => console.error(msg)}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-        ) : null}
-
-        {mapState.dataMap ? (
-          <MapComponent
-            features={mapState.dataMap.features}
-            width={width}
-            height={height}
-            onClickAudioBook={handleOnClickAudioBook}
-            onClickBook={handleOnClickBook}
-          />
-        ) : null}
+      <div className="absolute w-full z-[60] flex justify-between p-4 ">
+        <SearchBookBox onClickBook={handleOnClickBook} />
+        <Button
+          className="rounded-full bg-slate-50 self-center size-12"
+          variant="ghost"
+          size="icon"
+          onClick={handleOnClickAvatar}
+        >
+          <span className="text-black">
+            {authState.user
+              ? authState.user.email.split("@")[0][0].toUpperCase()
+              : "?"}
+          </span>
+        </Button>
       </div>
-    </Dialog>
+
+      {mapState.dataMap ? (
+        <MapComponent
+          features={mapState.dataMap.features}
+          width={width}
+          height={height}
+          onClickAudioBook={handleOnClickAudioBook}
+          onClickBook={handleOnClickBook}
+        />
+      ) : null}
+    </div>
   );
+
+  //   return (
+  //     <Dialog open={dialog}>
+  //       {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
+  //       {selectedBook.book ? (
+  //         <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
+  //           <DialogTitle className="p-0 m-0 flex justify-end h-1">
+  //             <Button
+  //               onClick={handleOnCloseBook}
+  //               size="icon"
+  //               variant="ghost"
+  //               className="p-0 m-1 "
+  //             >
+  //               <Cross1Icon />
+  //             </Button>
+  //           </DialogTitle>
+  //           <Tabs
+  //             defaultValue={currentTab}
+  //             value={currentTab}
+  //             className="m-0 size-full"
+  //           >
+  //             <TabsContent value={MapModalTabs.BookInfo.toString()}>
+  //               <BookInfoCardComponent
+  //                 load={selectedBook.load}
+  //                 book={selectedBook.book}
+  //                 audios={selectedBook.audios}
+  //                 onClickRate={handleOnClickRate}
+  //                 onClickAuth={() => {
+  //                   setAuthFormState({ open: true, notifySuccess: false });
+  //                 }}
+  //                 onClickAddAudio={handleOnClickAddAudio}
+  //               ></BookInfoCardComponent>
+  //             </TabsContent>
+  //             <TabsContent value={MapModalTabs.AddApplicationAudio.toString()}>
+  //               <CreateApplicationAudioForm
+  //                 storyId={selectedBook.book ? selectedBook.book.id : 0}
+  //                 languages={languageListState.languages}
+  //                 userId={authState.user ? Number(authState.user.sub) : 0}
+  //                 onClose={() => setCurrentTab(MapModalTabs.BookInfo.toString())}
+  //               />
+  //             </TabsContent>
+  //           </Tabs>
+  //         </DialogContent>
+  //       ) : null}
+  //       <div className="map-pag__content">
+  //         <ToastContainer containerId="mapPageToast" />
+  //         <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full text-slate-600">
+  //           <SearchBookBox onClickBook={handleOnClickBook} />
+  //           <Button
+  //             className="rounded-full bg-slate-50 self-center size-12"
+  //             variant="ghost"
+  //             size="icon"
+  //             onClick={handleOnClickAvatar}
+  //           >
+  //             <span className="text-black">
+  //               {authState.user
+  //                 ? authState.user.email.split("@")[0][0].toUpperCase()
+  //                 : "?"}
+  //             </span>
+  //           </Button>
+  //         </div>
+
+  //         {selectedAudioBook ? (
+  //           <Sheet open={selectedAudioBook != undefined} modal={true}>
+  //             <SheetContent
+  //               className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
+  //               side="bottom"
+  //             >
+  //               <SheetHeader className="w-full m-0 p-0">
+  //                 <SheetTitle className="flex justify-between items-center m-0 p-0 text-xl">
+  //                   <span>{selectedAudioBook.name}</span>
+  //                   <Button
+  //                     className="p-0 m-0"
+  //                     variant="secondary"
+  //                     size="icon"
+  //                     onClick={() => setSelectedAudioBook(null)}
+  //                   >
+  //                     <Cross1Icon />
+  //                   </Button>
+  //                 </SheetTitle>
+  //               </SheetHeader>
+  //               <div className="grid grid-cols-2 gap-3">
+  //                 {selectedAudioBook.srcImg ? (
+  //                   <img
+  //                     src={selectedAudioBook.srcImg}
+  //                     alt={selectedAudioBook.name}
+  //                     className="rounded-t-xl w-44 h-60 object-cover"
+  //                   />
+  //                 ) : (
+  //                   <NotCoverBook />
+  //                 )}
+
+  //                 <AudioBookPlayer
+  //                   audios={selectedAudioBook.audios}
+  //                   onClickRate={handleOnClickRate}
+  //                   onError={(msg) => console.error(msg)}
+  //                 />
+  //               </div>
+  //             </SheetContent>
+  //           </Sheet>
+  //         ) : null}
+
+  //         {mapState.dataMap ? (
+  //           <MapComponent
+  //             features={mapState.dataMap.features}
+  //             width={width}
+  //             height={height}
+  //             onClickAudioBook={handleOnClickAudioBook}
+  //             onClickBook={handleOnClickBook}
+  //           />
+  //         ) : null}
+  //       </div>
+  //     </Dialog>
+  //   );
 };
 
 export default MapPage;

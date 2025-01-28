@@ -144,7 +144,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   };
 
   return (
-    <Card className="add-audio-form__container border-none">
+    <Card className="add-audio-form__container border-none shadow-none">
       <Toaster />
       <CardHeader className="mt-0">
         <CardTitle className="flex justify-between items-center space-x-2">

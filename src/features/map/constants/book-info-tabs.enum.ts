@@ -1,4 +1,5 @@
-export enum BookInfoTabs {
+export enum MapModalTabs {
   BookInfo,
   AddApplicationAudio,
+  Auth,
 }

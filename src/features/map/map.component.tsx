@@ -314,7 +314,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
           opacity: tooltip.open ? 1 : 0,
         }}
         transition={{ duration: 0.2 }}
-        exit={{ opacity: 0 }}
         style={{
           left: tooltip.x,
           top: tooltip.y,
@@ -334,7 +333,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
-            exit={{ opacity: 0 }}
           >
             {listBook.books.length > 0 ? (
               <Popover open={listBook.open} onOpenChange={handleOpenMenuBooks}>
@@ -383,6 +381,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                             value={book.name}
                             onSelect={() => {
                               handleOpenMenuBooks(false);
+                              onClickBook(book);
                             }}
                           >
                             <div className="w-full flex justify-between items-center px-2 ">

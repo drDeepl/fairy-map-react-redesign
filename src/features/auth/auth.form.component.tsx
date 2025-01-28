@@ -8,12 +8,6 @@ import { JwtPayload, setError, setLoad } from "./auth.slice";
 import { useDispatch, useSelector } from "react-redux";
 import { Components } from "@/api/schemas/client";
 
-import {
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
 import { TabsContent, Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CaptchaComponent from "@/components/captcha.component";
 import SignInForm from "./forms/sign-in.form.component";
@@ -163,10 +157,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   };
 
   return (
-    <DialogContent className="max-w-sm px-8 pt-1 [&>button]:hidden transition-transform duration-500 transform">
+    // <DialogContent className="max-w-sm px-8 pt-1 [&>button]:hidden transition-transform duration-500 transform">
+    <div>
       <ToastContainer containerId="authFormToast" className="w-full p-4" />
       <Tabs defaultValue={currentTab} onValueChange={handleTabsValueChange}>
-        <DialogTitle className="flex flex-col items-center p-0 m-0">
+        <div className="flex flex-col items-center p-0 m-0">
           <Button
             className="absolute right-0 top-0"
             size="icon"
@@ -189,15 +184,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
               Регистрация
             </TabsTrigger>
           </TabsList>
-        </DialogTitle>
-        <DialogDescription className="flex justify-center">
+        </div>
+        <div className="flex justify-center">
           {authState.error?.message || authState.error?.validationErrors ? (
             <ErrorsAlertComponent
               title="ошибка"
               errors={{ error: [authState.error?.message] }}
             />
           ) : null}
-        </DialogDescription>
+        </div>
         <TabsContent value={Tab.SignIn} className="animate-zoom-in">
           <SignInForm loading={authState.loading} onSubmit={handleSignIn}>
             <TooltipProvider
@@ -264,7 +259,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
           )}
         </div>
       </Tabs>
-    </DialogContent>
+    </div>
+    //  </DialogContent>
   );
 };
 

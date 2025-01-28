@@ -36,17 +36,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import NotCoverBook from "@/components/not-cover-book.component";
+import { PageMetaDto } from "@/api/interfaces/page-meta.dto";
 
 interface SearchBookBoxProps {
   onClickBook: (
     books: Components.Schemas.StoryBookResponseDto
   ) => Promise<void>;
 }
+
+interface BookPageResponse {
+  data: Components.Schemas.StoryBookResponseDto[];
+  meta: PageMetaDto;
+}
+
 interface ListBookState {
   load: boolean;
-  books: Components.Schemas.PageResponseDto<
-    Components.Schemas.StoryBookResponseDto
-  >;
+  books: BookPageResponse;
 }
 
 const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
@@ -126,11 +131,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
       setIsConnected(false);
     };
 
-    const onBookResults = (
-      books: Components.Schemas.PageResponseDto<
-        Components.Schemas.StoryBookResponseDto
-      >
-    ) => {
+    const onBookResults = (books: BookPageResponse) => {
       console.log("onBookResults");
       console.log(books);
       setListBookState({
@@ -154,7 +155,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
   return (
     <div>
       <Popover open={open} onOpenChange={handleOpenPopover}>
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={500}>
           <Tooltip>
             <TooltipTrigger asChild>
               <PopoverTrigger asChild>
@@ -198,7 +199,10 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                       className="cursor-pointer font-semibold text-center"
                       key={book.name}
                       value={book.name}
-                      onSelect={() => onClickBook(book)}
+                      onSelect={() => {
+                        onClickBook(book);
+                        handleOpenPopover(false);
+                      }}
                     >
                       <div className="flex justify-center items-center space-x-2">
                         <div className="self-center size-8 ">
