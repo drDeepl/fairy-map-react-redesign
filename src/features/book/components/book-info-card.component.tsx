@@ -17,6 +17,7 @@ import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useRef, useState } from "react";
 
 import {
+  CaretUpIcon,
   EnterFullScreenIcon,
   ExclamationTriangleIcon,
 } from "@radix-ui/react-icons";
@@ -39,6 +40,11 @@ import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 import { ToastContainer, toast } from "react-toastify";
+import { motion } from "framer-motion";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip } from "@radix-ui/react-tooltip";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { Separator } from "@/components/ui/separator";
 
 interface BookInfoCardProps {
   load: boolean;
@@ -201,7 +207,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   if (isMobile) {
     return (
-      <Card className="absolute w-full bottom-[5%] top-[10%] border-none flex flex-col justify-center shadow-none">
+      <Card className="w-full border-none flex flex-col justify-center shadow-none">
         <ToastContainer
           containerId="bookInfoCardToast"
           className="w-full p-4"
@@ -401,55 +407,68 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
           </div>
         )}
+
+        <div className="flex justify-between">
+          <Button
+            className="flex justify-between w-44 place-self-start p-0 m-0 [&_svg]:size-6"
+            variant="link"
+            onClick={() => {
+              handleShowText(!textAction.show);
+            }}
+          >
+            <span className="text-md">
+              {!textAction.show ? "показать текст..." : "скрыть текст"}
+            </span>
+            <CaretUpIcon
+              className={`${
+                textAction.show ? "animate-rotate-180" : "animate-rotate-270"
+              }`}
+            />
+          </Button>
+          {textAction.show && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="text-slate-600 border border-slate-500 bg-opacity-50 bg-white"
+              onClick={() =>
+                setTextAction((prevState) => ({
+                  ...prevState,
+                  fullScreen: !prevState.fullScreen,
+                }))
+              }
+            >
+              <EnterFullScreenIcon />
+            </Button>
+          )}
+        </div>
+        <Separator />
       </CardHeader>
 
-      <CardFooter>
-        <Accordion type="single" collapsible className="w-full">
-          <AccordionItem value="story-text">
-            <AccordionTrigger
-              className="text-base outline-none justify-between max-w-44"
-              onClick={() => {
-                handleShowText(!textAction.show);
-              }}
-            >
-              <div className="flex justify-between">
-                <span className="animate-in text-md">
-                  {!textAction.show ? "показать текст" : "скрыть текст"}
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="max-h-72 rounded-md overflow-auto mt-2">
-              {load ? (
-                <div>
-                  {Array(3)
-                    .fill(1)
-                    .map((value) => (
-                      <Skeleton
-                        key={value}
-                        className="w-full h-4 bg-zinc-300 my-2"
-                      />
-                    ))}
-                </div>
-              ) : (
-                <div className="text-base">
-                  <p className="row-span-1 flex justify-center">{book.text}</p>
-                  <div className="fixed -right-[5rem] bottom-7 w-1/3">
-                    <Button
-                      variant="secondary"
-                      className="size-8 border border-slate-800"
-                      onClick={() => {
-                        handleFullScreen(!textAction.fullScreen);
-                      }}
-                    >
-                      <EnterFullScreenIcon className=" text-slate-800" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </CardFooter>
+      {/* <CardFooter className={`p-0 relative h-full`}> */}
+      {/* <div className="flex  flex-col rounded-md"> */}
+      <motion.div
+        className="italic text-justify text-slate-800"
+        initial="closed"
+        animate={textAction.show ? "open" : "closed"}
+        variants={{
+          open: {
+            opacity: 1,
+            height: textAction.fullScreen ? "70svh" : "30svh",
+          },
+          closed: { opacity: 0, height: 0 },
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
+        <ScrollArea
+          className={`${
+            textAction.fullScreen ? "h-[70svh]" : "h-[30svh]"
+          } px-3`}
+        >
+          {book.text}
+        </ScrollArea>
+      </motion.div>
+      {/* </div> */}
+      {/* </CardFooter> */}
     </Card>
   );
 };

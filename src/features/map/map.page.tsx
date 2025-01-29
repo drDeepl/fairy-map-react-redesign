@@ -21,7 +21,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { MapModalTabs } from "./constants/book-info-tabs.enum";
 import { ToastContainer } from "react-toastify";
 
@@ -32,7 +31,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import AudioBookPlayer from "../audio-book/audio-book-player.component";
-import { Cross1Icon } from "@radix-ui/react-icons";
+
 import apiClient from "@/api/apiClient";
 import { simplifyGeoJsonHelper } from "./helpers/simplify-geo-json.helper";
 import { FeatureProperties } from "./map.interface";
@@ -40,8 +39,8 @@ import { FeatureCollection, Geometry } from "geojson";
 import NotCoverBook from "@/components/not-cover-book.component";
 import SearchBookBox from "../book/components/search-book-box.component";
 import { useMediaQuery } from "react-responsive";
-import { motion } from "framer-motion";
-import ModalContainer from "@/components/modal-container";
+
+import DialogSheet from "@/components/dialog-sheet";
 
 interface MapPageProps {
   width: number;
@@ -66,7 +65,7 @@ interface MapState {
 
 interface SelectedBookState {
   load: boolean;
-  book: Components.Schemas.StoryBookResponseDto | null;
+  book: Components.Schemas.StoryBookWithAudiosResponseDto | null;
   audios: Components.Schemas.AudioStoryResponseDto[];
 }
 
@@ -111,8 +110,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialog, setOpenDialog] = useState<boolean>(false);
 
@@ -136,32 +137,31 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   });
 
   const handleOnClickBook = async (
-    book: Components.Schemas.StoryBookResponseDto
+    book: Components.Schemas.StoryBookWithAudiosResponseDto
   ) => {
-    setSelectedBook((prevState) => ({ ...prevState, book: book }));
+    console.log(book);
+    setSelectedBook((prevState) => ({ ...prevState, book: book, load: false }));
     setOpenDialog(true);
     setCurrentTab(MapModalTabs.BookInfo.toString());
-    try {
-      const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
-        storyId: book.id,
-      });
-      setSelectedBook((prevState) => ({
-        ...prevState,
-        audios: res.data,
-        load: false,
-      }));
-    } catch (error) {
-      console.log(error);
-      setSelectedBook((prevState) => ({
-        ...prevState,
-        load: false,
-      }));
-    }
+    // try {
+    // const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
+    //   storyId: book.id,
+    // });
+    //   setSelectedBook((prevState) => ({
+    //     ...prevState,
+    //     audios: res.data,
+    //     load: false,
+    //   }));
+    // } catch (error) {
+    //   console.log(error);
+    //   setSelectedBook((prevState) => ({
+    //     ...prevState,
+    //     load: false,
+    //   }));
+    // }
   };
 
-  const handleOnCloseBook = async () => {
-    console.log("handleOnCloseBook");
-    setOpenDialog(false);
+  const handleOnCloseBook = () => {
     setSelectedBook({
       load: true,
       book: null,
@@ -233,33 +233,26 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   }
 
   return (
-    <div>
+    <div className="flex flex-col">
       {authFormState.open && (
-        <ModalContainer
-          title=""
-          open={authFormState.open}
-          zIndex={100}
-          onClose={handleOnCloseAuthForm}
-        >
-          <AuthForm onClose={handleOnCloseAuthForm} />
-        </ModalContainer>
+        <DialogSheet onClose={handleOnCloseAuthForm}>
+          <div className="w-44">
+            <AuthForm onClose={handleOnCloseAuthForm} />
+          </div>
+        </DialogSheet>
       )}
       {selectedBook.book && (
-        <ModalContainer
-          title=""
-          open={dialog}
-          onClose={() => setOpenDialog(false)}
-        >
+        <DialogSheet onClose={handleOnCloseBook}>
           <Tabs
             defaultValue={currentTab}
             value={currentTab}
-            className="m-0 size-full"
+            className="p-1 size-full"
           >
             <TabsContent value={MapModalTabs.BookInfo.toString()}>
               <BookInfoCardComponent
                 load={selectedBook.load}
                 book={selectedBook.book}
-                audios={selectedBook.audios}
+                audios={selectedBook.book.audios}
                 onClickRate={handleOnClickRate}
                 onClickAuth={() => {
                   setAuthFormState({ open: true, notifySuccess: false });
@@ -271,23 +264,18 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               value={MapModalTabs.AddApplicationAudio.toString()}
               className="p-0 m-0"
             >
-              {selectedBook.book && (
-                <CreateApplicationAudioForm
-                  storyId={selectedBook.book.id}
-                  languages={languageListState.languages}
-                  userId={authState.user ? Number(authState.user.sub) : 0}
-                  onClose={() =>
-                    setCurrentTab(MapModalTabs.BookInfo.toString())
-                  }
-                />
-              )}
+              <CreateApplicationAudioForm
+                storyId={selectedBook.book.id}
+                languages={languageListState.languages}
+                userId={authState.user ? Number(authState.user.sub) : 0}
+                onClose={() => setCurrentTab(MapModalTabs.BookInfo.toString())}
+              />
             </TabsContent>
           </Tabs>
-        </ModalContainer>
+        </DialogSheet>
       )}
-
-      <div className="absolute w-full z-[60] flex justify-between p-4 ">
-        <SearchBookBox onClickBook={handleOnClickBook} />
+      <div className="absolute z-[10] w-full flex justify-between p-4 ">
+        {/* <SearchBookBox onClickBook={handleOnClickBook} /> */}
         <Button
           className="rounded-full bg-slate-50 self-center size-12"
           variant="ghost"
@@ -301,8 +289,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </span>
         </Button>
       </div>
-
-      {mapState.dataMap ? (
+      {mapState.dataMap && (
         <MapComponent
           features={mapState.dataMap.features}
           width={width}
@@ -310,7 +297,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           onClickAudioBook={handleOnClickAudioBook}
           onClickBook={handleOnClickBook}
         />
-      ) : null}
+      )}
     </div>
   );
 

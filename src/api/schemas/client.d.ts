@@ -285,7 +285,7 @@ declare namespace Components {
             /**
              * рейтинг озвучки
              */
-            moderateScore: number;
+            commonRating: number;
         }
         export interface AudioStoryRequestEntity {
             id: number;
@@ -342,7 +342,7 @@ declare namespace Components {
             /**
              * рейтинг озвучки
              */
-            moderateScore: number;
+            commonRating: number;
         }
         export interface AuthorAudioStoryResponseDto {
             /**
@@ -1016,7 +1016,7 @@ declare namespace Components {
             /**
              * одобренные озвучки для сказки
              */
-            audios: AudioResponseDto[];
+            audios: AudioStoryResponseDto[];
         }
         export interface StoryDto {
             /**

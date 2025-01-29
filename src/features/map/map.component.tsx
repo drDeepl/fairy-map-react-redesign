@@ -52,7 +52,9 @@ interface MapComponentProps {
     audio: Components.Schemas.PreviewAudioStoryResponseDto
   ) => void;
 
-  onClickBook: (book: Components.Schemas.StoryBookResponseDto) => Promise<void>;
+  onClickBook: (
+    book: Components.Schemas.StoryBookWithAudiosResponseDto
+  ) => Promise<void>;
 }
 
 interface ListBookState {
@@ -61,6 +63,13 @@ interface ListBookState {
   onlyWithAudio: boolean;
   books: Components.Schemas.StoryBookWithAudiosResponseDto[];
   viewBooks: Components.Schemas.StoryBookWithAudiosResponseDto[];
+}
+
+interface TooltipState {
+  open: boolean;
+  y: number;
+  x: number;
+  title: string;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({
@@ -149,13 +158,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     zoomedPath(svg, d);
   };
 
-  interface TooltipState {
-    open: boolean;
-    y: number;
-    x: number;
-    title: string;
-  }
-
   const [tooltip, setTooltip] = useState<TooltipState>({
     open: false,
     y: 0,
@@ -193,8 +195,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
         y: centerY + 10,
         title: ethnicGroupPoint.ethnicGroupName,
       });
-
-      console.log(tooltip);
 
       const res = await apiClient.paths[
         "/api/story/ethnic-group/books/{ethnicGroupId}"
@@ -272,6 +272,14 @@ const MapComponent: React.FC<MapComponentProps> = ({
       svg.call(zoom);
     }
   }, []);
+
+  const handleOnSelectBook = async (
+    book: Components.Schemas.StoryBookWithAudiosResponseDto
+  ) => {
+    handleOpenMenuBooks(false);
+    resetTooltip();
+    onClickBook(book);
+  };
 
   const handleOnCheckedShowAudioStory = (isOn: boolean) => {
     let books = isOn
@@ -379,10 +387,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                             className="flex flex-col [&_svg]:size-6 cursor-pointer"
                             key={book.name}
                             value={book.name}
-                            onSelect={() => {
-                              handleOpenMenuBooks(false);
-                              onClickBook(book);
-                            }}
+                            onSelect={() => handleOnSelectBook(book)}
                           >
                             <div className="w-full flex justify-between items-center px-2 ">
                               <span className="text-md  font-semibold">

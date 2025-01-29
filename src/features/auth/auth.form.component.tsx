@@ -158,7 +158,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
 
   return (
     // <DialogContent className="max-w-sm px-8 pt-1 [&>button]:hidden transition-transform duration-500 transform">
-    <div>
+    <div className="py-4 px-6">
       <ToastContainer containerId="authFormToast" className="w-full p-4" />
       <Tabs defaultValue={currentTab} onValueChange={handleTabsValueChange}>
         <div className="flex flex-col items-center p-0 m-0">

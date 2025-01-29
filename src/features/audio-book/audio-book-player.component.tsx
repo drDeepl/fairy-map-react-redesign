@@ -97,7 +97,7 @@ const AudioBookPlayer: React.FC<AudioBookPlayerProps> = ({
               <small className="text-slate-500">{`${playlistState.currentAudio.author.firstName} ${playlistState.currentAudio.author.lastName}`}</small>
             </div>
             <StarRating
-              commonRating={playlistState.currentAudio.moderateScore}
+              commonRating={playlistState.currentAudio.commonRating}
               onClickRate={handleOnClickRate}
             />
           </div>
