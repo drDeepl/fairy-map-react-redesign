@@ -31,7 +31,7 @@ const DialogSheet: React.FC<DialogProps> = ({ onClose, children }) => {
       exit={{ opacity: 0 }}
     >
       <motion.div
-        className="bg-white rounded-lg max-w-xl w-[100%] max-h-[90%] shadow-md"
+        className="bg-white rounded-lg max-w-xl max-h-[90%] shadow-md"
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 50, opacity: 0 }}

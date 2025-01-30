@@ -110,10 +110,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialog, setOpenDialog] = useState<boolean>(false);
 
@@ -216,6 +214,25 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       });
   }, []);
 
+  const handleOnSelectSearchedBook = async (
+    book: Components.Schemas.StoryBookResponseDto
+  ) => {
+    let audios: Components.Schemas.AudioResponseDto[] = [];
+    try {
+      const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
+        storyId: book.id,
+      });
+      audios = res.data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      handleOnClickBook({
+        ...book,
+        audios: audios,
+      } as Components.Schemas.StoryBookWithAudiosResponseDto);
+    }
+  };
+
   const [currentTab, setCurrentTab] = useState<string>(
     MapModalTabs.BookInfo.toString()
   );
@@ -236,7 +253,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     <div className="flex flex-col">
       {authFormState.open && (
         <DialogSheet onClose={handleOnCloseAuthForm}>
-          <div className="w-44">
+          <div className="w-[30svw]">
             <AuthForm onClose={handleOnCloseAuthForm} />
           </div>
         </DialogSheet>
@@ -274,15 +291,15 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Tabs>
         </DialogSheet>
       )}
-      <div className="absolute z-[10] w-full flex justify-between p-4 ">
-        {/* <SearchBookBox onClickBook={handleOnClickBook} /> */}
+      <div className="absolute w-full flex justify-between p-4 z-[50]">
+        <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
         <Button
-          className="rounded-full bg-slate-50 self-center size-12"
-          variant="ghost"
+          className="rounded-full bg-slate-50 self-center size-12 border border-baby-blue-800 shadow-md"
+          variant="outline"
           size="icon"
           onClick={handleOnClickAvatar}
         >
-          <span className="text-black">
+          <span className="text-slate-700 ">
             {authState.user
               ? authState.user.email.split("@")[0][0].toUpperCase()
               : "?"}

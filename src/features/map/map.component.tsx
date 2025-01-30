@@ -315,7 +315,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <g>{renderedFeatures}</g>
       </svg>
       <motion.div
-        className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-50 bg-white -translate-x-[50%]`}
+        className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-30 bg-white -translate-x-[50%]`}
         initial={{ height: 0 }}
         animate={{
           height: tooltip.open ? "8rem" : 0,

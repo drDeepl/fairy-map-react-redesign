@@ -155,7 +155,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                   role="combobox"
                   aria-expanded={open}
                   size="icon"
-                  className="rounded-full border border-baby-blue-500 lg:size-12"
+                  className="rounded-full border border-baby-blue-800 lg:size-12"
                 >
                   <MagnifyingGlassIcon className="text-slate-700" />
                 </Button>
