@@ -115,10 +115,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [
-    selectedAudioBook,
-    setSelectedAudioBook,
-  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [selectedAudioBook, setSelectedAudioBook] =
+    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialog, setOpenDialog] = useState<boolean>(false);
 
@@ -246,9 +244,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       setNotifications((prev) => [...prev, newNotification]);
 
       // Автоматическое удаление через 5 секунд
-      setTimeout(() => {
-        removeNotification(newNotification.id);
-      }, 5000);
+      // setTimeout(() => {
+      // removeNotification(newNotification.id);
+      // }, 5000);
     },
     []
   );
