@@ -43,6 +43,10 @@ import { useMediaQuery } from "react-responsive";
 import DialogSheet from "@/components/dialog-sheet";
 import AudioBook from "../audio-book/components/audio-book";
 
+import NotifyContainer, {
+  Notification,
+} from "../book/components/notificaiton.component";
+
 interface MapPageProps {
   width: number;
   height: number;
@@ -226,6 +230,29 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   };
   const [audioStory, setAudioStory] = useState<boolean>(false);
 
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const removeNotification = useCallback((id: string) => {
+    setNotifications((prev) => prev.filter((notify) => notify.id !== id));
+  }, []);
+
+  const addNotification = useCallback(
+    (notification: Omit<Notification, "id">) => {
+      const newNotification: Notification = {
+        ...notification,
+        id: `notify-${Date.now()}`,
+      };
+
+      setNotifications((prev) => [...prev, newNotification]);
+
+      // Автоматическое удаление через 5 секунд
+      setTimeout(() => {
+        removeNotification(newNotification.id);
+      }, 5000);
+    },
+    []
+  );
+
   if (mapState.load) {
     return <LoadSpinner />;
   }
@@ -238,7 +265,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     <div className="flex flex-col">
       {authFormState.open && (
         <DialogSheet onClose={handleOnCloseAuthForm}>
-          <div className="w-[30svw]">
+          <div className="w-md">
             <AuthForm onClose={handleOnCloseAuthForm} />
           </div>
         </DialogSheet>
@@ -279,6 +306,26 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       {audioStory && (
         <DialogSheet onClose={() => setAudioStory(false)}>
           <div>
+            <div className="absolute w-[100%]">
+              <div className="relative w-full">
+                <Button
+                  className=""
+                  onClick={() =>
+                    addNotification({
+                      type: "error",
+                      message: "Операция выполнена успешно!",
+                    })
+                  }
+                >
+                  <span>notify</span>
+                </Button>
+                <NotifyContainer
+                  notifications={notifications}
+                  onRemove={removeNotification}
+                />
+              </div>
+            </div>
+
             <AudioBook
               audioBook={{
                 id: 1,

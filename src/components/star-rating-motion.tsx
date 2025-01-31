@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimate, animate } from "framer-motion";
 import { Cross1Icon, StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
 
 interface StarRatingProps {

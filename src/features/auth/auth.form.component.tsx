@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
@@ -30,6 +30,10 @@ import {
 import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 import { useNavigate } from "react-router-dom";
 import { parsePayloadFromAccessToken } from "@/common/helpers/token.helper";
+import NotifyContainer, {
+  Notification,
+} from "../book/components/notificaiton.component";
+
 enum Tab {
   SignIn = "signin",
   SignUp = "signup",
@@ -63,7 +67,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   };
 
   const hundleErrorCaptcha = () => {
-    showErrorToast("ошибка подтверждения каптчи");
+    addNotification({
+      type: "error",
+      message: "ошибка подтверждения каптчи",
+    });
   };
 
   const handleSignUp = async (values: Components.Schemas.SignUpRequestDto) => {
@@ -71,9 +78,18 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
       const user: JwtPayload = parsePayloadFromAccessToken(
         action.payload.accessToken
       );
-      const msg = "Регистрация прошла успешно!";
 
-      showSuccessToast(msg, () => navigate(getRoutePageByUserRole(user.role)));
+      addNotification({
+        type: "success",
+        message: "Регистрация прошла успешно!",
+        action: (
+          <div className="flex justify-end">
+            <Button onClick={() => navigate(getRoutePageByUserRole(user.role))}>
+              в личный кабинет
+            </Button>
+          </div>
+        ),
+      });
     });
   };
 
@@ -82,9 +98,22 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
       const user: JwtPayload = parsePayloadFromAccessToken(
         action.payload.accessToken
       );
-      const msg = "Вход выполнен успешно!";
 
-      showSuccessToast(msg, () => navigate(getRoutePageByUserRole(user.role)));
+      addNotification({
+        type: "success",
+        message: "Вход выполнен успешно!",
+        action: (
+          <div className="flex justify-end pt-4">
+            <Button
+              variant="outline"
+              className="border border-green-500"
+              onClick={() => navigate(getRoutePageByUserRole(user.role))}
+            >
+              в личный кабинет
+            </Button>
+          </div>
+        ),
+      });
     });
   };
 
@@ -98,55 +127,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
     dispatch(setError(null));
   };
 
-  const showSuccessToast = (msg: string, onClose: () => void) =>
-    toast.success(
-      <SuccessToast msg={msg}>
-        <div className="flex flex-col items-center space-y-2">
-          <Button
-            onClick={handleOnClose}
-            variant="secondary"
-            className="bg-white text-green-500 border border-green-500"
-          >
-            остаться
-          </Button>
-        </div>
-      </SuccessToast>,
-      {
-        closeButton: false,
-        position: "top-center",
-        containerId: "authFormToast",
-        className:
-          "p-4 w-full bg-green-50 border border-green-500 text-green-500",
-        progressClassName: "bg-green-500",
-        onClose: () => onClose(),
-      }
-    );
-
-  const showErrorToast = (msg: string) =>
-    toast.error(msg, {
-      closeButton: false,
-      position: "top-center",
-      containerId: "authFormToast",
-      className: "p-4 w-full bg-red-50 border border-red-500 text-red-500",
-      progressClassName: "bg-red-500",
-      onClose: () => onClose(),
-    });
-
-  // useEffect(() => {
-  //   if (authState.success) {
-  //     const msg =
-  //       currentTab === Tab.SignUp
-  //         ? "Регистрация прошла успешно!"
-  //         : "Вход выполнен успешно!";
-
-  //     showSuccessToast(msg, onSubmit);
-  //   }
-
-  //   return () => {
-  //     dispatch(setSuccess(false));
-  //   };
-  // }, [authState.success]);
-
   const handleTabsValueChange = async (value: string) => {
     setCaptchaState({
       open: false,
@@ -156,10 +136,38 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
     clearForm();
   };
 
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const removeNotification = useCallback((id: string) => {
+    setNotifications((prev) => prev.filter((notify) => notify.id !== id));
+  }, []);
+
+  const addNotification = useCallback(
+    (notification: Omit<Notification, "id">) => {
+      const newNotification: Notification = {
+        ...notification,
+        id: `notify-auth-${Date.now()}`,
+      };
+
+      setNotifications([newNotification]);
+
+      // Автоматическое удаление через 5 секунд
+      setTimeout(() => {
+        removeNotification(newNotification.id);
+      }, 5000);
+    },
+    []
+  );
+
   return (
     // <DialogContent className="max-w-sm px-8 pt-1 [&>button]:hidden transition-transform duration-500 transform">
-    <div className="py-4 px-6">
-      <ToastContainer containerId="authFormToast" className="w-full p-4" />
+    <div className="py-4 px-6 w-full">
+      <div className="relative">
+        <NotifyContainer
+          notifications={notifications}
+          onRemove={removeNotification}
+        />
+      </div>
       <Tabs defaultValue={currentTab} onValueChange={handleTabsValueChange}>
         <div className="flex flex-col items-center p-0 m-0">
           <Button
