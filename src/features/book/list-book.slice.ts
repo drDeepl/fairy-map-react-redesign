@@ -124,8 +124,6 @@ const bookListSlice = createSlice({
           state,
           action: PayloadAction<Components.Schemas.StoryBookResponseDto>
         ) => {
-          console.log(action.payload);
-
           const bookIndex = state.books.data.findIndex(
             (book) => action.payload.id === book.id
           );

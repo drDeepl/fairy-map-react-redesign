@@ -41,6 +41,7 @@ import SearchBookBox from "../book/components/search-book-box.component";
 import { useMediaQuery } from "react-responsive";
 
 import DialogSheet from "@/components/dialog-sheet";
+import AudioBook from "../audio-book/components/audio-book";
 
 interface MapPageProps {
   width: number;
@@ -110,8 +111,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
+  const [
+    selectedAudioBook,
+    setSelectedAudioBook,
+  ] = useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
 
   const [dialog, setOpenDialog] = useState<boolean>(false);
 
@@ -137,26 +140,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const handleOnClickBook = async (
     book: Components.Schemas.StoryBookWithAudiosResponseDto
   ) => {
-    console.log(book);
     setSelectedBook((prevState) => ({ ...prevState, book: book, load: false }));
-    setOpenDialog(true);
-    setCurrentTab(MapModalTabs.BookInfo.toString());
-    // try {
-    // const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
-    //   storyId: book.id,
-    // });
-    //   setSelectedBook((prevState) => ({
-    //     ...prevState,
-    //     audios: res.data,
-    //     load: false,
-    //   }));
-    // } catch (error) {
-    //   console.log(error);
-    //   setSelectedBook((prevState) => ({
-    //     ...prevState,
-    //     load: false,
-    //   }));
-    // }
   };
 
   const handleOnCloseBook = () => {
@@ -240,6 +224,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const handleOnClickAddAudio = () => {
     setCurrentTab(MapModalTabs.AddApplicationAudio.toString());
   };
+  const [audioStory, setAudioStory] = useState<boolean>(false);
 
   if (mapState.load) {
     return <LoadSpinner />;
@@ -291,8 +276,33 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Tabs>
         </DialogSheet>
       )}
+      {audioStory && (
+        <DialogSheet onClose={() => setAudioStory(false)}>
+          <div>
+            <AudioBook
+              audioBook={{
+                id: 1,
+                srcAudio:
+                  "http://82.97.249.207:3000/uploads/audio/35/3/4/audio-1738253966999-63210898.mp3",
+                language: {
+                  id: 4,
+                  name: "тубаларский",
+                },
+                storyId: 35,
+                commonRating: 2.5555564,
+                author: {
+                  id: 3,
+                  firstName: "admin",
+                  lastName: "admin",
+                },
+              }}
+            />
+          </div>
+        </DialogSheet>
+      )}
       <div className="absolute w-full flex justify-between p-4 z-[50]">
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
+        <Button onClick={() => setAudioStory(true)}>аудиоплеер</Button>
         <Button
           className="rounded-full bg-slate-50 self-center size-12 border border-baby-blue-800 shadow-md"
           variant="outline"
@@ -306,6 +316,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </span>
         </Button>
       </div>
+
       {mapState.dataMap && (
         <MapComponent
           features={mapState.dataMap.features}
