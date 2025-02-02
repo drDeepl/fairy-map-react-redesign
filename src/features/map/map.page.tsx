@@ -46,6 +46,9 @@ import AudioBook from "../audio-book/components/audio-book";
 import NotifyContainer, {
   Notification,
 } from "../book/components/notificaiton.component";
+import StarRating from "@/components/star-rating-motion";
+import { AxiosResponse } from "node_modules/axios/index.d.cts";
+import DropdownBox from "@/components/dropdown-box.component";
 
 interface MapPageProps {
   width: number;
@@ -115,16 +118,34 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [selectedAudioBook, setSelectedAudioBook] =
-    useState<Components.Schemas.PreviewAudioStoryResponseDto | null>(null);
-
-  const [dialog, setOpenDialog] = useState<boolean>(false);
+  const [audioBook, setAudioBook] =
+    useState<Components.Schemas.AudioStoryResponseDto | null>(null);
 
   const handleOnClickAudioBook = (
-    audio: Components.Schemas.PreviewAudioStoryResponseDto
+    audio: Components.Schemas.AudioStoryResponseDto
   ) => {
-    setOpenDialog(true);
-    setSelectedAudioBook(audio);
+    setAudioBook(audio);
+  };
+
+  const handleOnSelectStar = async (rating: number) => {
+    console.log(rating);
+
+    if (!audioBook) return rating;
+
+    try {
+      const res: AxiosResponse<
+        Components.Schemas.AddedRatingAudioStoryDto,
+        any
+      > = await apiClient.paths["/api/story/rating/add"].post(null, {
+        rating: rating,
+        audioId: audioBook.id,
+      });
+
+      return res.data.ratingAudioStory;
+    } catch (error) {
+      console.log(error);
+      return audioBook.commonRating;
+    }
   };
 
   const handleOnClickRate = async (
@@ -226,7 +247,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   const handleOnClickAddAudio = () => {
     setCurrentTab(MapModalTabs.AddApplicationAudio.toString());
   };
-  const [audioStory, setAudioStory] = useState<boolean>(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -263,7 +283,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     <div className="flex flex-col">
       {authFormState.open && (
         <DialogSheet onClose={handleOnCloseAuthForm}>
-          <div className="w-md">
+          <div className="w-96">
             <AuthForm onClose={handleOnCloseAuthForm} />
           </div>
         </DialogSheet>
@@ -301,53 +321,76 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Tabs>
         </DialogSheet>
       )}
-      {audioStory && (
-        <DialogSheet onClose={() => setAudioStory(false)}>
+      {audioBook && (
+        <DialogSheet
+          onClose={() => {
+            setAudioBook(null);
+          }}
+        >
           <div>
-            <div className="absolute w-[100%]">
-              <div className="relative w-full">
-                <Button
+            <div className="relative flex flex-col items-center space-y-2">
+              <div className="p-1 absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
+                <StarRating
                   className=""
-                  onClick={() =>
-                    addNotification({
-                      type: "error",
-                      message: "Операция выполнена успешно!",
-                    })
-                  }
-                >
-                  <span>notify</span>
-                </Button>
-                <NotifyContainer
-                  notifications={notifications}
-                  onRemove={removeNotification}
+                  currentRating={audioBook.commonRating}
+                  onClickStar={handleOnSelectStar}
                 />
               </div>
+              <span className="absolute top-1 left-[47.3%] text-orange-500 italic text-md font-bold rounded-full">
+                {Math.round((audioBook.commonRating + Number.EPSILON) * 10) /
+                  10}
+              </span>
             </div>
+            <AudioBook audioBook={audioBook}>
+              <div className="w-full flex flex-col pt-4 text-slate-950">
+                <div className="flex space-x-1">
+                  <small className="text-sm">озвучил:</small>
+                  <small className="text-sm">
+                    {audioBook.author.firstName}
+                  </small>
+                  <small className="text-sm">{audioBook.author.lastName}</small>
+                </div>
+                <span className="text-lg font-semibold m-0">
+                  {audioBook.language.name} язык
+                </span>
 
-            <AudioBook
-              audioBook={{
-                id: 1,
-                srcAudio:
-                  "http://82.97.249.207:3000/uploads/audio/35/3/4/audio-1738253966999-63210898.mp3",
-                language: {
-                  id: 4,
-                  name: "тубаларский",
-                },
-                storyId: 35,
-                commonRating: 2.5555564,
-                author: {
-                  id: 3,
-                  firstName: "admin",
-                  lastName: "admin",
-                },
-              }}
-            />
+                <DropdownBox
+                  options={[
+                    { value: "1", label: "Option 1" },
+                    { value: "2", label: "Option 2" },
+                  ]}
+                  onChange={(option) => console.log("select", option)}
+                />
+              </div>
+            </AudioBook>
           </div>
         </DialogSheet>
       )}
       <div className="absolute w-full flex justify-between p-4 z-[50]">
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
-        <Button onClick={() => setAudioStory(true)}>аудиоплеер</Button>
+        <Button
+          onClick={() => {
+            const audioBook = {
+              id: 1,
+              srcAudio:
+                "http://82.97.249.207:3000/uploads/audio/35/3/4/audio-1738253966999-63210898.mp3",
+              language: {
+                id: 4,
+                name: "тубаларский",
+              },
+              storyId: 35,
+              commonRating: 2.5555564,
+              author: {
+                id: 3,
+                firstName: "admin",
+                lastName: "admin",
+              },
+            };
+            setAudioBook(audioBook);
+          }}
+        >
+          аудиоплеер
+        </Button>
         <Button
           className="rounded-full bg-slate-50 self-center size-12 border border-baby-blue-800 shadow-md"
           variant="outline"

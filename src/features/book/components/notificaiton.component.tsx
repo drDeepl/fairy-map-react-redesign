@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
-// Типы для уведомлений
 export interface Notification {
   id: string;
   type: "success" | "error" | "warning" | "info";
@@ -10,7 +10,6 @@ export interface Notification {
   action?: React.ReactNode;
 }
 
-// Интерфейс для пропсов контейнера
 interface NotifyContainerProps {
   notifications: Notification[];
   onRemove: (id: string) => void;
@@ -18,14 +17,6 @@ interface NotifyContainerProps {
   duration?: number;
 }
 
-interface TypeBarColors {
-  [key: string]: {
-    container: string;
-    bar: string;
-  };
-}
-
-// Компонент уведомления
 const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
   id,
   type,
@@ -37,49 +28,36 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
   // Цвета для разных типов уведомлений
   const typeColors = {
     success: "border border-green-500 bg-green-100 text-green-500 ",
-    error: "border border-red-500 bg-red-100 text-red-500 ",
+    error: "border border-red-500 text-red-500 ",
     warning: "border border-yellow-500 bg-yellow-100 text-yellow-500",
     info: "border border-blue-500 bg-blue-100 text-blue-500 ",
   };
 
   const [timeLeft, setTimeLeft] = useState(duration);
 
-  const typeBarColors: TypeBarColors = {
-    success: {
-      container: "border border-b-green-500 text-green-500 ",
-      bar: "bg-green-500",
-    },
-    error: {
-      container: "border border-b-red-500 text-red-500 bg-red-200",
-      bar: "bg-red-500",
-    },
-    warning: {
-      container: "border border-b-yellow-500 text-yellow-500 ",
-      bar: "bg-yellow-500",
-    },
-    info: {
-      container: "border border-b-blue-500 text-blue-500 ",
-      bar: "bg-blue-500",
-    },
+  const typeCircleColors = {
+    success: "stroke-green-500",
+    error: "stroke-red-500",
+    warning: "stroke-yellow-500",
+    info: "stroke-blue-500",
   };
 
   // Эффект для обновления таймера
   useEffect(() => {
-    let interval: any = null;
+    let interval: NodeJS.Timeout | null = null;
 
     if (timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
     } else if (timeLeft === 0) {
-      clearInterval(interval);
+      if (interval) clearInterval(interval);
       onClose();
     }
 
     return () => clearInterval(interval);
   }, [timeLeft]);
 
-  // Вычисление прогресса
   const progress = ((duration - timeLeft) / duration) * 100;
 
   return (
@@ -89,10 +67,9 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
       exit={{ opacity: 0, y: -100 }}
       transition={{ duration: 0.3 }}
       className={`
-        ${typeColors[type]} 
-        
-        
-        rounded-t-lg 
+        ${typeColors[type]}  
+        bg-neutral-50
+        rounded-md
         shadow-lg 
         mb-2 
         flex 
@@ -104,27 +81,57 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
         relative
       `}
     >
-      <div className="w-full flex justify-between space-x-4 m-2 p-2">
-        <span className="text-md">{message}</span>
-        <button
-          onClick={onClose}
-          className="text-slate-600 hover:opacity-75 transition-opacity"
-        >
-          ✕
-        </button>
+      <div className="w-full flex justify-between items-center space-x-4 mx-2 px-2 pt-4">
+        <span className="text-md font-semibold">{message}</span>
+        <div className="relative">
+          <motion.svg
+            viewBox="0 0 200 200"
+            className="transform -rotate-90 size-12"
+          >
+            {/* Задний фон круга */}
+            <circle
+              cx="100"
+              cy="100"
+              r="90"
+              className="stroke-gray-300 fill-none"
+              strokeWidth="20"
+            />
+
+            {/* Анимированный прогресс круга */}
+            <motion.circle
+              cx="100"
+              cy="100"
+              r="90"
+              className={`${typeCircleColors[type]} fill-none content-[${
+                timeLeft % 60
+              }]`}
+              strokeWidth="20"
+              strokeDasharray="565.48"
+              strokeDashoffset={`calc(565.48 - (565.48 * ${
+                progress * 1.25
+              }) / 100)`}
+              animate={{
+                strokeDashoffset: `calc(565.48 - (565.48 * ${
+                  progress * 1.25
+                }) / 100)`,
+              }}
+              transition={{
+                duration: 1,
+                ease: "linear",
+              }}
+            />
+          </motion.svg>
+          <Button
+            onClick={onClose}
+            size="icon"
+            variant="ghost"
+            className="absolute flex items-center top-1.5 left-1.5 [&_svg]:size-6 rounded-full text-slate-800"
+          >
+            ✕
+          </Button>
+        </div>
       </div>
       {action}
-      <div className={`w-full h-2 ${typeBarColors[type].container}`}>
-        <motion.div
-          className={`h-2 ${typeBarColors[type].bar}`}
-          initial={{ width: 0 }}
-          animate={{ width: `${progress * 1.25}%` }}
-          transition={{
-            duration: 1,
-            ease: "linear",
-          }}
-        />
-      </div>
     </motion.div>
   );
 };
@@ -134,7 +141,6 @@ const NotifyContainer: React.FC<NotifyContainerProps> = ({
   notifications,
   onRemove,
   maxVisibleNotifications = 1,
-  duration = 5,
 }) => {
   // Усечение количества видимых уведомлений
   const visibleNotifications = notifications.slice(0, maxVisibleNotifications);
@@ -149,6 +155,7 @@ const NotifyContainer: React.FC<NotifyContainerProps> = ({
         flex 
         flex-col 
         items-end
+        w-md
       "
     >
       <AnimatePresence>
