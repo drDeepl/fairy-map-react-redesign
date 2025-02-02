@@ -48,7 +48,13 @@ import NotifyContainer, {
 } from "../book/components/notificaiton.component";
 import StarRating from "@/components/star-rating-motion";
 import { AxiosResponse } from "node_modules/axios/index.d.cts";
-import DropdownBox from "@/components/dropdown-box.component";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@/components/dropdown-box.component";
+import { LanguagesIcon } from "lucide-react";
 
 interface MapPageProps {
   width: number;
@@ -343,24 +349,29 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             </div>
             <AudioBook audioBook={audioBook}>
               <div className="w-full flex flex-col pt-4 text-slate-950">
-                <div className="flex space-x-1">
-                  <small className="text-sm">озвучил:</small>
-                  <small className="text-sm">
-                    {audioBook.author.firstName}
-                  </small>
-                  <small className="text-sm">{audioBook.author.lastName}</small>
-                </div>
-                <span className="text-lg font-semibold m-0">
-                  {audioBook.language.name} язык
-                </span>
-
-                <DropdownBox
-                  options={[
-                    { value: "1", label: "Option 1" },
-                    { value: "2", label: "Option 2" },
-                  ]}
-                  onChange={(option) => console.log("select", option)}
-                />
+                <Dropdown className="w-full">
+                  <DropdownTrigger className="bg-slate-200 [&>*:not(div)]:text-slate-700">
+                    <div className="flex flex-col">
+                      <div className="flex space-x-1">
+                        <small className="text-sm">озвучил:</small>
+                        <small className="text-sm">
+                          {audioBook.author.firstName}
+                        </small>
+                        <small className="text-sm">
+                          {audioBook.author.lastName}
+                        </small>
+                      </div>
+                      <span className="text-lg font-semibold m-0">
+                        {audioBook.language.name} язык
+                      </span>
+                    </div>
+                    <LanguagesIcon className="-mr-[4.8rem]" />
+                  </DropdownTrigger>
+                  <DropdownMenu>
+                    <DropdownItem>Option 1</DropdownItem>
+                    <DropdownItem>Option 2</DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
               </div>
             </AudioBook>
           </div>
