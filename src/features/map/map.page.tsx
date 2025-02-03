@@ -47,14 +47,18 @@ import NotifyContainer, {
   Notification,
 } from "../book/components/notificaiton.component";
 import StarRating from "@/components/star-rating-motion";
-import { AxiosResponse } from "node_modules/axios/index.d.cts";
+import { AxiosResponse } from "axios";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
 } from "@/components/dropdown-menu-motion.component";
+
 import { LanguagesIcon } from "lucide-react";
+import { AudioResponseDto } from "../../api/schemas/client";
+import { StarFilledIcon } from "@radix-ui/react-icons";
+import AudioBookPlaylist from "../book/components/audio-book-playlist.component";
 
 interface MapPageProps {
   width: number;
@@ -268,11 +272,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       };
 
       setNotifications((prev) => [...prev, newNotification]);
-
-      // Автоматическое удаление через 5 секунд
-      // setTimeout(() => {
-      // removeNotification(newNotification.id);
-      // }, 5000);
     },
     []
   );
@@ -311,7 +310,13 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   setAuthFormState({ open: true, notifySuccess: false });
                 }}
                 onClickAddAudio={handleOnClickAddAudio}
-              ></BookInfoCardComponent>
+              >
+                {selectedBook.book.audios.length > 0 ? (
+                  <AudioBook audioBooks={selectedBook.book.audios} />
+                ) : (
+                  <p>аудиокниги не найдены</p>
+                )}
+              </BookInfoCardComponent>
             </TabsContent>
             <TabsContent
               value={MapModalTabs.AddApplicationAudio.toString()}
@@ -347,8 +352,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   10}
               </span>
             </div>
-            <AudioBook audioBook={audioBook}>
-              <div className="w-full flex flex-col pt-4 text-slate-950">
+            <AudioBook audioBooks={audioBook}>
+              <div className="flex flex-col w-full pt-4 text-slate-950">
                 <Dropdown className="w-full">
                   <DropdownTrigger className="bg-slate-200 [&>*:not(div)]:text-slate-700">
                     <div className="flex flex-col">
@@ -361,7 +366,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                           {audioBook.author.lastName}
                         </small>
                       </div>
-                      <span className="text-lg font-semibold m-0">
+                      <span className="m-0 text-lg font-semibold">
                         {audioBook.language.name} язык
                       </span>
                     </div>
@@ -403,7 +408,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           аудиоплеер
         </Button>
         <Button
-          className="rounded-full bg-slate-50 self-center size-12 border border-baby-blue-800 shadow-md"
+          className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
           variant="outline"
           size="icon"
           onClick={handleOnClickAvatar}
@@ -433,7 +438,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //       {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
   //       {selectedBook.book ? (
   //         <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
-  //           <DialogTitle className="p-0 m-0 flex justify-end h-1">
+  //           <DialogTitle className="flex justify-end h-1 p-0 m-0">
   //             <Button
   //               onClick={handleOnCloseBook}
   //               size="icon"
@@ -473,10 +478,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //       ) : null}
   //       <div className="map-pag__content">
   //         <ToastContainer containerId="mapPageToast" />
-  //         <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full text-slate-600">
+  //         <div className="fixed flex items-center justify-between w-full p-4 overflow-hidden text-slate-600">
   //           <SearchBookBox onClickBook={handleOnClickBook} />
   //           <Button
-  //             className="rounded-full bg-slate-50 self-center size-12"
+  //             className="self-center rounded-full bg-slate-50 size-12"
   //             variant="ghost"
   //             size="icon"
   //             onClick={handleOnClickAvatar}
@@ -495,8 +500,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //               className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
   //               side="bottom"
   //             >
-  //               <SheetHeader className="w-full m-0 p-0">
-  //                 <SheetTitle className="flex justify-between items-center m-0 p-0 text-xl">
+  //               <SheetHeader className="w-full p-0 m-0">
+  //                 <SheetTitle className="flex items-center justify-between p-0 m-0 text-xl">
   //                   <span>{selectedAudioBook.name}</span>
   //                   <Button
   //                     className="p-0 m-0"
@@ -513,7 +518,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //                   <img
   //                     src={selectedAudioBook.srcImg}
   //                     alt={selectedAudioBook.name}
-  //                     className="rounded-t-xl w-44 h-60 object-cover"
+  //                     className="object-cover rounded-t-xl w-44 h-60"
   //                   />
   //                 ) : (
   //                   <NotCoverBook />

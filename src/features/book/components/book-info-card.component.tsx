@@ -145,7 +145,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         position: "bottom-center",
         containerId: "bookInfoCardToast",
         className: "border border-red-500 text-slate-800",
-        icon: <ExclamationTriangleIcon className="size-24 text-red-500" />,
+        icon: <ExclamationTriangleIcon className="text-red-500 size-24" />,
         progressClassName: "bg-red-500",
       }
     );
@@ -157,7 +157,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
       position: "top-center",
       containerId: "bookInfoCardToast",
       className: "border border-red-500 text-slate-800",
-      icon: <ExclamationTriangleIcon className="size-12 text-red-500" />,
+      icon: <ExclamationTriangleIcon className="text-red-500 size-12" />,
       progressClassName: "bg-red-500",
     });
   };
@@ -207,17 +207,17 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   if (isMobile) {
     return (
-      <Card className="w-full border-none flex flex-col justify-center shadow-none">
+      <Card className="flex flex-col justify-center w-full border-none shadow-none">
         <ToastContainer
           containerId="bookInfoCardToast"
           className="w-full p-4"
         />
         <CardHeader className="flex flex-col items-center justify-center w-full">
-          <CardTitle className="w-full text-center text-xl py-3 m-0">
+          <CardTitle className="w-full py-3 m-0 text-xl text-center">
             {book.name}
           </CardTitle>
           <CardDescription className="p-0 m-0">
-            <div className="flex justify-items-center justify-center">
+            <div className="flex justify-center justify-items-center">
               {infoBookState.loadCover ? (
                 <div>
                   <Skeleton className="bg-neutral-300 size-44" />
@@ -231,7 +231,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <img
                       src={infoBookState.book.srcImg}
                       alt={infoBookState.book.name}
-                      className="size-44 rounded-t-xl object-cover"
+                      className="object-cover size-44 rounded-t-xl"
                     />
                   ) : (
                     <div className="size-40 rounded-xl animate-shimmer">
@@ -257,18 +257,18 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             >
               <AccordionItem value="story-text">
                 <AccordionTrigger
-                  className="text-base outline-none px-24"
+                  className="px-24 text-base outline-none"
                   onClick={() => {
                     handleShowText(!textAction.show);
                   }}
                 >
                   <div className="">
-                    <span className="animate-in text-lg">
+                    <span className="text-lg animate-in">
                       {!textAction.show ? "показать текст" : "скрыть текст"}
                     </span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="max-h-96 rounded-md overflow-auto mt-2">
+                <AccordionContent className="mt-2 overflow-auto rounded-md max-h-96">
                   {load ? (
                     <div>
                       {Array(3)
@@ -276,13 +276,13 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                         .map((value) => (
                           <Skeleton
                             key={value}
-                            className="w-full h-4 bg-zinc-300 my-2"
+                            className="w-full h-4 my-2 bg-zinc-300"
                           />
                         ))}
                     </div>
                   ) : (
                     <div className="text-lg">
-                      <p className="row-span-1 flex justify-center">
+                      <p className="flex justify-center row-span-1">
                         {book.text}
                       </p>
                     </div>
@@ -294,32 +294,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         </CardHeader>
         {!textAction.show && !textAction.fullScreen ? (
           <CardContent className="flex flex-col items-center space-y-2 text-xl">
-            {audios.length > 0 ? (
-              <AudioBookPlayer
-                audios={audios}
-                onClickRate={handleOnClickRate}
-                onError={handleError}
-              />
-            ) : (
-              <p className="self-center">аудиокниги не найдены</p>
-            )}
-            {children ? (
-              <div className="flex items-center cursor-pointer size-10">
-                {children}
-              </div>
-            ) : (
-              <div>
-                <Button
-                  onClick={handleOnClickAddAudio}
-                  variant="secondary"
-                  size="icon"
-                  className="border border-ghost text-lg flex items-center h-14 w-full px-4 [&_svg]:size-8 text-slate-800 my-4"
-                >
-                  <span>добавить свою озвучку</span>
-                  <FileAudio className="text-slate-600" />
-                </Button>
-              </div>
-            )}
+            {children}
           </CardContent>
         ) : null}
       </Card>
@@ -329,10 +304,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   return (
     <Card className="border-none shadow-none">
       <ToastContainer containerId="bookInfoCardToast" className="w-full p-4" />
-      <CardHeader className="m-0 py-0 w-full">
+      <CardHeader className="w-full py-0 m-0">
         {textAction.fullScreen ? null : (
-          <div className="w-full flex my-4 animate-out gap-4">
-            <div className="w-44 h-56 flex justify-items-center justify-center">
+          <div className="flex w-full gap-4 my-4 animate-out">
+            <div className="flex justify-center h-56 w-44 justify-items-center">
               {infoBookState.loadCover ? (
                 <div>
                   <Skeleton className="w-44 h-60 bg-neutral-300" />
@@ -346,7 +321,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     <img
                       src={infoBookState.book.srcImg}
                       alt={infoBookState.book.name}
-                      className="rounded-t-xl w-44 h-60 object-cover"
+                      className="object-cover rounded-t-xl w-44 h-60"
                     />
                   ) : (
                     <div className="w-44 h-60 animate-shimmer">
@@ -369,40 +344,14 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
             <div className="w-2/3">
               <CardTitle>
-                <div className="flex justify-between items-center space-x-2 mb-6">
+                <div className="flex items-center justify-between mb-6 space-x-2">
                   <span>{infoBookState.book.name}</span>
                 </div>
               </CardTitle>
               {load ? (
                 <Skeleton className="w-full h-24 bg-neutral-300" />
               ) : (
-                <CardDescription className="-mt-2 flex">
-                  <div className="flex -mb-12">
-                    {audios.length > 0 ? (
-                      <AudioBookPlayer
-                        audios={audios}
-                        onClickRate={onClickRate}
-                        onError={handleError}
-                      />
-                    ) : (
-                      <p className="self-center">аудиокниги не найдены</p>
-                    )}
-                    {children ? (
-                      <div className="flex items-center cursor-pointer ml-2 mt-1 size-10">
-                        {children}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="flex items-center cursor-pointer border border-ghost rounded-md shadow-md ml-2 mt-1 size-10">
-                          <FileAudio
-                            className="size-9 text-slate-700 p-2"
-                            onClick={handleOnClickAddAudio}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardDescription>
+                <CardDescription>{children}</CardDescription>
               )}
             </div>
           </div>
@@ -429,7 +378,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             <Button
               variant="outline"
               size="icon"
-              className="text-slate-600 border border-slate-500 bg-opacity-50 bg-white"
+              className="bg-white bg-opacity-50 border text-slate-600 border-slate-500"
               onClick={() =>
                 setTextAction((prevState) => ({
                   ...prevState,
@@ -445,7 +394,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
       </CardHeader>
 
       {/* <CardFooter className={`p-0 relative h-full`}> */}
-      {/* <div className="flex  flex-col rounded-md"> */}
+      {/* <div className="flex flex-col rounded-md"> */}
       <motion.div
         className="italic text-justify text-slate-800"
         initial="closed"

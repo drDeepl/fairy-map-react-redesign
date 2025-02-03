@@ -57,13 +57,13 @@ const Dropdown: FC<DropdownProps> = ({ children, className = "" }) => {
 
   return (
     <DropdownContext.Provider value={contextValue}>
-      <div
+      <motion.div
         className={`relative inline-block ${className}`}
         onBlur={closeDropdown}
         tabIndex={0}
       >
         {children}
-      </div>
+      </motion.div>
     </DropdownContext.Provider>
   );
 };
