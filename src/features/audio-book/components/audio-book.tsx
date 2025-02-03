@@ -13,13 +13,20 @@ import StarRating from "@/components/star-rating-motion";
 
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
+  onClickRate: (
+    rating: number,
+    audio: Components.Schemas.AudioStoryResponseDto
+  ) => Promise<number>;
   children?: React.ReactNode;
 }
 
-const AudioBook: React.FC<AudioPlayerProps> = ({ audioBooks, children }) => {
-  const [selectedAudio, setSelectedAudio] = useState<
-    Components.Schemas.AudioStoryResponseDto
-  >(audioBooks[0]);
+const AudioBook: React.FC<AudioPlayerProps> = ({
+  audioBooks,
+  onClickRate,
+  children,
+}) => {
+  const [selectedAudio, setSelectedAudio] =
+    useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
@@ -64,11 +71,6 @@ const AudioBook: React.FC<AudioPlayerProps> = ({ audioBooks, children }) => {
     audioRef.current.src = audio.srcAudio;
   };
 
-  const handleOnSelectStar = async (rating: number): Promise<number> => {
-    throw new Error("Not implemented");
-    return rating;
-  };
-
   return (
     <div>
       <div className="relative flex flex-col items-center space-y-2">
@@ -76,7 +78,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({ audioBooks, children }) => {
           <StarRating
             className=""
             currentRating={selectedAudio.commonRating}
-            onClickStar={handleOnSelectStar}
+            onClickStar={(rating) => onClickRate(rating, selectedAudio)}
           />
         </div>
         <span className="absolute top-1.5 left-[49%] text-orange-500 italic text-md font-bold rounded-full">

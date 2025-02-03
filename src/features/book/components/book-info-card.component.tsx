@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   CaretUpIcon,
@@ -31,34 +30,24 @@ import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-import AudioBookPlayer from "@/features/audio-book/audio-book-player.component";
-
-import { FileAudio } from "lucide-react";
-
 import { RootState } from "@/app/store";
 import { AuthState } from "@/features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
-import { ToastContainer, toast } from "react-toastify";
+
 import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tooltip } from "@radix-ui/react-tooltip";
-import { TooltipContent } from "@/components/ui/tooltip";
+
 import { Separator } from "@/components/ui/separator";
 
 interface BookInfoCardProps {
   load: boolean;
   book: Components.Schemas.StoryBookResponseDto;
-  audios: Components.Schemas.AudioStoryResponseDto[];
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryBookResponseDto>;
 
   onClickAddAudio: () => void;
-  onClickAuth: () => void;
-  onClickRate: (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ) => Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined>;
   children?: React.ReactNode;
 }
 
@@ -75,11 +64,7 @@ interface InfoBookState {
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   load,
   book,
-  audios,
-  onClickAuth,
-  onClickRate,
   onUploadCover,
-  onClickAddAudio,
   children,
 }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
@@ -98,10 +83,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   const handleShowText = (showText: boolean) => {
     setTextAction({ show: showText, fullScreen: false });
-  };
-
-  const handleFullScreen = (fullScreen: boolean) => {
-    setTextAction((prevState) => ({ ...prevState, fullScreen: fullScreen }));
   };
 
   const handleUploadFile = async (
@@ -124,83 +105,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     }
   };
 
-  const createActionToast = (
-    msg: string,
-    btnText: string,
-    onAction: () => void
-  ) => {
-    toast.info(
-      <div className="flex items-center">
-        <span className="font-normal ">{msg}</span>
-        <Button
-          variant="outline"
-          className="border border-slate-500"
-          onClick={onAction}
-        >
-          {btnText}
-        </Button>
-      </div>,
-      {
-        closeButton: false,
-        position: "bottom-center",
-        containerId: "bookInfoCardToast",
-        className: "border border-red-500 text-slate-800",
-        icon: <ExclamationTriangleIcon className="text-red-500 size-24" />,
-        progressClassName: "bg-red-500",
-      }
-    );
-  };
-
-  const createErrorToast = (msg: string) => {
-    toast.error(msg, {
-      closeButton: true,
-      position: "top-center",
-      containerId: "bookInfoCardToast",
-      className: "border border-red-500 text-slate-800",
-      icon: <ExclamationTriangleIcon className="text-red-500 size-12" />,
-      progressClassName: "bg-red-500",
-    });
-  };
-
-  const handleError = (msg: string) => {
-    createErrorToast(msg);
-  };
-
-  const handleOnClickRate = async (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
-    console.log("BookInfoCardComponent: handleOnClickRate");
-    if (!user) {
-      console.log("NO USER");
-
-      createActionToast(
-        "оценить озвучку могут только авторизованные пользователи",
-        "войти",
-        () => {
-          onClickAuth();
-        }
-      );
-
-      return undefined;
-    } else {
-      return await onClickRate(dto);
-    }
-  };
-
-  const handleOnClickAddAudio = () => {
-    if (!user) {
-      createActionToast(
-        "подать заявку на добавление озвучку могут только авторизованные пользователи",
-        "войти",
-        () => {
-          onClickAuth();
-        }
-      );
-    } else {
-      onClickAddAudio();
-    }
-  };
-
   useEffect(() => {
     setInfoBookState((prevState) => ({ ...prevState, loadCover: false }));
   }, []);
@@ -208,10 +112,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   if (isMobile) {
     return (
       <Card className="flex flex-col justify-center w-full border-none shadow-none">
-        <ToastContainer
-          containerId="bookInfoCardToast"
-          className="w-full p-4"
-        />
         <CardHeader className="flex flex-col items-center justify-center w-full">
           <CardTitle className="w-full py-3 m-0 text-xl text-center">
             {book.name}
@@ -303,7 +203,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   return (
     <Card className="border-none shadow-none">
-      <ToastContainer containerId="bookInfoCardToast" className="w-full p-4" />
       <CardHeader className="w-full py-0 m-0">
         {textAction.fullScreen ? null : (
           <div className="flex w-full gap-4 my-4 animate-out">
@@ -393,8 +292,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         <Separator />
       </CardHeader>
 
-      {/* <CardFooter className={`p-0 relative h-full`}> */}
-      {/* <div className="flex flex-col rounded-md"> */}
       <motion.div
         className="italic text-justify text-slate-800"
         initial="closed"
@@ -416,8 +313,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
           {book.text}
         </ScrollArea>
       </motion.div>
-      {/* </div> */}
-      {/* </CardFooter> */}
     </Card>
   );
 };

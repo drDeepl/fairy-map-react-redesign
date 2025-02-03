@@ -48,9 +48,6 @@ interface MapComponentProps {
   features: any;
   width: number;
   height: number;
-  onClickAudioBook: (
-    audio: Components.Schemas.PreviewAudioStoryResponseDto
-  ) => void;
 
   onClickBook: (
     book: Components.Schemas.StoryBookWithAudiosResponseDto
@@ -76,7 +73,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   features,
   width,
   height,
-  onClickAudioBook,
   onClickBook,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);

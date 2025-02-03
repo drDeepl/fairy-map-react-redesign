@@ -15,22 +15,27 @@ interface NotifyContainerProps {
   onRemove: (id: string) => void;
   maxVisibleNotifications?: number;
   duration?: number;
+  className?: string;
 }
 
-const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
-  id,
+interface NotificationItemProps extends Notification {
+  onClose: () => void;
+  className?: string;
+}
+
+const NotificationItem: React.FC<NotificationItemProps> = ({
   type,
   message,
   onClose,
   action,
   duration = 5,
+  className = "",
 }) => {
-  // Цвета для разных типов уведомлений
   const typeColors = {
-    success: "border border-green-500 bg-green-100 text-green-500 ",
-    error: "border border-red-500 text-red-500 ",
+    success: "border border-green-500 bg-green-100 text-green-500",
+    error: "border border-red-500 text-red-500",
     warning: "border border-yellow-500 bg-yellow-100 text-yellow-500",
-    info: "border border-blue-500 bg-blue-100 text-blue-500 ",
+    info: "border border-blue-500 bg-blue-100 text-blue-500",
   };
 
   const [timeLeft, setTimeLeft] = useState(duration);
@@ -42,21 +47,26 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
     info: "stroke-blue-500",
   };
 
-  // Эффект для обновления таймера
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
     if (timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1);
+        setTimeLeft((prevTime) => {
+          const newTime = prevTime - 1;
+          if (newTime <= 0) {
+            if (interval) clearInterval(interval);
+            onClose();
+          }
+          return newTime;
+        });
       }, 1000);
-    } else if (timeLeft === 0) {
-      if (interval) clearInterval(interval);
-      onClose();
     }
 
-    return () => clearInterval(interval);
-  }, [timeLeft]);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timeLeft, onClose]);
 
   const progress = ((duration - timeLeft) / duration) * 100;
 
@@ -67,7 +77,8 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
       exit={{ opacity: 0, y: -100 }}
       transition={{ duration: 0.3 }}
       className={`
-        ${typeColors[type]}  
+        ${typeColors[type]}
+        ${className}
         bg-neutral-50
         rounded-md
         shadow-lg 
@@ -75,20 +86,19 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
         flex 
         flex-col
         items-center
-        justify-between
+        justify-center
         max-w-md
         w-full
         relative
       `}
     >
-      <div className="w-full flex justify-between items-center space-x-4 mx-2 px-2 pt-4">
-        <span className="text-md font-semibold">{message}</span>
+      <div className="flex items-center justify-between w-full px-2 pt-4 mx-2 space-x-4">
+        <span className="font-semibold text-md">{message}</span>
         <div className="relative">
           <motion.svg
             viewBox="0 0 200 200"
             className="transform -rotate-90 size-12"
           >
-            {/* Задний фон круга */}
             <circle
               cx="100"
               cy="100"
@@ -96,8 +106,6 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
               className="stroke-gray-300 fill-none"
               strokeWidth="20"
             />
-
-            {/* Анимированный прогресс круга */}
             <motion.circle
               cx="100"
               cy="100"
@@ -131,32 +139,31 @@ const NotificationItem: React.FC<Notification & { onClose: () => void }> = ({
           </Button>
         </div>
       </div>
-      {action}
+      <div onClick={onClose}>{action}</div>
     </motion.div>
   );
 };
 
-// Основной компонент контейнера уведомлений
 const NotifyContainer: React.FC<NotifyContainerProps> = ({
   notifications,
   onRemove,
   maxVisibleNotifications = 1,
+  className = "",
 }) => {
-  // Усечение количества видимых уведомлений
   const visibleNotifications = notifications.slice(0, maxVisibleNotifications);
 
   return (
     <div
-      className="
+      className={`
         absolute 
-        top-4 
-        left-0
+        top-4
         z-[60] 
         flex 
-        flex-col 
-        items-end
-        w-md
-      "
+        flex-col
+        items-center
+        max-w-md
+        ${className}
+      `}
     >
       <AnimatePresence>
         {visibleNotifications.map((notification) => (

@@ -32,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 import { parsePayloadFromAccessToken } from "@/common/helpers/token.helper";
 import NotifyContainer, {
   Notification,
-} from "../book/components/notificaiton.component";
+} from "../../components/notificaiton.component";
 
 enum Tab {
   SignIn = "signin",

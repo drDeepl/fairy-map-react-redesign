@@ -22,21 +22,12 @@ import LoadSpinner from "@/components/ui/load-spinner";
 import { Button } from "@/components/ui/button";
 
 import { MapModalTabs } from "./constants/book-info-tabs.enum";
-import { ToastContainer } from "react-toastify";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import AudioBookPlayer from "../audio-book/audio-book-player.component";
 
 import apiClient from "@/api/apiClient";
 import { simplifyGeoJsonHelper } from "./helpers/simplify-geo-json.helper";
 import { FeatureProperties } from "./map.interface";
 import { FeatureCollection, Geometry } from "geojson";
-import NotCoverBook from "@/components/not-cover-book.component";
+
 import SearchBookBox from "../book/components/search-book-box.component";
 import { useMediaQuery } from "react-responsive";
 
@@ -45,20 +36,8 @@ import AudioBook from "../audio-book/components/audio-book";
 
 import NotifyContainer, {
   Notification,
-} from "../book/components/notificaiton.component";
-import StarRating from "@/components/star-rating-motion";
-import { AxiosResponse } from "axios";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@/components/dropdown-menu-motion.component";
-
-import { LanguagesIcon } from "lucide-react";
-import { AudioResponseDto } from "../../api/schemas/client";
-import { StarFilledIcon } from "@radix-ui/react-icons";
-import AudioBookPlaylist from "../book/components/audio-book-playlist.component";
+} from "../../components/notificaiton.component";
+import { AxiosResponse } from "node_modules/axios/index.d.cts";
 
 interface MapPageProps {
   width: number;
@@ -126,42 +105,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     } else {
       setAuthFormState({ open: true, notifySuccess: true });
     }
-  };
-
-  const [audioBook, setAudioBook] =
-    useState<Components.Schemas.AudioStoryResponseDto | null>(null);
-
-  const handleOnClickAudioBook = (
-    audio: Components.Schemas.AudioStoryResponseDto
-  ) => {
-    setAudioBook(audio);
-  };
-
-  const handleOnSelectStar = async (rating: number) => {
-    console.log(rating);
-
-    if (!audioBook) return rating;
-
-    try {
-      const res: AxiosResponse<
-        Components.Schemas.AddedRatingAudioStoryDto,
-        any
-      > = await apiClient.paths["/api/story/rating/add"].post(null, {
-        rating: rating,
-        audioId: audioBook.id,
-      });
-
-      return res.data.ratingAudioStory;
-    } catch (error) {
-      console.log(error);
-      return audioBook.commonRating;
-    }
-  };
-
-  const handleOnClickRate = async (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
-    return await dispatch(addRatingAudio(dto)).unwrap();
   };
 
   const [selectedBook, setSelectedBook] = useState<SelectedBookState>({
@@ -271,10 +214,57 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         id: `notify-${Date.now()}`,
       };
 
-      setNotifications((prev) => [...prev, newNotification]);
+      setNotifications((prevState) => [...prevState, newNotification]);
     },
     []
   );
+
+  const handleOnClickRate = async (
+    rating: number,
+    audio: Components.Schemas.AudioStoryResponseDto
+  ): Promise<number> => {
+    if (!authState.user) {
+      addNotification({
+        type: "error",
+        message: "для оценки озвучки необходимо авторизоваться",
+        action: (
+          <Button
+            onClick={() => {
+              handleOnClickAvatar();
+            }}
+            variant="link"
+            className="m-2"
+          >
+            войти
+          </Button>
+        ),
+      });
+      return audio.commonRating;
+    }
+
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
+
+    setSelectedBook((prevState) => ({
+      ...prevState,
+      book: prevState.book
+        ? {
+            ...prevState.book,
+            audios: prevState.book.audios.map(
+              (audio: Components.Schemas.AudioStoryResponseDto) =>
+                audio.id === res.data.audioId
+                  ? { ...audio, commonRating: res.data.ratingAudioStory }
+                  : audio
+            ),
+          }
+        : null,
+    }));
+
+    return res.data.ratingAudioStory;
+  };
 
   if (mapState.load) {
     return <LoadSpinner />;
@@ -294,7 +284,15 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         </DialogSheet>
       )}
       {selectedBook.book && (
-        <DialogSheet onClose={handleOnCloseBook}>
+        <DialogSheet onClose={handleOnCloseBook} contentClassName="relative">
+          {notifications.length > 0 ? (
+            <NotifyContainer
+              className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
+              notifications={notifications}
+              onRemove={removeNotification}
+            />
+          ) : null}
+
           <Tabs
             defaultValue={currentTab}
             value={currentTab}
@@ -304,15 +302,13 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               <BookInfoCardComponent
                 load={selectedBook.load}
                 book={selectedBook.book}
-                audios={selectedBook.book.audios}
-                onClickRate={handleOnClickRate}
-                onClickAuth={() => {
-                  setAuthFormState({ open: true, notifySuccess: false });
-                }}
                 onClickAddAudio={handleOnClickAddAudio}
               >
                 {selectedBook.book.audios.length > 0 ? (
-                  <AudioBook audioBooks={selectedBook.book.audios} />
+                  <AudioBook
+                    audioBooks={selectedBook.book.audios}
+                    onClickRate={handleOnClickRate}
+                  />
                 ) : (
                   <p>аудиокниги не найдены</p>
                 )}
@@ -332,81 +328,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Tabs>
         </DialogSheet>
       )}
-      {audioBook && (
-        <DialogSheet
-          onClose={() => {
-            setAudioBook(null);
-          }}
-        >
-          <div>
-            <div className="relative flex flex-col items-center space-y-2">
-              <div className="p-1 absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
-                <StarRating
-                  className=""
-                  currentRating={audioBook.commonRating}
-                  onClickStar={handleOnSelectStar}
-                />
-              </div>
-              <span className="absolute top-1 left-[47.3%] text-orange-500 italic text-md font-bold rounded-full">
-                {Math.round((audioBook.commonRating + Number.EPSILON) * 10) /
-                  10}
-              </span>
-            </div>
-            <AudioBook audioBooks={audioBook}>
-              <div className="flex flex-col w-full pt-4 text-slate-950">
-                <Dropdown className="w-full">
-                  <DropdownTrigger className="bg-slate-200 [&>*:not(div)]:text-slate-700">
-                    <div className="flex flex-col">
-                      <div className="flex space-x-1">
-                        <small className="text-sm">озвучил:</small>
-                        <small className="text-sm">
-                          {audioBook.author.firstName}
-                        </small>
-                        <small className="text-sm">
-                          {audioBook.author.lastName}
-                        </small>
-                      </div>
-                      <span className="m-0 text-lg font-semibold">
-                        {audioBook.language.name} язык
-                      </span>
-                    </div>
-                    <LanguagesIcon className="-mr-[4.8rem]" />
-                  </DropdownTrigger>
-                  <DropdownMenu>
-                    <DropdownItem>Option 1</DropdownItem>
-                    <DropdownItem>Option 2</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-            </AudioBook>
-          </div>
-        </DialogSheet>
-      )}
+
       <div className="absolute w-full flex justify-between p-4 z-[50]">
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
-        <Button
-          onClick={() => {
-            const audioBook = {
-              id: 1,
-              srcAudio:
-                "http://82.97.249.207:3000/uploads/audio/35/3/4/audio-1738253966999-63210898.mp3",
-              language: {
-                id: 4,
-                name: "тубаларский",
-              },
-              storyId: 35,
-              commonRating: 2.5555564,
-              author: {
-                id: 3,
-                firstName: "admin",
-                lastName: "admin",
-              },
-            };
-            setAudioBook(audioBook);
-          }}
-        >
-          аудиоплеер
-        </Button>
         <Button
           className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
           variant="outline"
@@ -426,126 +350,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           features={mapState.dataMap.features}
           width={width}
           height={height}
-          onClickAudioBook={handleOnClickAudioBook}
           onClickBook={handleOnClickBook}
         />
       )}
     </div>
   );
-
-  //   return (
-  //     <Dialog open={dialog}>
-  //       {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
-  //       {selectedBook.book ? (
-  //         <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
-  //           <DialogTitle className="flex justify-end h-1 p-0 m-0">
-  //             <Button
-  //               onClick={handleOnCloseBook}
-  //               size="icon"
-  //               variant="ghost"
-  //               className="p-0 m-1 "
-  //             >
-  //               <Cross1Icon />
-  //             </Button>
-  //           </DialogTitle>
-  //           <Tabs
-  //             defaultValue={currentTab}
-  //             value={currentTab}
-  //             className="m-0 size-full"
-  //           >
-  //             <TabsContent value={MapModalTabs.BookInfo.toString()}>
-  //               <BookInfoCardComponent
-  //                 load={selectedBook.load}
-  //                 book={selectedBook.book}
-  //                 audios={selectedBook.audios}
-  //                 onClickRate={handleOnClickRate}
-  //                 onClickAuth={() => {
-  //                   setAuthFormState({ open: true, notifySuccess: false });
-  //                 }}
-  //                 onClickAddAudio={handleOnClickAddAudio}
-  //               ></BookInfoCardComponent>
-  //             </TabsContent>
-  //             <TabsContent value={MapModalTabs.AddApplicationAudio.toString()}>
-  //               <CreateApplicationAudioForm
-  //                 storyId={selectedBook.book ? selectedBook.book.id : 0}
-  //                 languages={languageListState.languages}
-  //                 userId={authState.user ? Number(authState.user.sub) : 0}
-  //                 onClose={() => setCurrentTab(MapModalTabs.BookInfo.toString())}
-  //               />
-  //             </TabsContent>
-  //           </Tabs>
-  //         </DialogContent>
-  //       ) : null}
-  //       <div className="map-pag__content">
-  //         <ToastContainer containerId="mapPageToast" />
-  //         <div className="fixed flex items-center justify-between w-full p-4 overflow-hidden text-slate-600">
-  //           <SearchBookBox onClickBook={handleOnClickBook} />
-  //           <Button
-  //             className="self-center rounded-full bg-slate-50 size-12"
-  //             variant="ghost"
-  //             size="icon"
-  //             onClick={handleOnClickAvatar}
-  //           >
-  //             <span className="text-black">
-  //               {authState.user
-  //                 ? authState.user.email.split("@")[0][0].toUpperCase()
-  //                 : "?"}
-  //             </span>
-  //           </Button>
-  //         </div>
-
-  //         {selectedAudioBook ? (
-  //           <Sheet open={selectedAudioBook != undefined} modal={true}>
-  //             <SheetContent
-  //               className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
-  //               side="bottom"
-  //             >
-  //               <SheetHeader className="w-full p-0 m-0">
-  //                 <SheetTitle className="flex items-center justify-between p-0 m-0 text-xl">
-  //                   <span>{selectedAudioBook.name}</span>
-  //                   <Button
-  //                     className="p-0 m-0"
-  //                     variant="secondary"
-  //                     size="icon"
-  //                     onClick={() => setSelectedAudioBook(null)}
-  //                   >
-  //                     <Cross1Icon />
-  //                   </Button>
-  //                 </SheetTitle>
-  //               </SheetHeader>
-  //               <div className="grid grid-cols-2 gap-3">
-  //                 {selectedAudioBook.srcImg ? (
-  //                   <img
-  //                     src={selectedAudioBook.srcImg}
-  //                     alt={selectedAudioBook.name}
-  //                     className="object-cover rounded-t-xl w-44 h-60"
-  //                   />
-  //                 ) : (
-  //                   <NotCoverBook />
-  //                 )}
-
-  //                 <AudioBookPlayer
-  //                   audios={selectedAudioBook.audios}
-  //                   onClickRate={handleOnClickRate}
-  //                   onError={(msg) => console.error(msg)}
-  //                 />
-  //               </div>
-  //             </SheetContent>
-  //           </Sheet>
-  //         ) : null}
-
-  //         {mapState.dataMap ? (
-  //           <MapComponent
-  //             features={mapState.dataMap.features}
-  //             width={width}
-  //             height={height}
-  //             onClickAudioBook={handleOnClickAudioBook}
-  //             onClickBook={handleOnClickBook}
-  //           />
-  //         ) : null}
-  //       </div>
-  //     </Dialog>
-  //   );
 };
 
 export default MapPage;
