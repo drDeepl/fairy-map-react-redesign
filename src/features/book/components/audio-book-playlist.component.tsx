@@ -21,7 +21,7 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
   onClickAudioBook,
 }) => {
   return (
-    <div className="flex flex-col w-full pt-4 text-slate-950">
+    <div className="flex flex-col w-full pt-7 md:pt-4 sm:pt-4 text-slate-950">
       <Dropdown className="w-full">
         <DropdownTrigger className="bg-slate-200 hover:bg-slate-300 px-2 [&>*:not(div)]:text-slate-700">
           <div className="flex flex-col w-2/3">
@@ -30,7 +30,7 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
               <small className="text-sm">{currentAudio.author.firstName}</small>
               <small className="text-sm">{currentAudio.author.lastName}</small>
             </div>
-            <span className="m-0 text-lg font-semibold">
+            <span className="m-0 text-lg font-semibold leading-[18px]">
               {currentAudio.language.name} язык
             </span>
           </div>
@@ -46,17 +46,17 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
               className="flex items-center justify-between w-full px-2 py-2 text-slate-950"
             >
               <div className="flex flex-col w-44">
-                <span className="-mb-1 text-xs text-slate-600">
+                <span className="-mb-0.5 text-xs text-slate-600">
                   {`озвучил: ${audio.author.firstName} ${audio.author.lastName}`}
                 </span>
-                <span className="text-sm font-semibold lg:text-lg sm:text-sm">
+                <span className="font-semibold text-[18px] leading-[18px] lg:text-lg md:text-md">
                   {audio.language.name} язык
                 </span>
               </div>
 
-              <div className="flex items-center">
+              <div className="flex items-center self-center space-x-1">
                 <StarFilledIcon className="text-orange-500 size-6" />
-                <span className="italic text-orange-500">
+                <span className="italic leading-none text-orange-500 font-stretch-extra-condensed text-[16px]">
                   {`( ${audio.commonRating} )`}
                 </span>
               </div>

@@ -74,9 +74,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   return (
     <div>
       <div className="relative flex flex-col items-center space-y-2">
-        <div className="p-1 absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
+        <div className="absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
           <StarRating
-            className=""
             currentRating={selectedAudio.commonRating}
             onClickStar={(rating) => onClickRate(rating, selectedAudio)}
           />

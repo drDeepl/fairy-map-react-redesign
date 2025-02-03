@@ -1,12 +1,21 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence, useAnimate, animate } from "framer-motion";
-import { Cross1Icon, StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  StarIcon,
+  StarFilledIcon,
+  Cross1Icon,
+  TriangleDownIcon,
+  TriangleUpIcon,
+} from "@radix-ui/react-icons";
+import classNames from "classnames";
 
 interface StarRatingProps {
   className?: string;
   currentRating: number;
-  onClickStar: (value: number) => Promise<number>;
+  onClickStar: (rating: number) => Promise<number>;
 }
+
+const TOTAL_STARS = 5;
 
 const StarRating: React.FC<StarRatingProps> = ({
   className,
@@ -18,9 +27,7 @@ const StarRating: React.FC<StarRatingProps> = ({
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleStarClick = () => {
-    if (!isExpanded) {
-      setIsExpanded(true);
-    }
+    setIsExpanded(!isExpanded);
   };
 
   const handleStarHover = (value: number) => {
@@ -33,6 +40,7 @@ const StarRating: React.FC<StarRatingProps> = ({
     if (isExpanded) {
       const newRating = await onClickStar(value);
       setRating(newRating);
+      setIsExpanded(false);
     }
   };
 
@@ -52,7 +60,7 @@ const StarRating: React.FC<StarRatingProps> = ({
           onClick={() => handleStarSelect(i)}
           className="cursor-pointer"
         >
-          {isExpanded && i <= (hoverRating || rating) ? (
+          {i <= (hoverRating || rating) ? (
             <StarFilledIcon className="w-8 h-8 text-orange-500" />
           ) : (
             <StarIcon className="w-8 h-8 text-gray-300" />
@@ -77,32 +85,63 @@ const StarRating: React.FC<StarRatingProps> = ({
     },
   };
 
+  const tooltipVariants = {
+    hidden: {
+      opacity: 0,
+      y: 0,
+      x: -123,
+      scale: 0.9,
+    },
+    visible: {
+      opacity: 1,
+      y: -5,
+      x: -123,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+      },
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      scale: 0.9,
+      transition: {
+        duration: 0.3,
+      },
+    },
+  };
+
   return (
-    <div className={`flex items-center space-x-2 ${className}`}>
+    <div
+      className={`relative flex items-center space-x-2 ${className} bg-[inherit] rounded-full p-1`}
+      onBlur={() => setIsExpanded(false)}
+    >
       <AnimatePresence>
-        {!isExpanded ? (
+        <motion.div
+          key="initial-star"
+          initial="hidden"
+          animate="visible"
+          variants={initialStarVariants}
+          onClick={handleStarClick}
+          className="flex flex-col items-center space-x-1 cursor-pointer"
+        >
+          <StarFilledIcon className="text-orange-500 size-8" />
+        </motion.div>
+
+        {isExpanded && (
           <motion.div
-            key="initial-star"
+            key="star-rating-tooltip"
             initial="hidden"
             animate="visible"
-            exit="hidden"
-            variants={initialStarVariants}
-            onClick={handleStarClick}
-            className="cursor-pointer flex flex-col items-center space-x-1"
-          >
-            <StarFilledIcon className="size-8 text-orange-500" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="star-rating"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={`flex space-x-4 px-2 animate-shimmer`}
+            exit="exit"
+            variants={tooltipVariants}
+            className="absolute left-0 z-10 flex items-center px-4 py-2 mt-2 space-x-4 bg-[inherit] rounded-lg shadow-lg top-full"
           >
             {renderStars()}
-
             <Cross1Icon
-              className="text-gray-300 size-4 cursor-pointer self-center"
+              className="self-center text-gray-300 cursor-pointer size-4"
               onClick={() => setIsExpanded(false)}
             />
           </motion.div>
