@@ -8,14 +8,21 @@ import {
   PlayIcon,
 } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
+import AudioBookPlaylist from "@/features/book/components/audio-book-playlist.component";
+import StarRating from "@/components/star-rating-motion";
 
 interface AudioPlayerProps {
-  audioBook: Components.Schemas.AudioStoryResponseDto;
+  audioBooks: Components.Schemas.AudioStoryResponseDto[];
   children?: React.ReactNode;
 }
 
-const AudioBook: React.FC<AudioPlayerProps> = ({ audioBook, children }) => {
-  const audioRef = useRef(new Audio(audioBook.srcAudio));
+const AudioBook: React.FC<AudioPlayerProps> = ({ audioBooks, children }) => {
+  const [selectedAudio, setSelectedAudio] = useState<
+    Components.Schemas.AudioStoryResponseDto
+  >(audioBooks[0]);
+
+  const audioRef = useRef(new Audio(selectedAudio.srcAudio));
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -48,38 +55,74 @@ const AudioBook: React.FC<AudioPlayerProps> = ({ audioBook, children }) => {
     );
   };
 
+  const handleOnClickAudioBook = (
+    audio: Components.Schemas.AudioStoryResponseDto
+  ) => {
+    setIsPlaying(false);
+    setProgress(0);
+    setSelectedAudio(audio);
+    audioRef.current.src = audio.srcAudio;
+  };
+
+  const handleOnSelectStar = async (rating: number): Promise<number> => {
+    throw new Error("Not implemented");
+    return rating;
+  };
+
   return (
-    <div className="flex flex-col w-72 space-x-2 space-y-2 items-center py-4 px-2 rounded-xl bg-slate-200 border border-slate-950 shadow-md">
-      <div className="w-full">{children}</div>
-      <div className="flex w-full justify-items-center items-center justify-center">
-        <audio
-          ref={audioRef}
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={() => setIsPlaying(false)}
-          src={audioBook.srcAudio}
-        />
-        <div className="w-full bg-gray-800 rounded-full h-[0.25rem] overflow-hidden">
-          <motion.div
-            className="bg-blue-400 h-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.1 }}
+    <div>
+      <div className="relative flex flex-col items-center space-y-2">
+        <div className="p-1 absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
+          <StarRating
+            className=""
+            currentRating={selectedAudio.commonRating}
+            onClickStar={handleOnSelectStar}
           />
         </div>
-        <div className="flex items-center px-2 space-x-2  [&_svg]:text-slate-950">
-          <button onClick={handleRewind} className="">
-            <TrackPreviousIcon className="size-6 stroke-none" />
-          </button>
-          <button onClick={togglePlayPause}>
-            {isPlaying ? (
-              <PauseIcon className="size-8" />
-            ) : (
-              <PlayIcon className="size-8" />
-            )}
-          </button>
-          <button onClick={handleFastForward} className="text-white">
-            <TrackNextIcon className="size-6" />
-          </button>
+        <span className="absolute top-1.5 left-[49%] text-orange-500 italic text-md font-bold rounded-full">
+          {Math.round((selectedAudio.commonRating + Number.EPSILON) * 10) / 10}
+        </span>
+      </div>
+      <div className="flex flex-col items-center px-2 py-4 space-x-2 space-y-2 border shadow-md w-72 rounded-xl bg-slate-200 border-slate-950">
+        <div className="flex flex-col w-full">
+          <AudioBookPlaylist
+            audios={audioBooks}
+            currentAudio={selectedAudio}
+            onClickAudioBook={handleOnClickAudioBook}
+          />
+          {children}
+        </div>
+
+        <div className="flex items-center justify-center w-full justify-items-center">
+          <audio
+            ref={audioRef}
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={() => setIsPlaying(false)}
+            src={selectedAudio.srcAudio}
+          />
+          <div className="w-full bg-gray-800 rounded-full h-[0.25rem] overflow-hidden">
+            <motion.div
+              className="h-full bg-blue-400"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.1 }}
+            />
+          </div>
+          <div className="flex items-center px-2 space-x-2  [&_svg]:text-slate-950">
+            <button onClick={handleRewind} className="">
+              <TrackPreviousIcon className="size-6 stroke-none" />
+            </button>
+            <button onClick={togglePlayPause}>
+              {isPlaying ? (
+                <PauseIcon className="size-8" />
+              ) : (
+                <PlayIcon className="size-8" />
+              )}
+            </button>
+            <button onClick={handleFastForward} className="text-white">
+              <TrackNextIcon className="size-6" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -47,14 +47,18 @@ import NotifyContainer, {
   Notification,
 } from "../book/components/notificaiton.component";
 import StarRating from "@/components/star-rating-motion";
-import { AxiosResponse } from "node_modules/axios/index.d.cts";
+import { AxiosResponse } from "axios";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-} from "@/components/dropdown-box.component";
+} from "@/components/dropdown-menu-motion.component";
+
 import { LanguagesIcon } from "lucide-react";
+import { AudioResponseDto } from "../../api/schemas/client";
+import { StarFilledIcon } from "@radix-ui/react-icons";
+import AudioBookPlaylist from "../book/components/audio-book-playlist.component";
 
 interface MapPageProps {
   width: number;
@@ -124,8 +128,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
-  const [audioBook, setAudioBook] =
-    useState<Components.Schemas.AudioStoryResponseDto | null>(null);
+  const [
+    audioBook,
+    setAudioBook,
+  ] = useState<Components.Schemas.AudioStoryResponseDto | null>(null);
 
   const handleOnClickAudioBook = (
     audio: Components.Schemas.AudioStoryResponseDto
@@ -268,11 +274,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       };
 
       setNotifications((prev) => [...prev, newNotification]);
-
-      // Автоматическое удаление через 5 секунд
-      // setTimeout(() => {
-      // removeNotification(newNotification.id);
-      // }, 5000);
     },
     []
   );
@@ -311,7 +312,13 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   setAuthFormState({ open: true, notifySuccess: false });
                 }}
                 onClickAddAudio={handleOnClickAddAudio}
-              ></BookInfoCardComponent>
+              >
+                {selectedBook.book.audios.length > 0 ? (
+                  <AudioBook audioBooks={selectedBook.book.audios} />
+                ) : (
+                  <p>аудиокниги не найдены</p>
+                )}
+              </BookInfoCardComponent>
             </TabsContent>
             <TabsContent
               value={MapModalTabs.AddApplicationAudio.toString()}
@@ -347,8 +354,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   10}
               </span>
             </div>
-            <AudioBook audioBook={audioBook}>
-              <div className="w-full flex flex-col pt-4 text-slate-950">
+            <AudioBook audioBooks={audioBook}>
+              <div className="flex flex-col w-full pt-4 text-slate-950">
                 <Dropdown className="w-full">
                   <DropdownTrigger className="bg-slate-200 [&>*:not(div)]:text-slate-700">
                     <div className="flex flex-col">
@@ -361,7 +368,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                           {audioBook.author.lastName}
                         </small>
                       </div>
-                      <span className="text-lg font-semibold m-0">
+                      <span className="m-0 text-lg font-semibold">
                         {audioBook.language.name} язык
                       </span>
                     </div>
