@@ -53,7 +53,7 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-} from "@/components/dropdown-box.component";
+} from "@/components/dropdown-menu-motion.component";
 import { LanguagesIcon } from "lucide-react";
 
 interface MapPageProps {
