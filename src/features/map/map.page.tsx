@@ -351,7 +351,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
         <Button onClick={() => setAudioStory(true)}>аудиоплеер</Button>
         <Button
-          className="rounded-full bg-slate-50 self-center size-12 border border-baby-blue-800 shadow-md"
+          className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
           variant="outline"
           size="icon"
           onClick={handleOnClickAvatar}
@@ -381,7 +381,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //       {authFormState.open ? <AuthForm onClose={handleOnCloseAuthForm} /> : null}
   //       {selectedBook.book ? (
   //         <DialogContent className="[&>button]:hidden m-0 p-0 animate-zoom-in dialog__content h-full w-full sm:h-72">
-  //           <DialogTitle className="p-0 m-0 flex justify-end h-1">
+  //           <DialogTitle className="flex justify-end h-1 p-0 m-0">
   //             <Button
   //               onClick={handleOnCloseBook}
   //               size="icon"
@@ -421,10 +421,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //       ) : null}
   //       <div className="map-pag__content">
   //         <ToastContainer containerId="mapPageToast" />
-  //         <div className="overflow-hidden fixed flex items-center justify-between p-4 w-full text-slate-600">
+  //         <div className="fixed flex items-center justify-between w-full p-4 overflow-hidden text-slate-600">
   //           <SearchBookBox onClickBook={handleOnClickBook} />
   //           <Button
-  //             className="rounded-full bg-slate-50 self-center size-12"
+  //             className="self-center rounded-full bg-slate-50 size-12"
   //             variant="ghost"
   //             size="icon"
   //             onClick={handleOnClickAvatar}
@@ -443,8 +443,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //               className="[&>button]:hidden flex flex-col w-[55vw] py-1 px-4 place-self-center rounded-t-md"
   //               side="bottom"
   //             >
-  //               <SheetHeader className="w-full m-0 p-0">
-  //                 <SheetTitle className="flex justify-between items-center m-0 p-0 text-xl">
+  //               <SheetHeader className="w-full p-0 m-0">
+  //                 <SheetTitle className="flex items-center justify-between p-0 m-0 text-xl">
   //                   <span>{selectedAudioBook.name}</span>
   //                   <Button
   //                     className="p-0 m-0"
@@ -461,7 +461,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
   //                   <img
   //                     src={selectedAudioBook.srcImg}
   //                     alt={selectedAudioBook.name}
-  //                     className="rounded-t-xl w-44 h-60 object-cover"
+  //                     className="object-cover rounded-t-xl w-44 h-60"
   //                   />
   //                 ) : (
   //                   <NotCoverBook />
