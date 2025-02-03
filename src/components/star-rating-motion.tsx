@@ -3,11 +3,13 @@ import { motion, AnimatePresence, useAnimate, animate } from "framer-motion";
 import { Cross1Icon, StarFilledIcon, StarIcon } from "@radix-ui/react-icons";
 
 interface StarRatingProps {
+  className?: string;
   currentRating: number;
   onClickStar: (value: number) => Promise<number>;
 }
 
 const StarRating: React.FC<StarRatingProps> = ({
+  className,
   currentRating,
   onClickStar,
 }) => {
@@ -76,7 +78,7 @@ const StarRating: React.FC<StarRatingProps> = ({
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className={`flex items-center space-x-2 ${className}`}>
       <AnimatePresence>
         {!isExpanded ? (
           <motion.div
@@ -86,25 +88,21 @@ const StarRating: React.FC<StarRatingProps> = ({
             exit="hidden"
             variants={initialStarVariants}
             onClick={handleStarClick}
-            className="cursor-pointer flex items-center space-x-1"
+            className="cursor-pointer flex flex-col items-center space-x-1"
           >
-            <StarIcon className="size-8 text-orange-500" />
-            <motion.span className="text-gray-400 italic text-sm">
-              ({Math.round((currentRating + Number.EPSILON) * 100) / 100}/
-              {totalStars})
-            </motion.span>
+            <StarFilledIcon className="size-8 text-orange-500" />
           </motion.div>
         ) : (
           <motion.div
             key="star-rating"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex space-x-1"
+            className={`flex space-x-4 px-2 animate-shimmer`}
           >
             {renderStars()}
 
             <Cross1Icon
-              className="text-gray-500 siz-7 cursor-pointer self-center"
+              className="text-gray-300 size-4 cursor-pointer self-center"
               onClick={() => setIsExpanded(false)}
             />
           </motion.div>

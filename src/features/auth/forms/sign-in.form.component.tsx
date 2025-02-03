@@ -40,7 +40,10 @@ const SignInForm: React.FC<SignInFormProps> = ({
 
   return (
     <Form {...signInForm}>
-      <form onSubmit={signInForm.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={signInForm.handleSubmit(onSubmit)}
+        className="space-y-8 w-full"
+      >
         <FormField
           control={signInForm.control}
           name="email"

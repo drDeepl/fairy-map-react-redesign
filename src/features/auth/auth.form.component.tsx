@@ -103,10 +103,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
         type: "success",
         message: "Вход выполнен успешно!",
         action: (
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end">
             <Button
-              variant="outline"
-              className="border border-green-500"
+              variant="link"
+              className="text-green-500 p-0 m-0"
               onClick={() => navigate(getRoutePageByUserRole(user.role))}
             >
               в личный кабинет
@@ -140,6 +140,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
 
   const removeNotification = useCallback((id: string) => {
     setNotifications((prev) => prev.filter((notify) => notify.id !== id));
+    onClose();
   }, []);
 
   const addNotification = useCallback(
@@ -150,18 +151,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
       };
 
       setNotifications([newNotification]);
-
-      // Автоматическое удаление через 5 секунд
-      setTimeout(() => {
-        removeNotification(newNotification.id);
-      }, 5000);
     },
     []
   );
 
   return (
-    // <DialogContent className="max-w-sm px-8 pt-1 [&>button]:hidden transition-transform duration-500 transform">
-    <div className="py-4 px-6 w-full">
+    <div className="py-4 px-6">
       <div className="relative">
         <NotifyContainer
           notifications={notifications}
@@ -178,7 +173,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
           >
             <Cross1Icon className="text-slate-600" />
           </Button>
-          <TabsList className="grid w-64 center space-x-4 grid-cols-2 mb-2">
+          <TabsList className="grid center space-x-4 grid-cols-2 mb-2">
             <TabsTrigger
               value={Tab.SignIn}
               className="data-[state=active]:border border-blue-300 data-[state=active]:text-slate-800 data-[state=active]:bg-secondary"
@@ -201,7 +196,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
             />
           ) : null}
         </div>
-        <TabsContent value={Tab.SignIn} className="animate-zoom-in">
+        <TabsContent value={Tab.SignIn}>
           <SignInForm loading={authState.loading} onSubmit={handleSignIn}>
             <TooltipProvider
               delayDuration={captchaState.verifyed ? 1000000 : 0}
@@ -228,7 +223,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
             </TooltipProvider>
           </SignInForm>
         </TabsContent>
-        <TabsContent value={Tab.SignUp} className="animate-zoom-in">
+        <TabsContent value={Tab.SignUp} className="animate-fade-in">
           <SignUpFormComponent
             loading={authState.loading}
             onSubmit={handleSignUp}
@@ -268,7 +263,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
         </div>
       </Tabs>
     </div>
-    //  </DialogContent>
   );
 };
 
