@@ -33,10 +33,15 @@ const useDropdownContext = () => {
 interface DropdownProps {
   children: ReactNode;
   className?: string;
+  open?: boolean;
 }
 
-const Dropdown: FC<DropdownProps> = ({ children, className = "" }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const Dropdown: FC<DropdownProps> = ({
+  children,
+  className = "",
+  open = false,
+}) => {
+  const [isOpen, setIsOpen] = useState(open);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleDropdown = () => {
@@ -88,7 +93,7 @@ interface DropdownMenuProps {
   className?: string;
 }
 
-const Menu: FC<DropdownMenuProps> = ({ children, className = "" }) => {
+const Menu: React.FC<DropdownMenuProps> = ({ children, className = "" }) => {
   const { isOpen } = useDropdownContext();
   const [openUpward, setOpenUpward] = useState(false);
 

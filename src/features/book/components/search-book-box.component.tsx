@@ -155,7 +155,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                   role="combobox"
                   aria-expanded={open}
                   size="icon"
-                  className="rounded-full border border-baby-blue-800 lg:size-12"
+                  className="border rounded-full border-baby-blue-800 size-12"
                 >
                   <MagnifyingGlassIcon className="text-slate-700" />
                 </Button>
@@ -165,12 +165,12 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
           </Tooltip>
         </TooltipProvider>
 
-        <PopoverContent className="w-60 p-0 space-y-4" side="right">
+        <PopoverContent className="p-0 space-y-4 w-60" side="right">
           <Command>
             <CommandInput
               onValueChange={(e) => handleStoryNameInput(e)}
               placeholder="введите название книги..."
-              className="h-9 relative"
+              className="relative h-9"
             />
             <Separator />
             <CommandList className="absolute top-8 right-[0.5px] rounded-[inherit] bg-white w-60">
@@ -180,14 +180,14 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                   .map((_, idx) => (
                     <Skeleton
                       key={idx}
-                      className="w-5/6 h-4 bg-neutral-300 my-2 mx-4"
+                      className="w-5/6 h-4 mx-4 my-2 bg-neutral-300"
                     />
                   ))
               ) : (
                 <CommandGroup>
                   {listBookState.books.data.map((book) => (
                     <CommandItem
-                      className="cursor-pointer font-semibold text-center"
+                      className="font-semibold text-center cursor-pointer"
                       key={book.name}
                       value={book.name}
                       onSelect={() => {
@@ -195,7 +195,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                         handleOpenPopover(false);
                       }}
                     >
-                      <div className="flex justify-center items-center space-x-2">
+                      <div className="flex items-center justify-center space-x-2">
                         <div className="self-center size-8 ">
                           {book.srcImg ? (
                             <img src={book.srcImg} alt="" />
@@ -207,7 +207,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
                           <span className="text-start line-clamp-1">
                             {book.name}
                           </span>
-                          <small className="text-slate-500 lowercase">
+                          <small className="lowercase text-slate-500">
                             {book.ethnicGroup.name}
                           </small>
                         </div>

@@ -237,7 +237,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             <div className="w-2/3">
               <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="capitalize text-res-base">
+                  <span className="capitalize text-res-base md:text-res-sm">
                     {infoBookState.book.name}
                   </span>
                   {headerChildren}
@@ -262,7 +262,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               handleShowText(!textAction.show);
             }}
           >
-            <span className="text-md">
+            <span className="text-md md:text-lg">
               {!textAction.show ? "показать текст..." : "скрыть текст"}
             </span>
             <CaretUpIcon

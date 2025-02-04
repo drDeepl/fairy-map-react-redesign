@@ -9,7 +9,6 @@ import {
 import { LanguagesIcon } from "lucide-react";
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 
 interface AudioBookPlaylistProps {
   currentAudio: Components.Schemas.AudioStoryResponseDto;
@@ -57,13 +56,12 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
                   </span>
                 </div>
 
-                <div className="flex items-center self-center space-x-1">
+                <div className="flex flex-col items-center w-20 space-y-0.5">
                   <StarFilledIcon className="text-orange-500 size-6" />
                   <small className="italic leading-none text-orange-500 text-res-sm sm:text-res-xs">
                     {`( ${audio.commonRating} )`}
                   </small>
                 </div>
-                {/* <Separator className="w-full bg-slate-300" /> */}
               </DropdownItem>
             ))}
           </ScrollArea>

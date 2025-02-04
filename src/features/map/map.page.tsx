@@ -11,8 +11,6 @@ import { getRoutePageByUserRole } from "@/common/helpers/page.helper";
 
 import { Components } from "@/api/schemas/client";
 
-import { addRatingAudio } from "../audio-book/audio-book.actions";
-
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
 import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
@@ -39,8 +37,10 @@ import NotifyContainer, {
 } from "../../components/notificaiton.component";
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import MagicStarButton from "@/components/magic-stars-button.component";
-import { Cross1Icon } from "@radix-ui/react-icons";
+import { Cross1Icon, HomeIcon } from "@radix-ui/react-icons";
+import { BottomNavigation } from "@/components/bottom-navigation/bottom-navigation.component";
+import { SearchIcon } from "lucide-react";
+import { NavItem } from "@/components/bottom-navigation";
 
 interface MapPageProps {
   width: number;
@@ -249,29 +249,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
-      "/api/story/rating/add"
-    ].post(null, {
-      audioId: audio.id,
-      rating: rating,
-    });
-
-    // setSelectedBook((prevState) => ({
-    //   ...prevState,
-    //   book: prevState.book
-    //     ? {
-    //         ...prevState.book,
-    //         audios: prevState.book.audios.map(
-    //           (audio: Components.Schemas.AudioStoryResponseDto) =>
-    //             audio.id === res.data.audioId
-    //               ? { ...audio, commonRating: res.data.ratingAudioStory }
-    //               : audio
-    //         ),
-    //       }
-    //     : null,
-    // }));
-
-    console.log(res.data);
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
 
     return res.data.ratingAudioStory;
   };
@@ -329,10 +311,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         >
           <DrawerContent>
             {selectedBook.book && (
-              <div>
+              <div className="relative">
                 {notifications.length > 0 ? (
                   <NotifyContainer
-                    className="absolute w-full top-[85svh]"
+                    className="absolute w-full top-1"
                     notifications={notifications}
                     onRemove={removeNotification}
                   />
@@ -348,15 +330,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                       load={selectedBook.load}
                       book={selectedBook.book}
                       onClickAddAudio={handleOnClickAddAudio}
-                      headerChildren={
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => handleOnCloseBook()}
-                        >
-                          <Cross1Icon className="text-gray-300 size-8" />
-                        </Button>
-                      }
                     >
                       {selectedBook.book.audios.length > 0 ? (
                         <AudioBook
@@ -386,7 +359,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             )}
           </DrawerContent>
         </Drawer>
-        <div className="absolute w-full flex justify-between p-4 z-[50]">
+
+        <div className="absolute w-full flex justify-between p-4 z-[50] top-1">
           <SearchBookBox
             onClickBook={async (
               books: Components.Schemas.StoryBookResponseDto
@@ -412,6 +386,15 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             </span>
           </Button>
         </div>
+
+        {/* <BottomNavigation initialTab="home">
+          <NavItem
+            id="search"
+            icon={SearchIcon}
+            label="Search"
+            onClick={() => {}}
+          />
+        </BottomNavigation> */}
 
         {mapState.dataMap && (
           <Map
