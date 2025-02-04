@@ -1,13 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  StarIcon,
-  StarFilledIcon,
-  Cross1Icon,
-  TriangleDownIcon,
-  TriangleUpIcon,
-} from "@radix-ui/react-icons";
-import classNames from "classnames";
+import { StarIcon, StarFilledIcon, Cross1Icon } from "@radix-ui/react-icons";
+
+import TapableButton from "./tapable-button.component";
 
 interface StarRatingProps {
   className?: string;
@@ -15,15 +10,13 @@ interface StarRatingProps {
   onClickStar: (rating: number) => Promise<number>;
 }
 
-const TOTAL_STARS = 5;
-
 const StarRating: React.FC<StarRatingProps> = ({
   className,
   currentRating,
   onClickStar,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [rating, setRating] = useState(currentRating);
+  const [rating, setRating] = useState(currentRating - 1);
   const [hoverRating, setHoverRating] = useState(0);
 
   const handleStarClick = () => {
@@ -61,9 +54,9 @@ const StarRating: React.FC<StarRatingProps> = ({
           className="cursor-pointer"
         >
           {i <= (hoverRating || rating) ? (
-            <StarFilledIcon className="w-8 h-8 text-orange-500" />
+            <StarFilledIcon className="text-orange-500 size-8" />
           ) : (
-            <StarIcon className="w-8 h-8 text-gray-300" />
+            <StarIcon className="text-gray-300 size-8" />
           )}
         </motion.div>
       );
@@ -127,7 +120,9 @@ const StarRating: React.FC<StarRatingProps> = ({
           onClick={handleStarClick}
           className="flex flex-col items-center space-x-1 cursor-pointer"
         >
-          <StarFilledIcon className="text-orange-500 size-8" />
+          <TapableButton>
+            <StarFilledIcon className="text-orange-500 size-8" />
+          </TapableButton>
         </motion.div>
 
         {isExpanded && (

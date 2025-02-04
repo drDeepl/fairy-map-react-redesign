@@ -1,7 +1,7 @@
 import { AppDispatch, RootState } from "@/app/store";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import MapComponent from "./map.component";
+import Map from "./map.component";
 
 import { AuthState } from "../auth/auth.slice";
 import AuthForm from "../auth/auth.form.component";
@@ -37,7 +37,10 @@ import AudioBook from "../audio-book/components/audio-book";
 import NotifyContainer, {
   Notification,
 } from "../../components/notificaiton.component";
-import { AxiosResponse } from "node_modules/axios/index.d.cts";
+import { AxiosResponse } from "axios";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import MagicStarButton from "@/components/magic-stars-button.component";
+import { Cross1Icon } from "@radix-ui/react-icons";
 
 interface MapPageProps {
   width: number;
@@ -103,7 +106,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
       navigate(routeUserPersonalPage);
     } else {
-      setAuthFormState({ open: true, notifySuccess: true });
+      setAuthFormState({ open: true });
     }
   };
 
@@ -227,10 +230,14 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       addNotification({
         type: "error",
         message: "для оценки озвучки необходимо авторизоваться",
+
         action: (
           <Button
             onClick={() => {
               handleOnClickAvatar();
+              if (isMobile) {
+                setDrawer((prevState) => ({ ...prevState, authForm: true }));
+              }
             }}
             variant="link"
             className="m-2"
@@ -242,29 +249,43 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
-      await apiClient.paths["/api/story/rating/add"].post(null, {
-        audioId: audio.id,
-        rating: rating,
-      });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
+      "/api/story/rating/add"
+    ].post(null, {
+      audioId: audio.id,
+      rating: rating,
+    });
 
-    setSelectedBook((prevState) => ({
-      ...prevState,
-      book: prevState.book
-        ? {
-            ...prevState.book,
-            audios: prevState.book.audios.map(
-              (audio: Components.Schemas.AudioStoryResponseDto) =>
-                audio.id === res.data.audioId
-                  ? { ...audio, commonRating: res.data.ratingAudioStory }
-                  : audio
-            ),
-          }
-        : null,
-    }));
+    // setSelectedBook((prevState) => ({
+    //   ...prevState,
+    //   book: prevState.book
+    //     ? {
+    //         ...prevState.book,
+    //         audios: prevState.book.audios.map(
+    //           (audio: Components.Schemas.AudioStoryResponseDto) =>
+    //             audio.id === res.data.audioId
+    //               ? { ...audio, commonRating: res.data.ratingAudioStory }
+    //               : audio
+    //         ),
+    //       }
+    //     : null,
+    // }));
+
+    console.log(res.data);
 
     return res.data.ratingAudioStory;
   };
+
+  interface DrawerState {
+    authForm: boolean;
+    selectedBook: boolean;
+  }
+  const [drawer, setDrawer] = useState<DrawerState>({
+    authForm: false,
+    selectedBook: false,
+  });
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   if (mapState.load) {
     return <LoadSpinner />;
@@ -274,17 +295,152 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     return <ErrorMessageScreen message={mapState.error.message} />;
   }
 
+  if (isMobile) {
+    return (
+      <div ref={containerRef}>
+        <Drawer
+          container={containerRef.current}
+          open={drawer.authForm}
+          onOpenChange={(open) =>
+            setDrawer((prevState) => ({ ...prevState, authForm: open }))
+          }
+          modal={true}
+          dismissible={false}
+        >
+          <DrawerContent className="z-[100]">
+            {authFormState.open && (
+              <AuthForm
+                onClose={() => {
+                  handleOnCloseAuthForm();
+                  setDrawer((prevState) => ({ ...prevState, authForm: false }));
+                }}
+              />
+            )}
+          </DrawerContent>
+        </Drawer>
+        <Drawer
+          container={containerRef.current}
+          open={drawer.selectedBook}
+          onOpenChange={(open) =>
+            setDrawer((prevState) => ({ ...prevState, selectedBook: open }))
+          }
+          modal={true}
+          dismissible={false}
+        >
+          <DrawerContent>
+            {selectedBook.book && (
+              <div>
+                {notifications.length > 0 ? (
+                  <NotifyContainer
+                    className="absolute w-full top-[85svh]"
+                    notifications={notifications}
+                    onRemove={removeNotification}
+                  />
+                ) : null}
+
+                <Tabs
+                  defaultValue={currentTab}
+                  value={currentTab}
+                  className="p-1 size-full"
+                >
+                  <TabsContent value={MapModalTabs.BookInfo.toString()}>
+                    <BookInfoCardComponent
+                      load={selectedBook.load}
+                      book={selectedBook.book}
+                      onClickAddAudio={handleOnClickAddAudio}
+                      headerChildren={
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleOnCloseBook()}
+                        >
+                          <Cross1Icon className="text-gray-300 size-8" />
+                        </Button>
+                      }
+                    >
+                      {selectedBook.book.audios.length > 0 ? (
+                        <AudioBook
+                          audioBooks={selectedBook.book.audios}
+                          onClickRate={handleOnClickRate}
+                        />
+                      ) : (
+                        <p>аудиокниги не найдены</p>
+                      )}
+                    </BookInfoCardComponent>
+                  </TabsContent>
+                  <TabsContent
+                    value={MapModalTabs.AddApplicationAudio.toString()}
+                    className="p-0 m-0"
+                  >
+                    <CreateApplicationAudioForm
+                      storyId={selectedBook.book.id}
+                      languages={languageListState.languages}
+                      userId={authState.user ? Number(authState.user.sub) : 0}
+                      onClose={() =>
+                        setCurrentTab(MapModalTabs.BookInfo.toString())
+                      }
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
+          </DrawerContent>
+        </Drawer>
+        <div className="absolute w-full flex justify-between p-4 z-[50]">
+          <SearchBookBox
+            onClickBook={async (
+              books: Components.Schemas.StoryBookResponseDto
+            ) => {
+              handleOnSelectSearchedBook(books);
+              setDrawer((prevState) => ({ ...prevState, selectedBook: true }));
+            }}
+          />
+
+          <Button
+            className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
+            variant="outline"
+            size="icon"
+            onClick={() => {
+              setDrawer((prevState) => ({ ...prevState, authForm: true }));
+              handleOnClickAvatar();
+            }}
+          >
+            <span className="text-slate-700 ">
+              {authState.user
+                ? authState.user.email.split("@")[0][0].toUpperCase()
+                : "?"}
+            </span>
+          </Button>
+        </div>
+
+        {mapState.dataMap && (
+          <Map
+            features={mapState.dataMap.features}
+            width={width}
+            height={height}
+            onClickBook={async (
+              book: Components.Schemas.StoryBookWithAudiosResponseDto
+            ) => {
+              handleOnClickBook(book);
+              setDrawer((prevState) => ({ ...prevState, selectedBook: true }));
+            }}
+          />
+        )}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col">
       {authFormState.open && (
-        <DialogSheet onClose={handleOnCloseAuthForm}>
-          <div className="w-96">
-            <AuthForm onClose={handleOnCloseAuthForm} />
-          </div>
+        <DialogSheet
+          onClose={handleOnCloseAuthForm}
+          contentClassName="max-w-96"
+        >
+          <AuthForm onClose={handleOnCloseAuthForm} />
         </DialogSheet>
       )}
       {selectedBook.book && (
-        <DialogSheet onClose={handleOnCloseBook} contentClassName="relative">
+        <DialogSheet contentClassName={`${isMobile ? "size-screen" : ""}`}>
           {notifications.length > 0 ? (
             <NotifyContainer
               className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
@@ -303,6 +459,15 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                 load={selectedBook.load}
                 book={selectedBook.book}
                 onClickAddAudio={handleOnClickAddAudio}
+                headerChildren={
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleOnCloseBook()}
+                  >
+                    <Cross1Icon className="text-gray-300 size-8" />
+                  </Button>
+                }
               >
                 {selectedBook.book.audios.length > 0 ? (
                   <AudioBook
@@ -346,7 +511,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       </div>
 
       {mapState.dataMap && (
-        <MapComponent
+        <Map
           features={mapState.dataMap.features}
           width={width}
           height={height}

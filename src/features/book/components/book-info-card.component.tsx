@@ -15,11 +15,7 @@ import {
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";
 
-import {
-  CaretUpIcon,
-  EnterFullScreenIcon,
-  ExclamationTriangleIcon,
-} from "@radix-ui/react-icons";
+import { CaretUpIcon, EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Components } from "@/api/schemas/client";
 
@@ -30,9 +26,6 @@ import { CoverUploadDto } from "../interfaces/cover-upload.dto";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { RootState } from "@/app/store";
-import { AuthState } from "@/features/auth/auth.slice";
-import { useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
 import { motion } from "framer-motion";
@@ -46,9 +39,9 @@ interface BookInfoCardProps {
   onUploadCover?: (
     dto: CoverUploadDto
   ) => Promise<Components.Schemas.StoryBookResponseDto>;
-
   onClickAddAudio: () => void;
   children?: React.ReactNode;
+  headerChildren?: React.ReactNode;
 }
 
 interface TextAction {
@@ -66,10 +59,9 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   book,
   onUploadCover,
   children,
+  headerChildren,
 }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
-  const { user }: AuthState = useSelector((state: RootState) => state.auth);
 
   const [textAction, setTextAction] = useState<TextAction>({
     show: false,
@@ -113,8 +105,9 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     return (
       <Card className="flex flex-col justify-center w-full border-none shadow-none">
         <CardHeader className="flex flex-col items-center justify-center w-full">
+          {headerChildren}
           <CardTitle className="w-full py-3 m-0 text-center capitalize text-res-lg">
-            {book.name}
+            <span className="">{book.name}</span>
           </CardTitle>
           <CardDescription className="p-0 m-0">
             <div className="flex justify-center justify-items-center">
@@ -202,7 +195,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
   }
 
   return (
-    <Card className="border-none shadow-none">
+    <Card className="p-0 m-0 border-none shadow-none">
       <CardHeader className="w-full py-0 m-0">
         {textAction.fullScreen ? null : (
           <div className="flex w-full gap-4 my-4 animate-out">
@@ -242,10 +235,16 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
 
             <div className="w-2/3">
-              <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2 capitalize text-res-base">
-                <span>{infoBookState.book.name}</span>
+              <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="capitalize text-res-base">
+                    {infoBookState.book.name}
+                  </span>
+                  {headerChildren}
+                </div>
                 <Separator className="w-full bg-slate-300" />
               </CardTitle>
+
               {load ? (
                 <Skeleton className="w-full h-24 bg-neutral-300" />
               ) : (

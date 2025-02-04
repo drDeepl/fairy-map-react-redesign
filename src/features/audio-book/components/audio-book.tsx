@@ -31,6 +31,18 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
+  const handleOnClickStar = async (rating: number) => {
+    const newRating = await onClickRate(rating, selectedAudio);
+
+    console.log(newRating);
+
+    setSelectedAudio((prevState) => ({
+      ...prevState,
+      commonRating: newRating,
+    }));
+    return newRating;
+  };
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
 
@@ -73,19 +85,19 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   };
 
   return (
-    <div>
+    <div className="w-full">
       <div className="relative flex flex-col items-center space-y-2">
         <div className="absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
           <StarRating
             currentRating={selectedAudio.commonRating}
-            onClickStar={(rating) => onClickRate(rating, selectedAudio)}
+            onClickStar={handleOnClickStar}
           />
         </div>
-        <span className="absolute top-1.5 left-[49%] text-orange-500 italic text-md font-bold rounded-full">
+        <span className="w-12 absolute top-1.5 left-[43.5%] text-orange-500 italic text-md font-bold rounded-full flex justify-center md:text-res-sm">
           {Math.round((selectedAudio.commonRating + Number.EPSILON) * 10) / 10}
         </span>
       </div>
-      <div className="flex flex-col items-center px-2 py-4 space-x-2 space-y-2 border shadow-md w-72 rounded-xl bg-slate-200 border-slate-950">
+      <div className="flex flex-col items-center px-2 py-4 space-x-2 space-y-2 border shadow-md rounded-xl bg-slate-200 border-slate-950">
         <div className="flex flex-col w-full">
           <AudioBookPlaylist
             audios={audioBooks}
@@ -105,8 +117,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
           <div className="w-full bg-gray-800 rounded-full h-[0.25rem] overflow-hidden">
             <motion.div
               className="h-full bg-blue-400"
-              initial={{ style: { width: 0 } }}
-              animate={{ style: { width: `${progress}%` } }}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
               transition={{ duration: 0.1 }}
             />
           </div>

@@ -42,9 +42,8 @@ import { Button } from "@/components/ui/button";
 
 import { Separator } from "@/components/ui/separator";
 import SwitchMotion from "@/components/switch-motion";
-import { Label } from "@/components/ui/label";
 
-interface MapComponentProps {
+interface MapProps {
   features: any;
   width: number;
   height: number;
@@ -69,12 +68,7 @@ interface TooltipState {
   title: string;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({
-  features,
-  width,
-  height,
-  onClickBook,
-}) => {
+const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const projection = useMemo(() => {
@@ -323,13 +317,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
           top: tooltip.y,
         }}
       >
-        <motion.p className="text-xl font-semibold mb-2">
+        <motion.p className="mb-2 text-xl font-semibold">
           {tooltip.title}
         </motion.p>
 
         {listBook.load ? (
-          <motion.div className="w-full flex justify-center">
-            <Skeleton className="bg-baby-blue-800 h-6 w-48 my-2" />
+          <motion.div className="flex justify-center w-full">
+            <Skeleton className="w-48 h-6 my-2 bg-baby-blue-800" />
           </motion.div>
         ) : (
           <motion.div
@@ -363,7 +357,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                     />
                     <CommandList>
                       <CommandEmpty>книги не найдены...</CommandEmpty>
-                      <CommandItem className="cursor-pointer w-full flex justify-around">
+                      <CommandItem className="flex justify-around w-full cursor-pointer">
                         <Button
                           className="flex justify-around p-0"
                           variant="ghost"
@@ -385,11 +379,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
                             value={book.name}
                             onSelect={() => handleOnSelectBook(book)}
                           >
-                            <div className="w-full flex justify-between items-center px-2 ">
-                              <span className="text-md  font-semibold">
+                            <div className="flex items-center justify-between w-full px-2 ">
+                              <span className="font-semibold text-md">
                                 {book.name}
                               </span>
-                              <div className="flex items-center space-x-1 self-center  place-self-end">
+                              <div className="flex items-center self-center space-x-1 place-self-end">
                                 <BookAudioIcon className="size-full text-slate-600" />
                                 <span className="text-lg">
                                   {book.audios.length}
@@ -414,4 +408,4 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-export default React.memo(MapComponent);
+export default React.memo(Map);
