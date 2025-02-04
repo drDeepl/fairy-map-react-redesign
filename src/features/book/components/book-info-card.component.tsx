@@ -113,7 +113,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
     return (
       <Card className="flex flex-col justify-center w-full border-none shadow-none">
         <CardHeader className="flex flex-col items-center justify-center w-full">
-          <CardTitle className="w-full py-3 m-0 text-xl text-center">
+          <CardTitle className="w-full py-3 m-0 text-center capitalize text-res-lg">
             {book.name}
           </CardTitle>
           <CardDescription className="p-0 m-0">
@@ -242,10 +242,9 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             </div>
 
             <div className="w-2/3">
-              <CardTitle>
-                <div className="flex items-center justify-between mb-6 space-x-2">
-                  <span>{infoBookState.book.name}</span>
-                </div>
+              <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2 capitalize text-res-base">
+                <span>{infoBookState.book.name}</span>
+                <Separator className="w-full bg-slate-300" />
               </CardTitle>
               {load ? (
                 <Skeleton className="w-full h-24 bg-neutral-300" />
