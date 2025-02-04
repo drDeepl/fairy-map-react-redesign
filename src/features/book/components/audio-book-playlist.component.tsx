@@ -8,6 +8,8 @@ import {
 } from "@/components/dropdown-menu-motion.component";
 import { LanguagesIcon } from "lucide-react";
 import { StarFilledIcon } from "@radix-ui/react-icons";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 
 interface AudioBookPlaylistProps {
   currentAudio: Components.Schemas.AudioStoryResponseDto;
@@ -23,7 +25,7 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
   return (
     <div className="flex flex-col w-full pt-7 md:pt-4 sm:pt-4 text-slate-950">
       <Dropdown className="w-full">
-        <DropdownTrigger className="bg-slate-200 hover:bg-slate-300 px-2 [&>*:not(div)]:text-slate-700">
+        <DropdownTrigger className="bg-slate-200 hover:bg-slate-300 px-2 [&>*:not(div)]:text-slate-700 p-2">
           <div className="flex flex-col w-2/3">
             <div className="flex space-x-1">
               <small className="text-sm">озвучил:</small>
@@ -37,31 +39,34 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
           <LanguagesIcon className="-mr-14" />
         </DropdownTrigger>
         <DropdownMenu>
-          {audios.map((audio: Components.Schemas.AudioStoryResponseDto) => (
-            <DropdownItem
-              onSelect={() => {
-                onClickAudioBook(audio);
-              }}
-              key={audio.id}
-              className="flex items-center justify-between w-full px-2 py-2 text-slate-950"
-            >
-              <div className="flex flex-col w-44">
-                <span className="-mb-0.5 text-xs text-slate-600">
-                  {`озвучил: ${audio.author.firstName} ${audio.author.lastName}`}
-                </span>
-                <span className="font-semibold text-[18px] leading-[18px] lg:text-lg md:text-md">
-                  {audio.language.name} язык
-                </span>
-              </div>
+          <ScrollArea className="h-56">
+            {audios.map((audio: Components.Schemas.AudioStoryResponseDto) => (
+              <DropdownItem
+                onSelect={() => {
+                  onClickAudioBook(audio);
+                }}
+                key={audio.id}
+                className="flex items-center justify-between w-full h-20 px-2 py-1 border text-slate-950 border-b-slate-300"
+              >
+                <div className="flex flex-col space-y-1 leading-none w-44 text-res-sm sm:text-res-xs">
+                  <span className="text-xs text-slate-600">
+                    {`озвучил: ${audio.author.firstName} ${audio.author.lastName}`}
+                  </span>
+                  <span className="font-semibold">
+                    {audio.language.name} язык
+                  </span>
+                </div>
 
-              <div className="flex items-center self-center space-x-1">
-                <StarFilledIcon className="text-orange-500 size-6" />
-                <span className="italic leading-none text-orange-500 font-stretch-extra-condensed text-[16px]">
-                  {`( ${audio.commonRating} )`}
-                </span>
-              </div>
-            </DropdownItem>
-          ))}
+                <div className="flex items-center self-center space-x-1">
+                  <StarFilledIcon className="text-orange-500 size-6" />
+                  <small className="italic leading-none text-orange-500 text-res-sm sm:text-res-xs">
+                    {`( ${audio.commonRating} )`}
+                  </small>
+                </div>
+                {/* <Separator className="w-full bg-slate-300" /> */}
+              </DropdownItem>
+            ))}
+          </ScrollArea>
         </DropdownMenu>
       </Dropdown>
     </div>

@@ -1,26 +1,25 @@
 import React, {
   createContext,
-  useState,
   useContext,
-  ReactNode,
+  useState,
   FC,
+  ReactNode,
+  useRef,
+  useEffect,
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon } from "lucide-react";
 
-// Типы для контекста Dropdown
 interface DropdownContextType {
   isOpen: boolean;
   toggleDropdown: () => void;
   closeDropdown: () => void;
 }
 
-// Создание контекста
 const DropdownContext = createContext<DropdownContextType | undefined>(
   undefined
 );
 
-// Хук для использования контекста
 const useDropdownContext = () => {
   const context = useContext(DropdownContext);
   if (!context) {
@@ -31,7 +30,6 @@ const useDropdownContext = () => {
   return context;
 };
 
-// Основной компонент Dropdown
 interface DropdownProps {
   children: ReactNode;
   className?: string;
@@ -39,6 +37,7 @@ interface DropdownProps {
 
 const Dropdown: FC<DropdownProps> = ({ children, className = "" }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
@@ -48,7 +47,6 @@ const Dropdown: FC<DropdownProps> = ({ children, className = "" }) => {
     setIsOpen(false);
   };
 
-  // Значения контекста
   const contextValue = {
     isOpen,
     toggleDropdown,
@@ -57,32 +55,22 @@ const Dropdown: FC<DropdownProps> = ({ children, className = "" }) => {
 
   return (
     <DropdownContext.Provider value={contextValue}>
-      <motion.div
-        className={`relative inline-block ${className}`}
-        onBlur={closeDropdown}
-        tabIndex={0}
-      >
+      <div ref={dropdownRef} className={`relative inline-block ${className}`}>
         {children}
-      </motion.div>
+      </div>
     </DropdownContext.Provider>
   );
 };
 
-// Компонент кнопки-триггера
-interface DropdownTriggerProps {
-  children: ReactNode;
-  className?: string;
-}
-
-const Trigger: FC<DropdownTriggerProps> = ({ children, className = "" }) => {
+const Trigger: FC<DropdownProps> = ({ children, className = "" }) => {
   const { isOpen, toggleDropdown } = useDropdownContext();
 
   return (
     <button
       onClick={toggleDropdown}
-      className={`w-full text-left  bg-gray-100 rounded-md 
-                 flex items-center justify-between 
-                 hover:bg-gray-200 transition-colors ${className}`}
+      className={`w-full text-left bg-gray-100 rounded-md 
+        flex items-center justify-between 
+        hover:bg-gray-200 transition-colors ${className}`}
     >
       {children}
       <motion.span
@@ -95,7 +83,6 @@ const Trigger: FC<DropdownTriggerProps> = ({ children, className = "" }) => {
   );
 };
 
-// Компонент списка
 interface DropdownMenuProps {
   children: ReactNode;
   className?: string;
@@ -103,11 +90,31 @@ interface DropdownMenuProps {
 
 const Menu: FC<DropdownMenuProps> = ({ children, className = "" }) => {
   const { isOpen } = useDropdownContext();
+  const [openUpward, setOpenUpward] = useState(false);
+
+  useEffect(() => {
+    const checkDropdownPosition = () => {
+      const dropdownEl = document.querySelector(".dropdown-menu");
+      if (!dropdownEl) return;
+
+      const rect = dropdownEl.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      setOpenUpward(spaceBelow < 200 && spaceAbove > 200);
+    };
+
+    if (isOpen) {
+      checkDropdownPosition();
+    }
+  }, [isOpen]);
 
   const menuVariants = {
     closed: {
       opacity: 0,
       height: 0,
+      transformOrigin: openUpward ? "bottom" : "top",
+      scale: 0.9,
       transition: {
         duration: 0.3,
         ease: "easeInOut",
@@ -116,6 +123,8 @@ const Menu: FC<DropdownMenuProps> = ({ children, className = "" }) => {
     open: {
       opacity: 1,
       height: "auto",
+      transformOrigin: openUpward ? "bottom" : "top",
+      scale: 1,
       transition: {
         duration: 0.3,
         ease: "easeInOut",
@@ -127,12 +136,14 @@ const Menu: FC<DropdownMenuProps> = ({ children, className = "" }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          className={`absolute z-10 w-full 
+      ${openUpward ? "bottom-full mb-1" : "mt-1"} 
+      bg-white shadow-lg rounded-md overflow-hidden 
+      dropdown-menu ${className}`}
           variants={menuVariants}
           initial="closed"
           animate="open"
           exit="closed"
-          className={`absolute z-10 w-full mt-1 bg-white 
-                     shadow-lg rounded-md overflow-hidden ${className}`}
         >
           {children}
         </motion.div>
@@ -141,7 +152,6 @@ const Menu: FC<DropdownMenuProps> = ({ children, className = "" }) => {
   );
 };
 
-// Компонент элемента меню
 interface DropdownItemProps {
   children: ReactNode;
   onSelect?: () => void;

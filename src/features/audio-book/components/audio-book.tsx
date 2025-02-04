@@ -25,8 +25,9 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   onClickRate,
   children,
 }) => {
-  const [selectedAudio, setSelectedAudio] =
-    useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
+  const [selectedAudio, setSelectedAudio] = useState<
+    Components.Schemas.AudioStoryResponseDto
+  >(audioBooks[0]);
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
@@ -104,8 +105,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
           <div className="w-full bg-gray-800 rounded-full h-[0.25rem] overflow-hidden">
             <motion.div
               className="h-full bg-blue-400"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              initial={{ style: { width: 0 } }}
+              animate={{ style: { width: `${progress}%` } }}
               transition={{ duration: 0.1 }}
             />
           </div>

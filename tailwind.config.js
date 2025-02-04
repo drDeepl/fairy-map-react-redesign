@@ -6,6 +6,14 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontSize: {
+        "res-xs": "calc(0.75rem + 0.3vw)",
+        "res-sm": "calc(0.875rem + 0.5vw)",
+        "res-base": "calc(1rem + 0.7vw)",
+        "res-lg": "calc(1.25rem + 1vw)",
+        "res-xl": "calc(1.5rem + 1.5vw)",
+        "res-2xl": "calc(2rem + 2vw)",
+      },
       screens: {
         xsm: "400px",
         sm: "640px",
@@ -263,6 +271,18 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        red: {
+          50: "#FFF2F1",
+          100: "#FFE5E4",
+          200: "#FFCBCA",
+          300: "#FFA7A4",
+          400: "#FF7A75",
+          500: "#FF4E45",
+          600: "#FF1D12",
+          700: "#E60C00",
+          800: "#B30900",
+          900: "#800700",
+        },
         ghost: "#D4E6FA",
         "baby-blue": {
           50: "#F6FAFE",
@@ -270,6 +290,7 @@ export default {
           500: "#D4E6FA",
           800: "#A9B8C8",
         },
+
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
