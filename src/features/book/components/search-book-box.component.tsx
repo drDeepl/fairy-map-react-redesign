@@ -122,6 +122,9 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
       setIsConnected(false);
     };
 
+    if (isConnected) {
+      onConnect();
+    }
     const onBookResults = (books: BookPageResponse) => {
       console.log("onBookResults");
       console.log(books);
@@ -131,7 +134,6 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
       });
       setIsTyping(false);
     };
-
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("searchResultStoryByName", onBookResults);

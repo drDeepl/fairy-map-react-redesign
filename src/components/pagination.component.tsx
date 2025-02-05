@@ -11,7 +11,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "react-responsive";
-import { Separator } from "@radix-ui/react-dropdown-menu";
 
 interface PaginationProps {
   meta: PageMetaDto;
@@ -47,7 +46,7 @@ const PaginationBox: React.FC<PaginationProps> = ({ meta, onApplyPage }) => {
     return (
       <div className="flex items-center">
         <Pagination>
-          <PaginationContent className="flex flex-col shadow-md p-2 rounded-md">
+          <PaginationContent className="flex flex-col p-2 rounded-md shadow-md">
             <PaginationItem className="flex items-center space-x-2">
               <Input
                 ref={pageInputRef}
@@ -95,7 +94,7 @@ const PaginationBox: React.FC<PaginationProps> = ({ meta, onApplyPage }) => {
   return (
     <div className="flex justify-center">
       <Pagination>
-        <PaginationContent className="shadow-md p-2 rounded-md">
+        <PaginationContent className="p-2 rounded-md shadow-md">
           {meta.hasPreviousPage ? (
             <PaginationItem>
               <PaginationPrevious

@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { AxiosError } from "axios";
 import { Components } from "@/api/schemas/client";
 import { createColumns } from "../application/components/data-table/columns";
+
 import { DataTableApplicationAdmin } from "../application/components/data-table/data-table-application-admin.component";
 
 import { Toaster } from "@/components/ui/toaster";
@@ -80,8 +81,6 @@ const AdminRequestsPage = () => {
     applicationAudio: null,
   });
 
-  const pageInputRef = useRef<HTMLInputElement | null>(null);
-
   const handleOnClickAudio = (
     application: Components.Schemas.AudioApplicationWithUserAudioResponseDto
   ) => {
@@ -117,9 +116,9 @@ const AdminRequestsPage = () => {
         "top-10 right-0 flex fixed w-1/3 border border-red-500 bg-red-50"
       ),
       action: (
-        <div className="flex items-center space-x-2 w-full">
-          <CrossCircledIcon className="size-6 text-red-500" />
-          <span className="font-semibold text-sm">{msg}</span>
+        <div className="flex items-center w-full space-x-2">
+          <CrossCircledIcon className="text-red-500 size-6" />
+          <span className="text-sm font-semibold">{msg}</span>
         </div>
       ),
     });
@@ -131,9 +130,9 @@ const AdminRequestsPage = () => {
         "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
       ),
       action: (
-        <div className="flex items-center space-x-2 w-full text-green-500">
+        <div className="flex items-center w-full space-x-2 text-green-500">
           <CrossCircledIcon className="size-6 " />
-          <span className="font-semibold text-sm">{msg}</span>
+          <span className="text-sm font-semibold">{msg}</span>
         </div>
       ),
     });
@@ -317,7 +316,7 @@ const AdminRequestsPage = () => {
           >
             <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
               <DrawerHeader className="pt-0">
-                <DrawerTitle className="text-center text-xl">
+                <DrawerTitle className="text-xl text-center">
                   <span>
                     {audioPlayerState.applicationAudio?.userAudio.originalName}
                   </span>
@@ -347,7 +346,7 @@ const AdminRequestsPage = () => {
               />
 
               <DrawerFooter className="flex justify-between text-slate-800">
-                <div className="flex items-center justify-items-center w-full space-x-4">
+                <div className="flex items-center w-full space-x-4 justify-items-center">
                   {audioPlayerState.applicationAudio.status === "SEND" ? (
                     <StatusDropdownMenu
                       onSelectStatus={async (key: string) => {

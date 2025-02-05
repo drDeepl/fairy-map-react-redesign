@@ -68,7 +68,6 @@ interface SelectedBookState {
 
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
-import { addRatingAudio } from "../audio-book/audio-book.actions";
 
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -219,12 +218,6 @@ const AdminStoriesPage: React.FC = () => {
     }
   };
 
-  const handleOnClickRate = async (
-    dto: Components.Schemas.AddRatingAudioStoryDto
-  ): Promise<Components.Schemas.AddedRatingAudioStoryDto | undefined> => {
-    return await dispatch(addRatingAudio(dto)).unwrap();
-  };
-
   useEffect(() => {
     apiClient.EthnicGroupController_getAllLanguage().then((result) => {
       setLanguageListState({
@@ -260,11 +253,8 @@ const AdminStoriesPage: React.FC = () => {
             <BookInfoCardComponent
               load={bookState.load}
               book={bookState.book}
-              audios={bookState.audios}
               onUploadCover={handleOnUploadBookCover}
               onClickAddAudio={() => console.log("onClickAddAudio")}
-              onClickAuth={() => {}}
-              onClickRate={handleOnClickRate}
             >
               <span></span>
             </BookInfoCardComponent>
@@ -275,7 +265,7 @@ const AdminStoriesPage: React.FC = () => {
             <div className="flex justify-between">
               <Button
                 variant="outline"
-                className="w-24 border border-baby-blue-800  bg-slate-200 text-slate-800 text-md"
+                className="w-24 border border-baby-blue-800 bg-slate-200 text-slate-800 text-md"
                 onClick={handleCloseInfoBook}
               >
                 закрыть
@@ -310,7 +300,7 @@ const AdminStoriesPage: React.FC = () => {
 
                   <PopoverContent className="px-0">
                     <Command>
-                      <p className="w-full font-semibold text-md text-center">
+                      <p className="w-full font-semibold text-center text-md">
                         выберите язык для озвучки
                       </p>
                       <CommandInput
@@ -318,7 +308,7 @@ const AdminStoriesPage: React.FC = () => {
                         className="h-9"
                       />
                       <CommandList className="px-0">
-                        <CommandEmpty className="text-md text-center">
+                        <CommandEmpty className="text-center text-md">
                           языки для озвучки не найдены
                         </CommandEmpty>
                         <CommandGroup>
@@ -332,7 +322,7 @@ const AdminStoriesPage: React.FC = () => {
                                 onSelect={() =>
                                   handleOnSelectLanguage(language)
                                 }
-                                className="text-md flex flex-col items-start"
+                                className="flex flex-col items-start text-md"
                               >
                                 <Separator />
                                 <span>{language.name}</span>
@@ -349,17 +339,17 @@ const AdminStoriesPage: React.FC = () => {
           </DrawerFooter>
         </DrawerContent>
 
-        <section className="flex flex-col  space-y-2">
+        <section className="flex flex-col space-y-2">
           <ListBookCarousel
             load={listBookState.loading}
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
-            <div className="flex jsutify-center items-center space-x-2">
+            <div className="flex items-center space-x-2 jsutify-center">
               <Button
                 variant="outline"
                 onClick={handleOnClickAddBook}
-                className="w-42 border border-ghost text-md lg:h-12"
+                className="border w-42 border-ghost text-md lg:h-12"
               >
                 <span className="">добавить сказку</span>
                 <BookPlus />
@@ -379,17 +369,17 @@ const AdminStoriesPage: React.FC = () => {
   return (
     <Dialog open={openDialog}>
       <div>
-        <section className="mx-8 flex flex-col  space-y-2">
+        <section className="flex flex-col mx-8 space-y-2">
           <ListBookCarousel
             load={listBookState.loading}
             books={listBookState.books.data}
             onClickBook={handleOnClickPreviewBook}
           >
-            <div className="flex jsutify-center items-center space-x-2">
+            <div className="flex items-center space-x-2 jsutify-center">
               <Button
                 variant="outline"
                 onClick={handleOnClickAddBook}
-                className="w-42 border border-ghost text-md lg:h-12"
+                className="border w-42 border-ghost text-md lg:h-12"
               >
                 <span className="">добавить сказку</span>
                 <BookPlus />
@@ -450,11 +440,8 @@ const AdminStoriesPage: React.FC = () => {
               <BookInfoCardComponent
                 load={bookState.load}
                 book={bookState.book}
-                audios={bookState.audios}
                 onUploadCover={handleOnUploadBookCover}
                 onClickAddAudio={() => console.log("onClickAddAudio")}
-                onClickAuth={() => {}}
-                onClickRate={handleOnClickRate}
               >
                 <Popover
                   open={languageListState.open}
@@ -477,7 +464,7 @@ const AdminStoriesPage: React.FC = () => {
                             }))
                           }
                         >
-                          <UploadIcon className="size-6 self-center cursor-pointer hover:text-orange-500" />
+                          <UploadIcon className="self-center cursor-pointer size-6 hover:text-orange-500" />
                         </PopoverTrigger>
                       </TooltipTrigger>
                       <TooltipContent side="bottom">

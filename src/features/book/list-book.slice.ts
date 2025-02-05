@@ -9,11 +9,13 @@ import {
   uploadBookCover,
 } from "./book.actions";
 import { Components } from "@/api/schemas/client";
+import { PageMetaDto } from "@/api/interfaces/page-meta.dto";
 
 export interface ListBookState extends BaseAppState {
-  books: Components.Schemas.PageResponseDto<
-    Components.Schemas.StoryBookResponseDto
-  >;
+  books: {
+    data: Components.Schemas.StoryBookResponseDto[];
+    meta: PageMetaDto;
+  };
 }
 
 export const initialState: ListBookState = {
@@ -125,7 +127,7 @@ const bookListSlice = createSlice({
           action: PayloadAction<Components.Schemas.StoryBookResponseDto>
         ) => {
           const bookIndex = state.books.data.findIndex(
-            (book) => action.payload.id === book.id
+            (book: any) => action.payload.id === book.id
           );
 
           state.books.data[bookIndex] = action.payload;

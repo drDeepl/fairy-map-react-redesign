@@ -29,10 +29,9 @@ import {
 import { cn } from "@/lib/utils";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { CrossCircledIcon } from "@radix-ui/react-icons";
+
 import { Input } from "@/components/ui/input";
-import apiClient from "@/api/apiClient";
-import { Block } from "notiflix/build/notiflix-block-aio";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface CreateApplicationAudioDto {
@@ -44,14 +43,12 @@ export interface CreateApplicationAudioDto {
 interface CreateApplicationAudioFormProps {
   storyId: number;
   languages: Components.Schemas.LanguageDto[];
-  userId: number;
   onSubmit: (dto: CreateApplicationAudioDto) => Promise<void>;
   children?: React.ReactNode;
 }
 const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   storyId,
   languages,
-  userId,
   onSubmit,
   children,
 }) => {
@@ -95,9 +92,9 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   };
 
   return (
-    <Card className="add-audio-form__container border-none shadow-none">
+    <Card className="border-none shadow-none add-audio-form__container">
       <CardHeader className="mt-0">
-        <CardTitle className="flex justify-between items-center space-x-2">
+        <CardTitle className="flex items-center justify-between space-x-2">
           <span>Создание заявки на добавление озвучки</span>
         </CardTitle>
       </CardHeader>
@@ -105,7 +102,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSumbitForm)}
-            className="w-full space-y-6 flex flex-col justify-center"
+            className="flex flex-col justify-center w-full space-y-6"
           >
             <FormField
               control={form.control}

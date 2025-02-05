@@ -5,12 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 import NotCoverBook from "@/components/not-cover-book.component";
 import { useEffect, useState } from "react";

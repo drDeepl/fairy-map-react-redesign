@@ -1,6 +1,6 @@
-import { AppDispatch, RootState } from "@/app/store";
+import { RootState } from "@/app/store";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Map from "./map.component";
 
 import { AuthState } from "../auth/auth.slice";
@@ -39,10 +39,10 @@ import NotifyContainer, {
 } from "../../components/notificaiton.component";
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
-import { Cross1Icon, HomeIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
-import { BottomNavigation } from "@/components/bottom-navigation/bottom-navigation.component";
-import { ArrowLeftIcon, BookHeadphones, SearchIcon } from "lucide-react";
-import { NavItem } from "@/components/bottom-navigation";
+import { Cross1Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
+
+import { ArrowLeftIcon, BookHeadphones } from "lucide-react";
+
 import {
   Tooltip,
   TooltipTrigger,
@@ -57,7 +57,6 @@ interface MapPageProps {
 
 interface AuthFormState {
   open: boolean;
-  notifySuccess: boolean;
 }
 
 interface LanguageListState {
@@ -94,12 +93,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   );
 
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
   const [authFormState, setAuthFormState] = useState<AuthFormState>({
     open: false,
-    notifySuccess: false,
   });
 
   const handleOnCloseAuthForm = async () => {
@@ -400,7 +397,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                     <CreateApplicationAudioForm
                       storyId={selectedBook.book.id}
                       languages={languageListState.languages}
-                      userId={authState.user ? Number(authState.user.sub) : 0}
                       onSubmit={handleOnSubmitCreateApplicationAudio}
                     >
                       <Button
@@ -632,7 +628,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               <CreateApplicationAudioForm
                 storyId={selectedBook.book.id}
                 languages={languageListState.languages}
-                userId={authState.user ? Number(authState.user.sub) : 0}
                 onSubmit={handleOnSubmitCreateApplicationAudio}
               >
                 <Button

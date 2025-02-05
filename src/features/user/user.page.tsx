@@ -160,9 +160,9 @@ const UserPage: React.FC = () => {
         "top-10 right-0 flex fixed w-1/3 border border-red-500 bg-red-50"
       ),
       action: (
-        <div className="flex items-center space-x-2 w-full">
-          <CrossCircledIcon className="size-6 text-red-500" />
-          <span className="font-semibold text-sm">{msg}</span>
+        <div className="flex items-center w-full space-x-2">
+          <CrossCircledIcon className="text-red-500 size-6" />
+          <span className="text-sm font-semibold">{msg}</span>
         </div>
       ),
     });
@@ -174,9 +174,9 @@ const UserPage: React.FC = () => {
   //       "top-10 w-[30vw] left-[35lvw] right-[35lvw] flex fixed border border-green-500 bg-green-50"
   //     ),
   //     action: (
-  //       <div className="flex items-center space-x-2 w-full text-green-500">
+  //       <div className="flex items-center w-full space-x-2 text-green-500">
   //         <CrossCircledIcon className="size-6 " />
-  //         <span className="font-semibold text-sm">{msg}</span>
+  //         <span className="text-sm font-semibold">{msg}</span>
   //       </div>
   //     ),
   //   });
@@ -309,8 +309,8 @@ const UserPage: React.FC = () => {
   return (
     <div className="flex flex-col justify-center">
       <Toaster />
-      <div className="sticky w-full flex justify-between items-center px-4 py-4 lg:pl-20 md:pl-6 shadow-md rounded-md">
-        <p className="text-black font-semibold text-xl capitalize">
+      <div className="sticky flex items-center justify-between w-full px-4 py-4 rounded-md shadow-md lg:pl-20 md:pl-6">
+        <p className="text-xl font-semibold text-black capitalize">
           Привет, {user?.firstName}!👋
         </p>
 
@@ -319,7 +319,7 @@ const UserPage: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="rounded-full text-slate-600 border border-baby-blue-800 bg-baby-blue-50 size-11 shadow-md"
+                  className="border rounded-full shadow-md text-slate-600 border-baby-blue-800 bg-baby-blue-50 size-11"
                   variant="ghost"
                   size="icon"
                   onClick={() => navigate(RouteApp.MapPage)}
@@ -334,12 +334,12 @@ const UserPage: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  className="rounded-full text-slate-600 border border-baby-blue-800 bg-baby-blue-50 size-11 shadow-md"
+                  className="border rounded-full shadow-md text-slate-600 border-baby-blue-800 bg-baby-blue-50 size-11"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleOnClickLogout()}
                 >
-                  {/* <span className="text-black text-xl">
+                  {/* <span className="text-xl text-black">
             {user?.firstName[0].toUpperCase()}
           </span> */}
                   <ExitIcon />
@@ -350,7 +350,7 @@ const UserPage: React.FC = () => {
           </TooltipProvider>
         </div>
       </div>
-      <div className="lg:px-24 py-4 md:px-6">
+      <div className="py-4 lg:px-24 md:px-6">
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="audio-stories">
             <AccordionTrigger className="text-lg">
@@ -374,7 +374,7 @@ const UserPage: React.FC = () => {
             </AccordionTrigger>
             <AccordionContent>
               {applicationTableState.load ? (
-                <Skeleton className="w-full h-80 m-2" />
+                <Skeleton className="w-full m-2 h-80" />
               ) : (
                 <DataTableApplicationAdmin
                   columns={columns}
@@ -499,7 +499,7 @@ const UserPage: React.FC = () => {
         >
           <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
             <DrawerHeader className="pt-0">
-              <DrawerTitle className="text-center text-xl">
+              <DrawerTitle className="text-xl text-center">
                 <span>
                   {audioPlayerState.applicationAudio?.userAudio.originalName}
                 </span>
@@ -520,7 +520,7 @@ const UserPage: React.FC = () => {
             />
 
             <DrawerFooter className="flex justify-between text-slate-800">
-              <div className="flex items-center justify-items-center w-full space-x-4">
+              <div className="flex items-center w-full space-x-4 justify-items-center">
                 <Button
                   variant="outline"
                   onClick={handleOnClickCloseAudio}
@@ -548,19 +548,10 @@ const UserPage: React.FC = () => {
             }
           }}
         >
-          <DialogContent className="m-0 p-0">
+          <DialogContent className="p-0 m-0">
             <BookInfoCardComponent
               load={bookInfoState.load}
               book={bookInfoState.book}
-              audios={bookInfoState.audios}
-              onClose={() =>
-                setBookInfoState({
-                  load: true,
-                  book: null,
-
-                  audios: [],
-                })
-              }
               onClickAddAudio={() => {}}
             >
               <span></span>

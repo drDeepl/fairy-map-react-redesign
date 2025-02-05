@@ -39,7 +39,7 @@ const AdminPage: React.FC = () => {
     } else {
       setLoading(false);
       dispatch(fetchEthnicGroups());
-      dispatch(fetchListBooks());
+      dispatch(fetchListBooks({ page: 1, take: 10 }));
     }
   }, [authState]);
 

@@ -41,7 +41,7 @@ export const ListAudios: React.FC<ListAudiosProps> = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-between mt-2 ">
+        <Button variant="outline" className="justify-between w-full mt-2 ">
           {value
             ? audios.find((audio) => audio.language.name === value)?.language
                 .name
@@ -49,7 +49,7 @@ export const ListAudios: React.FC<ListAudiosProps> = ({
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-2">
+      <PopoverContent className="p-2 w-60">
         <Command>
           <CommandInput placeholder="поиск озвучки..." className="h-9" />
           <CommandList>
@@ -76,7 +76,7 @@ export const ListAudios: React.FC<ListAudiosProps> = ({
                 </div>
                 <div className="flex space-x-1 text-orange-500">
                   <StarFilledIcon className="self-center" />
-                  <span className="font-semibold">{audio.moderateScore}</span>
+                  <span className="font-semibold">{audio.commonRating}</span>
                 </div>
                 <Check
                   className={cn(

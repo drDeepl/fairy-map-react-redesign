@@ -52,7 +52,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
           const imgUrl = URL.createObjectURL(res.data);
           setSrcImg(imgUrl);
         })
-        .catch((error) => {
+        .catch(() => {
           setInfoBookState((prevState) => ({
             ...prevState,
             book: { ...prevState.book, srcImg: null },
@@ -69,7 +69,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
 
   return (
     <Card className="w-44 drop-shadow-xl drop-shadow-slate-300 h-72 rounded-xl">
-      <CardContent className="flex flex-col m-0 p-0">
+      <CardContent className="flex flex-col p-0 m-0">
         <AspectRatio ratio={3 / 4} className="">
           {infoBookState.loadCover ? (
             <Skeleton className="size-full bg-neutral-300" />
@@ -81,7 +81,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
                 <img
                   ref={imgRef}
                   src={srcImg}
-                  className="w-full h-full object-fill rounded-t-xl"
+                  className="object-fill w-full h-full rounded-t-xl"
                   alt={infoBookState.book.name}
                 />
               )}
@@ -91,7 +91,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
       </CardContent>
       <TooltipProvider delayDuration={300}>
         <Tooltip>
-          <CardFooter className="p-2  flex justify-center items-center">
+          <CardFooter className="flex items-center justify-center p-2">
             <TooltipTrigger asChild>
               <CardTitle className="line-clamp-2 ">
                 {infoBookState.book.name}

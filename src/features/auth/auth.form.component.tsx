@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { signIn, signUp } from "./auth.actions";
 
 import { AppDispatch, RootState } from "@/app/store";
@@ -17,8 +17,6 @@ import SignUpFormComponent from "./forms/sign-up.form.component";
 
 import { Button } from "@/components/ui/button";
 
-import { ToastContainer, toast } from "react-toastify";
-import SuccessToast from "@/components/success-toast-action.component";
 import { Cross1Icon, ReloadIcon } from "@radix-ui/react-icons";
 
 import {
@@ -106,7 +104,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
           <div className="flex justify-end">
             <Button
               variant="link"
-              className="text-green-500 p-0 m-0"
+              className="p-0 m-0 text-green-500"
               onClick={() => navigate(getRoutePageByUserRole(user.role))}
             >
               в личный кабинет
@@ -156,7 +154,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
   );
 
   return (
-    <div className="py-4 px-6">
+    <div className="px-6 py-4">
       <div className="relative">
         <NotifyContainer
           notifications={notifications}
@@ -166,14 +164,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
       <Tabs defaultValue={currentTab} onValueChange={handleTabsValueChange}>
         <div className="flex flex-col items-center p-0 m-0">
           <Button
-            className="absolute right-0 top-0"
+            className="absolute top-0 right-0"
             size="icon"
             variant="link"
             onClick={handleOnClose}
           >
             <Cross1Icon className="text-slate-600" />
           </Button>
-          <TabsList className="grid center space-x-4 grid-cols-2 mb-2">
+          <TabsList className="grid grid-cols-2 mb-2 space-x-4 center">
             <TabsTrigger
               value={Tab.SignIn}
               className="data-[state=active]:border border-blue-300 data-[state=active]:text-slate-800 data-[state=active]:bg-secondary"
@@ -210,7 +208,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
                       className="w-full"
                     >
                       {authState.loading ? (
-                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                        <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />
                       ) : null}
                       войти
                     </Button>
@@ -240,7 +238,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onClose }) => {
                       className="w-full"
                     >
                       {authState.loading ? (
-                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                        <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />
                       ) : null}
                       зарегистрироваться
                     </Button>

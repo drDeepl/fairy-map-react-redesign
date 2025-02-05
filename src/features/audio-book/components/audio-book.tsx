@@ -116,9 +116,9 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
           />
           <div className="w-full bg-gray-800 rounded-full h-[0.25rem] overflow-hidden">
             <motion.div
-              className="h-full bg-blue-400"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
+              className="h-full origin-left bg-blue-400"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: progress / 100 }}
               transition={{ duration: 0.1 }}
             />
           </div>

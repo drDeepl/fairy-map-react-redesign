@@ -1,10 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
 import * as d3 from "d3";
 
 import {
@@ -21,13 +16,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import {
-  BookAudioIcon,
-  BookHeadphones,
-  LibraryBig,
-  MapPin,
-  MapPinIcon,
-} from "lucide-react";
+import { BookAudioIcon, BookHeadphones } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -36,7 +25,7 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
@@ -69,7 +58,7 @@ interface TooltipState {
 }
 
 const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const projection = useMemo(() => {
     return d3
@@ -217,7 +206,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
                 `ethnic-group-point-region-${feature.properties.id}`
               )
             }
-            d={d}
+            d={d as any}
             fill="#FFFFFF"
           />
           {feature.properties.ethnicGroupsPoints.map(
@@ -297,9 +286,8 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
   return (
     <div style={{ position: "relative" }}>
       <svg
+        className={`w-full h-full`}
         ref={svgRef}
-        width={width}
-        height={height}
         viewBox={`0 0 ${width} ${height}`}
       >
         <g>{renderedFeatures}</g>
@@ -337,7 +325,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
                     variant="ghost"
                     className="w-48 mt-3 h-8 p-2 self-center flex justify-center space-x-1 items-center rounded-md bg-slate-100 text-gray-700 border border-slate-300 cursor-pointer [&_svg]:size-6"
                     role="combobox"
-                    aria-expanded={open}
+                    aria-expanded={listBook.open}
                   >
                     <BookHeadphones className="text-slate-600" />
                     <div className="flex items-center space-x-1 text-md">
