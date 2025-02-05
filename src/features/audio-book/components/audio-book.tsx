@@ -1,16 +1,12 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-import {
-  TrackPreviousIcon,
-  TrackNextIcon,
-  PauseIcon,
-  PlayIcon,
-} from "@radix-ui/react-icons";
+import { TrackPreviousIcon, TrackNextIcon } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
 import AudioBookPlaylist from "@/features/book/components/audio-book-playlist.component";
 import StarRating from "@/components/star-rating-motion";
-
+import styled from "styled-components";
+import TapableButton from "@/components/tapable-button.component";
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
   onClickRate: (
@@ -20,21 +16,50 @@ interface AudioPlayerProps {
   children?: React.ReactNode;
 }
 
+// Стилизованный компонент для контейнера иконки
+const IconContainer = styled(motion.div)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
+`;
+
+// Варианты анимации для иконки
+const iconVariants = {
+  play: {
+    rotate: 0,
+    scale: 1.2,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 15,
+    },
+  },
+  pause: {
+    rotate: 180,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 15,
+    },
+  },
+};
+
 const AudioBook: React.FC<AudioPlayerProps> = ({
   audioBooks,
   onClickRate,
   children,
 }) => {
-  const [selectedAudio, setSelectedAudio] = useState<
-    Components.Schemas.AudioStoryResponseDto
-  >(audioBooks[0]);
+  const [selectedAudio, setSelectedAudio] =
+    useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
   const handleOnClickStar = async (rating: number) => {
     const newRating = await onClickRate(rating, selectedAudio);
-
-    console.log(newRating);
 
     setSelectedAudio((prevState) => ({
       ...prevState,
@@ -123,19 +148,58 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
             />
           </div>
           <div className="flex items-center px-2 space-x-2  [&_svg]:text-slate-950">
-            <button onClick={handleRewind} className="">
+            <TapableButton onClick={handleRewind}>
               <TrackPreviousIcon className="size-6 stroke-none" />
-            </button>
-            <button onClick={togglePlayPause}>
-              {isPlaying ? (
-                <PauseIcon className="size-8" />
-              ) : (
-                <PlayIcon className="size-8" />
-              )}
-            </button>
-            <button onClick={handleFastForward} className="text-white">
+            </TapableButton>
+
+            <IconContainer
+              className="p-1.5 border rounded-full border-slate-700"
+              onClick={togglePlayPause}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.svg
+                viewBox="0 0 24 24"
+                initial={false}
+                animate={isPlaying ? "pause" : "play"}
+                variants={iconVariants}
+              >
+                {isPlaying ? (
+                  // Анимированные линии паузы
+                  <>
+                    <motion.rect
+                      x="6"
+                      y="4"
+                      width="4"
+                      height="16"
+                      fill="currentColor"
+                      initial={{ scaleY: 0.4 }}
+                      animate={{ scaleY: 1 }}
+                    />
+                    <motion.rect
+                      x="14"
+                      y="4"
+                      width="4"
+                      height="16"
+                      fill="currentColor"
+                      initial={{ scaleY: 0.4 }}
+                      animate={{ scaleY: 1 }}
+                    />
+                  </>
+                ) : (
+                  // Анимированный треугольник плей
+                  <motion.path
+                    className=" fill-slate-700"
+                    d="M8 5v14l11-7z"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                  />
+                )}
+              </motion.svg>
+            </IconContainer>
+            <TapableButton onClick={handleFastForward} className="text-white">
               <TrackNextIcon className="size-6" />
-            </button>
+            </TapableButton>
           </div>
         </div>
       </div>

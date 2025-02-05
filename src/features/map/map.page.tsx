@@ -39,7 +39,7 @@ import NotifyContainer, {
 } from "../../components/notificaiton.component";
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
-import { Cross1Icon, PaperPlaneIcon } from "@radix-ui/react-icons";
+import { Cross1Icon, PaperPlaneIcon, UpdateIcon } from "@radix-ui/react-icons";
 
 import { ArrowLeftIcon, BookHeadphones } from "lucide-react";
 
@@ -49,6 +49,7 @@ import {
   TooltipProvider,
   TooltipContent,
 } from "@/components/ui/tooltip";
+import TapableButton from "@/components/tapable-button.component";
 
 interface MapPageProps {
   width: number;
@@ -254,15 +255,22 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
-      "/api/story/rating/add"
-    ].post(null, {
-      audioId: audio.id,
-      rating: rating,
-    });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
 
     return res.data.ratingAudioStory;
   };
+  interface ApplicationAudioState {
+    load: boolean;
+  }
+
+  const [applicationAudioState, setApplicationAudioState] =
+    useState<ApplicationAudioState>({
+      load: false,
+    });
 
   const handleOnSubmitCreateApplicationAudio = async (
     dto: CreateApplicationAudioDto
@@ -275,7 +283,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       });
       return;
     }
-
+    setApplicationAudioState((prevState) => ({ ...prevState, load: true }));
     try {
       const addedAudioResponse: any = await apiClient.paths[
         "/api/user/story/{storyId}/language/{languageId}/audio/upload"
@@ -300,10 +308,25 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       });
       addNotification({
         type: "success",
-        message: "заявка на озвучку отправлена",
+        message: "заявка на озвучку отправлена и доступна в разделе мои заявки",
+        action: (
+          <Button
+            className="my-1"
+            variant="outline"
+            onClick={() => {
+              handleOnClickAvatar();
+            }}
+          >
+            <span>личный кабинет</span>
+          </Button>
+        ),
       });
       setCurrentTab(MapModalTabs.BookInfo.toString());
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setApplicationAudioState((prevState) => ({ ...prevState, load: false }));
+    }
   };
 
   interface DrawerState {
@@ -585,11 +608,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   )}
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="self-center text-slate-950 [&_svg]:size-8 size-10 border border-slate-950 shadow-md"
+                      <TooltipTrigger className="w-fit h-fit">
+                        <TapableButton
+                          className="border rounded-md shadow-md text-slate-950 border-slate-950 size-10 [&_svg]:size-8 flex items-center justify-center"
                           onClick={() => {
                             if (!authState.user) {
                               addNotification({
@@ -613,7 +634,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                           }}
                         >
                           <BookHeadphones className="" strokeWidth={1.2} />
-                        </Button>
+                        </TapableButton>
                       </TooltipTrigger>
                       <TooltipContent>предложить свою озвучку</TooltipContent>
                     </Tooltip>
@@ -641,9 +662,18 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   <ArrowLeftIcon />
                   <span>назад</span>
                 </Button>
-                <Button type="submit" className="w-32">
-                  отправить
-                  <PaperPlaneIcon className="-rotate-45" />
+
+                <Button
+                  type="submit"
+                  className="w-32 [&_svg]:size-5"
+                  disabled={applicationAudioState.load}
+                >
+                  <span>отправить</span>
+                  {applicationAudioState.load ? (
+                    <UpdateIcon className="size-6 animate-spin" />
+                  ) : (
+                    <PaperPlaneIcon className="-rotate-45" />
+                  )}
                 </Button>
               </CreateApplicationAudioForm>
             </TabsContent>

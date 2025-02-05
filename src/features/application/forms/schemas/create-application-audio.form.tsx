@@ -63,6 +63,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   });
 
   const [openLanguages, setOpenLanguages] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

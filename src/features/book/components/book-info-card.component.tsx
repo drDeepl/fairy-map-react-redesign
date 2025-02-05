@@ -251,7 +251,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
           </div>
         )}
 
-        <div className="flex justify-between pt-10">
+        <div className="flex justify-between">
           <Button
             className="flex justify-between w-44 place-self-start p-0 m-0 [&_svg]:size-6"
             variant="link"
