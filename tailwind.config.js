@@ -271,6 +271,17 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        "baby-blue": {
+          100: "#e6eeff",
+          200: "#cdddfe",
+          300: "#b4cbfe",
+          400: "#9bbafd",
+          500: "#82a9fd",
+          600: "#6887ca",
+          700: "#4e6598",
+          800: "#344465",
+          900: "#1a2233",
+        },
         red: {
           50: "#FFF2F1",
           100: "#FFE5E4",
@@ -284,12 +295,6 @@ export default {
           900: "#800700",
         },
         ghost: "#D4E6FA",
-        "baby-blue": {
-          50: "#F6FAFE",
-          100: "#EDF5FD",
-          500: "#D4E6FA",
-          800: "#A9B8C8",
-        },
 
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

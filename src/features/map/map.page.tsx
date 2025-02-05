@@ -13,7 +13,9 @@ import { Components } from "@/api/schemas/client";
 
 import BookInfoCardComponent from "../book/components/book-info-card.component";
 
-import CreateApplicationAudioForm from "../application/forms/schemas/create-application-audio.form";
+import CreateApplicationAudioForm, {
+  CreateApplicationAudioDto,
+} from "../application/forms/schemas/create-application-audio.form";
 
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import LoadSpinner from "@/components/ui/load-spinner";
@@ -36,11 +38,17 @@ import NotifyContainer, {
   Notification,
 } from "../../components/notificaiton.component";
 import { AxiosResponse } from "axios";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
-import { Cross1Icon, HomeIcon } from "@radix-ui/react-icons";
+import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
+import { Cross1Icon, HomeIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
 import { BottomNavigation } from "@/components/bottom-navigation/bottom-navigation.component";
-import { SearchIcon } from "lucide-react";
+import { ArrowLeftIcon, BookHeadphones, SearchIcon } from "lucide-react";
 import { NavItem } from "@/components/bottom-navigation";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipProvider,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface MapPageProps {
   width: number;
@@ -249,19 +257,63 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
-      await apiClient.paths["/api/story/rating/add"].post(null, {
-        audioId: audio.id,
-        rating: rating,
-      });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
+      "/api/story/rating/add"
+    ].post(null, {
+      audioId: audio.id,
+      rating: rating,
+    });
 
     return res.data.ratingAudioStory;
+  };
+
+  const handleOnSubmitCreateApplicationAudio = async (
+    dto: CreateApplicationAudioDto
+  ) => {
+    if (!authState.user) {
+      addNotification({
+        type: "error",
+        message: "для добавления озвучки необходимо авторизоваться",
+        action: <Button onClick={() => handleOnClickAvatar()}>войти</Button>,
+      });
+      return;
+    }
+
+    try {
+      const addedAudioResponse: any = await apiClient.paths[
+        "/api/user/story/{storyId}/language/{languageId}/audio/upload"
+      ].post(
+        {
+          storyId: dto.storyId,
+          languageId: dto.languageId,
+        },
+        dto.audioFormData as any,
+
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      await apiClient.paths["/api/audio-story-request/add"].post(null, {
+        userAudioId: addedAudioResponse.data.userAudioId,
+        userId: Number(authState.user.sub),
+        storyId: dto.storyId,
+      });
+      addNotification({
+        type: "success",
+        message: "заявка на озвучку отправлена",
+      });
+      setCurrentTab(MapModalTabs.BookInfo.toString());
+    } catch (error) {}
   };
 
   interface DrawerState {
     authForm: boolean;
     selectedBook: boolean;
   }
+
   const [drawer, setDrawer] = useState<DrawerState>({
     authForm: false,
     selectedBook: false,
@@ -309,7 +361,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           modal={true}
           dismissible={false}
         >
-          <DrawerContent>
+          <DrawerContent className="h-full">
             {selectedBook.book && (
               <div className="relative">
                 {notifications.length > 0 ? (
@@ -349,14 +401,87 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                       storyId={selectedBook.book.id}
                       languages={languageListState.languages}
                       userId={authState.user ? Number(authState.user.sub) : 0}
-                      onClose={() =>
-                        setCurrentTab(MapModalTabs.BookInfo.toString())
-                      }
-                    />
+                      onSubmit={handleOnSubmitCreateApplicationAudio}
+                    >
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="border border-ghost"
+                        onClick={() => {
+                          setCurrentTab(MapModalTabs.BookInfo.toString());
+                        }}
+                      >
+                        <ArrowLeftIcon />
+                        <span>назад</span>
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="secondary"
+                        className="self-center [&_svg]:size-5 border shadow-md border-baby-blue-500 shadow-baby-blue-200"
+                      >
+                        отправить заявку
+                        <PaperPlaneIcon className="-rotate-45" />
+                      </Button>
+                    </CreateApplicationAudioForm>
                   </TabsContent>
                 </Tabs>
               </div>
             )}
+            <DrawerFooter>
+              {currentTab != MapModalTabs.AddApplicationAudio.toString() && (
+                <div className="flex justify-between">
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      handleOnCloseBook();
+                      setDrawer((prevState) => ({
+                        ...prevState,
+                        selectedBook: false,
+                      }));
+                    }}
+                  >
+                    <ArrowLeftIcon />
+
+                    <span>закрыть</span>
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    className="self-center [&_svg]:size-8 border shadow-md border-baby-blue-500 shadow-baby-blue-200"
+                    onClick={() => {
+                      if (!authState.user) {
+                        addNotification({
+                          type: "error",
+                          message:
+                            "для добавления озвучки необходимо авторизоваться",
+                          action: (
+                            <Button
+                              variant="link"
+                              className="m-2"
+                              onClick={() => {
+                                setDrawer((prevState) => ({
+                                  ...prevState,
+                                  authForm: true,
+                                }));
+                                handleOnClickAvatar();
+                              }}
+                            >
+                              войти
+                            </Button>
+                          ),
+                        });
+                      } else {
+                        setCurrentTab(
+                          MapModalTabs.AddApplicationAudio.toString()
+                        );
+                      }
+                    }}
+                  >
+                    <span>предложить озвучку</span>
+                    <BookHeadphones className="" strokeWidth={1.2} />
+                  </Button>
+                </div>
+              )}
+            </DrawerFooter>
           </DrawerContent>
         </Drawer>
 
@@ -417,13 +542,13 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       {authFormState.open && (
         <DialogSheet
           onClose={handleOnCloseAuthForm}
-          contentClassName="max-w-96"
+          contentClassName="max-w-[24rem]"
         >
           <AuthForm onClose={handleOnCloseAuthForm} />
         </DialogSheet>
       )}
       {selectedBook.book && (
-        <DialogSheet contentClassName={`${isMobile ? "size-screen" : ""}`}>
+        <DialogSheet>
           {notifications.length > 0 ? (
             <NotifyContainer
               className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
@@ -444,22 +569,60 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                 onClickAddAudio={handleOnClickAddAudio}
                 headerChildren={
                   <Button
+                    className="border-gray-500"
                     variant="outline"
                     size="icon"
                     onClick={() => handleOnCloseBook()}
                   >
-                    <Cross1Icon className="text-gray-300 size-8" />
+                    <Cross1Icon className="text-gray-500 size-8" />
                   </Button>
                 }
               >
-                {selectedBook.book.audios.length > 0 ? (
-                  <AudioBook
-                    audioBooks={selectedBook.book.audios}
-                    onClickRate={handleOnClickRate}
-                  />
-                ) : (
-                  <p>аудиокниги не найдены</p>
-                )}
+                <div className="flex space-x-2">
+                  {selectedBook.book.audios.length > 0 ? (
+                    <AudioBook
+                      audioBooks={selectedBook.book.audios}
+                      onClickRate={handleOnClickRate}
+                    />
+                  ) : (
+                    <p>аудиокниги не найдены</p>
+                  )}
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="self-center text-slate-950 [&_svg]:size-8 size-10 border border-slate-950 shadow-md"
+                          onClick={() => {
+                            if (!authState.user) {
+                              addNotification({
+                                type: "error",
+                                message:
+                                  "для добавления озвучки необходимо авторизоваться",
+                                action: (
+                                  <Button
+                                    className="m-2"
+                                    onClick={() => handleOnClickAvatar()}
+                                  >
+                                    войти
+                                  </Button>
+                                ),
+                              });
+                            } else {
+                              setCurrentTab(
+                                MapModalTabs.AddApplicationAudio.toString()
+                              );
+                            }
+                          }}
+                        >
+                          <BookHeadphones className="" strokeWidth={1.2} />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>предложить свою озвучку</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               </BookInfoCardComponent>
             </TabsContent>
             <TabsContent
@@ -470,8 +633,24 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                 storyId={selectedBook.book.id}
                 languages={languageListState.languages}
                 userId={authState.user ? Number(authState.user.sub) : 0}
-                onClose={() => setCurrentTab(MapModalTabs.BookInfo.toString())}
-              />
+                onSubmit={handleOnSubmitCreateApplicationAudio}
+              >
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="border border-ghost"
+                  onClick={() => {
+                    setCurrentTab(MapModalTabs.BookInfo.toString());
+                  }}
+                >
+                  <ArrowLeftIcon />
+                  <span>назад</span>
+                </Button>
+                <Button type="submit" className="w-32">
+                  отправить
+                  <PaperPlaneIcon className="-rotate-45" />
+                </Button>
+              </CreateApplicationAudioForm>
             </TabsContent>
           </Tabs>
         </DialogSheet>

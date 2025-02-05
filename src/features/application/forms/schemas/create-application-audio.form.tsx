@@ -29,30 +29,31 @@ import {
 import { cn } from "@/lib/utils";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  ArrowLeftIcon,
-  CheckCircledIcon,
-  CrossCircledIcon,
-  PaperPlaneIcon,
-} from "@radix-ui/react-icons";
+import { CrossCircledIcon } from "@radix-ui/react-icons";
 import { Input } from "@/components/ui/input";
 import apiClient from "@/api/apiClient";
 import { Block } from "notiflix/build/notiflix-block-aio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toaster } from "@/components/ui/toaster";
-import { useToast } from "@/hooks/use-toast";
+
+export interface CreateApplicationAudioDto {
+  audioFormData: FormData;
+  languageId: number;
+  storyId: number;
+}
 
 interface CreateApplicationAudioFormProps {
   storyId: number;
   languages: Components.Schemas.LanguageDto[];
   userId: number;
-  onClose: () => void;
+  onSubmit: (dto: CreateApplicationAudioDto) => Promise<void>;
+  children?: React.ReactNode;
 }
 const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
   storyId,
   languages,
   userId,
-  onClose,
+  onSubmit,
+  children,
 }) => {
   const form = useForm<z.infer<typeof createApplicationFormSchema>>({
     resolver: zodResolver(createApplicationFormSchema),
@@ -66,86 +67,35 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
 
   const [openLanguages, setOpenLanguages] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
-  const setOverlayLoad = (load: boolean) => {
-    load
-      ? Block.dots(".add-audio-form__container", { cssAnimationDuration: 5000 })
-      : Block.remove(".add-audio-form__container");
-  };
 
   useEffect(() => {
     form.reset();
-    setOverlayLoad(false);
   }, []);
 
   const handleSumbitForm = async (
     data: z.infer<typeof createApplicationFormSchema>
   ) => {
-    setOverlayLoad(true);
     if (fileInputRef.current && fileInputRef.current.files) {
       const formData = new FormData();
       formData.append("audio", fileInputRef.current.files[0]);
 
       try {
-        const addedAudioResponse: any = await apiClient.paths[
-          "/api/user/story/{storyId}/language/{languageId}/audio/upload"
-        ].post(
-          {
-            storyId: data.storyId,
-            languageId: data.languageId,
-          },
-          formData as any,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        await apiClient.paths["/api/audio-story-request/add"].post(null, {
-          userAudioId: addedAudioResponse.data.userAudioId, // 24
-          userId: userId, // 1
+        const dto: CreateApplicationAudioDto = {
+          audioFormData: formData,
+          languageId: data.languageId,
           storyId: data.storyId,
-        });
-        toast({
-          className: cn(
-            "top-8 right-20 flex fixed w-2/3 border border-emerald-500 bg-emerald-50"
-          ),
-          action: (
-            <div className="flex items-center space-x-2 w-full">
-              <CheckCircledIcon className="size-6 text-emerald-500" />
-              <span className="font-semibold text-md">
-                Заявка успешно отправлена
-              </span>
-            </div>
-          ),
-        });
+        };
+        await onSubmit(dto);
         fileInputRef.current.value = "";
         form.reset();
       } catch (error) {
-        toast({
-          className: cn(
-            "top-8 right-20 flex fixed w-2/3 border border-red-500 bg-red-50"
-          ),
-          action: (
-            <div className="flex items-center space-x-2 w-full">
-              <CrossCircledIcon className="size-6 text-red-500" />
-              <span className="font-semibold text-md">
-                Что-то пошло не так...
-              </span>
-            </div>
-          ),
-        });
-      } finally {
-        setOverlayLoad(false);
+        console.error(error);
       }
     }
   };
 
   return (
     <Card className="add-audio-form__container border-none shadow-none">
-      <Toaster />
       <CardHeader className="mt-0">
         <CardTitle className="flex justify-between items-center space-x-2">
           <span>Создание заявки на добавление озвучки</span>
@@ -256,21 +206,7 @@ const CreateApplicationAudioForm: React.FC<CreateApplicationAudioFormProps> = ({
                 </FormItem>
               )}
             />
-            <div className="flex space-x-2">
-              <Button
-                type="button"
-                variant="secondary"
-                className="border border-ghost"
-                onClick={() => onClose()}
-              >
-                <ArrowLeftIcon />
-                <span>назад</span>
-              </Button>
-              <Button type="submit" className="w-32">
-                отправить
-                <PaperPlaneIcon className="-rotate-45" />
-              </Button>
-            </div>
+            <div className="flex space-x-2">{children}</div>
           </form>
         </Form>
       </CardContent>

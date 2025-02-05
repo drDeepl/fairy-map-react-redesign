@@ -106,85 +106,88 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
       <Card className="flex flex-col justify-center w-full border-none shadow-none">
         <CardHeader className="flex flex-col items-center justify-center w-full">
           {headerChildren}
-          <CardTitle className="w-full py-3 m-0 text-center capitalize text-res-lg">
+          <CardTitle className="w-full py-3 m-0 text-center first-letter:uppercase text-res-lg">
             <span className="">{book.name}</span>
           </CardTitle>
-          <CardDescription className="p-0 m-0">
-            <div className="flex justify-center justify-items-center">
-              {infoBookState.loadCover ? (
-                <div>
-                  <Skeleton className="bg-neutral-300 size-44" />
-                </div>
-              ) : (
-                <Label
-                  htmlFor="picture"
-                  className={`${onUploadCover ? "cursor-pointer" : ""}`}
-                >
-                  {infoBookState.book.srcImg ? (
-                    <img
-                      src={infoBookState.book.srcImg}
-                      alt={infoBookState.book.name}
-                      className="object-cover size-44 rounded-t-xl"
-                    />
-                  ) : (
-                    <div className="size-40 rounded-xl animate-shimmer">
-                      <NotCoverBook />
-                    </div>
-                  )}
-                </Label>
-              )}
-              {onUploadCover ? (
-                <Input
-                  className="hidden"
-                  id="picture"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleUploadFile}
-                />
-              ) : null}
-            </div>
-            <Accordion
-              type="single"
-              collapsible
-              className="w-screen px-4 text-xl"
-            >
-              <AccordionItem value="story-text">
-                <AccordionTrigger
-                  className="px-24 text-base outline-none"
-                  onClick={() => {
-                    handleShowText(!textAction.show);
-                  }}
-                >
-                  <div className="">
-                    <span className="text-lg animate-in">
-                      {!textAction.show ? "показать текст" : "скрыть текст"}
-                    </span>
+          {!textAction.show ? (
+            <CardDescription className="p-0 m-0">
+              <div className="flex justify-center justify-items-center">
+                {infoBookState.loadCover ? (
+                  <div>
+                    <Skeleton className="bg-neutral-300 size-44" />
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="mt-2 overflow-auto rounded-md max-h-96">
-                  {load ? (
-                    <div>
-                      {Array(3)
-                        .fill(1)
-                        .map((value) => (
-                          <Skeleton
-                            key={value}
-                            className="w-full h-4 my-2 bg-zinc-300"
-                          />
-                        ))}
-                    </div>
-                  ) : (
-                    <div className="text-lg">
-                      <p className="flex justify-center row-span-1">
-                        {book.text}
-                      </p>
-                    </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </CardDescription>
+                ) : (
+                  <Label
+                    htmlFor="picture"
+                    className={`${onUploadCover ? "cursor-pointer" : ""}`}
+                  >
+                    {infoBookState.book.srcImg ? (
+                      <img
+                        src={infoBookState.book.srcImg}
+                        alt={infoBookState.book.name}
+                        className="object-cover size-44 rounded-t-xl"
+                      />
+                    ) : (
+                      <div className="size-40 rounded-xl animate-shimmer">
+                        <NotCoverBook />
+                      </div>
+                    )}
+                  </Label>
+                )}
+                {onUploadCover ? (
+                  <Input
+                    className="hidden"
+                    id="picture"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleUploadFile}
+                  />
+                ) : null}
+              </div>
+            </CardDescription>
+          ) : null}
+          <div className="flex justify-between">
+            <Button
+              className="flex justify-between w-44 place-self-start py-0 px-2 m-0 [&_svg]:size-6"
+              variant="link"
+              onClick={() => {
+                handleShowText(!textAction.show);
+              }}
+            >
+              <span className="text-res-sm">
+                {!textAction.show ? "показать текст..." : "скрыть текст"}
+              </span>
+              <CaretUpIcon
+                className={`${
+                  textAction.show ? "animate-rotate-180" : "animate-rotate-270"
+                }`}
+              />
+            </Button>
+          </div>
+          <Separator />
         </CardHeader>
+        <motion.div
+          className="h-full italic text-justify text-slate-800"
+          initial="closed"
+          animate={textAction.show ? "open" : "closed"}
+          variants={{
+            open: {
+              opacity: 1,
+              height: textAction.show ? "60svh" : "30svh",
+            },
+            closed: { opacity: 0, height: 0 },
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          <ScrollArea
+            className={`${
+              textAction.show ? "h-[60svh]" : "h-[30svh]"
+            } px-4 pb-4`}
+          >
+            {book.text}
+          </ScrollArea>
+          <Separator />
+        </motion.div>
         {!textAction.show && !textAction.fullScreen ? (
           <CardContent className="flex flex-col items-center space-y-2 text-xl">
             {children}
@@ -237,7 +240,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
             <div className="w-2/3">
               <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="capitalize text-res-base md:text-res-sm">
+                  <span className="first-letter:uppercase text-res-base md:text-res-sm">
                     {infoBookState.book.name}
                   </span>
                   {headerChildren}
@@ -254,7 +257,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
           </div>
         )}
 
-        <div className="flex justify-between">
+        <div className="flex justify-between pt-10">
           <Button
             className="flex justify-between w-44 place-self-start p-0 m-0 [&_svg]:size-6"
             variant="link"
@@ -306,7 +309,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         <ScrollArea
           className={`${
             textAction.fullScreen ? "h-[70svh]" : "h-[30svh]"
-          } px-3`}
+          } px-4 pb-6`}
         >
           {book.text}
         </ScrollArea>

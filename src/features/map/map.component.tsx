@@ -36,7 +36,7 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
@@ -317,14 +317,12 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
           top: tooltip.y,
         }}
       >
-        <motion.p className="mb-2 text-xl font-semibold">
-          {tooltip.title}
-        </motion.p>
+        <p className="mb-2 text-xl font-semibold">{tooltip.title}</p>
 
         {listBook.load ? (
-          <motion.div className="flex justify-center w-full">
+          <div className="flex justify-center w-full">
             <Skeleton className="w-48 h-6 my-2 bg-baby-blue-800" />
-          </motion.div>
+          </div>
         ) : (
           <motion.div
             className="flex items-center justify-center px-4 py-2"
