@@ -25,7 +25,7 @@ import { EthnicGroupPoint } from "./map.interface";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion, Variants } from "framer-motion";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 
@@ -114,16 +114,13 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       );
   }
 
-  const handleClickPath = (d: any, pointsClass: string) => {
+  const handleClickPath = (d: any) => {
+    setSelectedRegion(d.properties);
     resetTooltip();
     const svg = d3.select(svgRef.current);
 
     const defaultRegionClass = "region fill-stone-100";
     const selectedRegionClass = "region fill-orange-500";
-
-    d3.selectAll(`circle`)
-      .style("visibility", "hidden")
-      .style("fill", "#82A9FD");
 
     d3.selectAll("path.region").attr("class", defaultRegionClass);
 
@@ -132,8 +129,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     g.selectChildren("path").attr("class", selectedRegionClass);
 
     g.selectChildren();
-
-    g.selectChildren(`circle.${pointsClass}`).style("visibility", "visible");
 
     zoomedPath(svg, d);
   };
@@ -192,7 +187,70 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     }
   };
 
-  const renderedFeatures = useMemo(() => {
+  const [selectedRegion, setSelectedRegion] = useState<any>(null);
+
+  // Варианты анимации для точек
+  const pointVariants: Variants = {
+    hidden: {
+      scale: 0,
+      opacity: 0,
+      transition: {
+        duration: 0.3,
+      },
+    },
+    visible: (index) => ({
+      scale: 1,
+      opacity: 1,
+      transition: {
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 300,
+        damping: 15,
+      },
+    }),
+    hover: {
+      scale: 1.2,
+      transition: { duration: 0.2 },
+    },
+  };
+
+  const renderRegionPoints = useMemo(() => {
+    if (!selectedRegion || !features) return null;
+
+    return (
+      <AnimatePresence>
+        {selectedRegion.ethnicGroupsPoints.map((point: any, index: number) => {
+          console.log(point);
+          const [x, y] = projection([point.longitude, point.latitude]) || [
+            0, 0,
+          ];
+
+          return (
+            <motion.circle
+              key={point.idPoint}
+              id={`circle-${point.idPoint}`}
+              cx={x}
+              cy={y}
+              r={5}
+              className={`cursor-pointer ethnic-group-point-region-${selectedRegion.id} z-50`}
+              fill="#82A9FD"
+              stroke="#FFFFFF"
+              strokeWidth="0.5"
+              custom={index}
+              variants={pointVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover="hover"
+              exit="hidden"
+              onClick={(e) => handleClickPoint(e, point)}
+            />
+          );
+        })}
+      </AnimatePresence>
+    );
+  }, [selectedRegion, features, projection]);
+
+  const renderedRegions = useMemo(() => {
     return features.map((feature: any) => {
       const d = pathGenerator(feature);
       return (
@@ -201,41 +259,10 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
             className="region fill-stone-100"
             stroke="#82A9FD"
             strokeWidth="0.3"
-            onClick={() =>
-              handleClickPath(
-                feature,
-                `ethnic-group-point-region-${feature.properties.id}`
-              )
-            }
+            onClick={() => handleClickPath(feature)}
             d={d as any}
             fill="#FFFFFF"
           />
-          {feature.properties.ethnicGroupsPoints.map(
-            (ethnicGroupPoint: any) => {
-              const point = projection([
-                ethnicGroupPoint.longitude,
-                ethnicGroupPoint.latitude,
-              ]);
-              if (point) {
-                const [cx, cy] = point;
-                return (
-                  <circle
-                    key={`point-${ethnicGroupPoint.idPoint}`}
-                    id={`circle-${ethnicGroupPoint.idPoint}`}
-                    className={`cursor-pointer ethnic-group-point-region-${feature.properties.id} z-50`}
-                    fill="#82A9FD"
-                    stroke="#FFFFFF"
-                    strokeWidth="0.5"
-                    cx={cx}
-                    cy={cy}
-                    r={4}
-                    onClick={(e) => handleClickPoint(e, ethnicGroupPoint)}
-                  />
-                );
-              }
-              return null;
-            }
-          )}
         </g>
       );
     });
@@ -291,7 +318,10 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
         ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
       >
-        <g>{renderedFeatures}</g>
+        <g>
+          {renderedRegions}
+          {renderRegionPoints}
+        </g>
       </svg>
 
       <PopoverMotion

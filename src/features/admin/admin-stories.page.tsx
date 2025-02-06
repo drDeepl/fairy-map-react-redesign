@@ -43,7 +43,6 @@ import { Toaster, toast } from "sonner";
 import { Cross1Icon, UploadIcon } from "@radix-ui/react-icons";
 
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import PaginationBox from "@/components/pagination.component";
 import SearchBookBox from "../book/components/search-book-box.component";
 import { useMediaQuery } from "react-responsive";
@@ -94,10 +93,8 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [
-    selectedLanguage,
-    setSelectedLanguage,
-  ] = useState<Components.Schemas.LanguageDto | null>(null);
+  const [selectedLanguage, setSelectedLanguage] =
+    useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {

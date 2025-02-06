@@ -255,12 +255,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
-      "/api/story/rating/add"
-    ].post(null, {
-      audioId: audio.id,
-      rating: rating,
-    });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
 
     return res.data.ratingAudioStory;
   };
@@ -268,11 +267,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     load: boolean;
   }
 
-  const [applicationAudioState, setApplicationAudioState] = useState<
-    ApplicationAudioState
-  >({
-    load: false,
-  });
+  const [applicationAudioState, setApplicationAudioState] =
+    useState<ApplicationAudioState>({
+      load: false,
+    });
 
   const handleOnSubmitCreateApplicationAudio = async (
     dto: CreateApplicationAudioDto
