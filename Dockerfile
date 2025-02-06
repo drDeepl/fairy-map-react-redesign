@@ -10,11 +10,14 @@ COPY package*.json ./
 # Установите зависимости
 RUN npm install
 
+RUN npm install @rollup/rollup-linux-x64-gnu
+
 # Скопируйте исходный код в контейнер
 COPY . .
 
 # Запустите сборку приложения
 RUN npm run build
+
 
 # Укажите базовый образ для production
 FROM nginx:stable-alpine
