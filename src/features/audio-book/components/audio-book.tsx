@@ -9,7 +9,7 @@ import styled from "styled-components";
 import TapableButton from "@/components/tapable-button.component";
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
-  onClickRate: (
+  onClickRate?: (
     rating: number,
     audio: Components.Schemas.AudioStoryResponseDto
   ) => Promise<number>;
@@ -60,13 +60,18 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
   const handleOnClickStar = async (rating: number) => {
-    const newRating = await onClickRate(rating, selectedAudio);
+    if (onClickRate) {
+      const newRating = await onClickRate(rating, selectedAudio);
 
-    setSelectedAudio((prevState) => ({
-      ...prevState,
-      commonRating: newRating,
-    }));
-    return newRating;
+      setSelectedAudio((prevState) => ({
+        ...prevState,
+        commonRating: newRating,
+      }));
+
+      return newRating;
+    } else {
+      return selectedAudio.commonRating;
+    }
   };
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -171,17 +176,15 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
                     <motion.rect
                       x="6"
                       y="4"
-                      widths={`${4}px`}
-                      height={`${16}px`}
+                      className={`w-[4px] h-[16px]`}
                       fill="currentColor"
                       initial={{ scaleY: 0.4 }}
                       animate={{ scaleY: 1 }}
                     />
                     <motion.rect
+                      className={`w-[4px] h-[16px]`}
                       x="14"
                       y="4"
-                      widths={`${4}px`}
-                      height={`${16}px`}
                       fill="currentColor"
                       initial={{ scaleY: 0.4 }}
                       animate={{ scaleY: 1 }}

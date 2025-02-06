@@ -1,7 +1,7 @@
 import { Components } from "@/api/schemas/client";
 import { AppDispatch, RootState } from "@/app/store";
 import { Button } from "@/components/ui/button";
-import { BookPlus } from "lucide-react";
+import { BookHeadphones, BookPlus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -68,6 +68,9 @@ interface SelectedBookState {
 
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Separator } from "@/components/ui/separator";
+import DialogSheet from "@/components/dialog-sheet";
+import AudioBook from "../audio-book/components/audio-book";
+import TapableButton from "@/components/tapable-button.component";
 
 const AdminStoriesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -139,25 +142,22 @@ const AdminStoriesPage: React.FC = () => {
   ) => {
     setBookState((prevState) => ({ ...prevState, book: book }));
     setOpenDialog(true);
-    apiClient.paths["/api/story/{storyId}/audio/all"]
-      .get({
+    try {
+      const res = await apiClient.paths["/api/story/{storyId}/audio/all"].get({
         storyId: book.id,
-      })
-      .then((res) => {
-        console.log(res);
-        setBookState((prevState) => ({
-          ...prevState,
-          audios: res.data,
-          load: false,
-        }));
-      })
-      .catch((error) => {
-        console.log(error);
-        setBookState((prevState) => ({
-          ...prevState,
-          load: false,
-        }));
       });
+      console.log(res);
+      setBookState((prevState) => ({
+        ...prevState,
+        audios: res.data,
+        load: false,
+      }));
+    } catch {
+      setBookState((prevState) => ({
+        ...prevState,
+        load: false,
+      }));
+    }
   };
 
   const handleCloseInfoBook = () => {
@@ -367,41 +367,37 @@ const AdminStoriesPage: React.FC = () => {
   }
 
   return (
-    <Dialog open={openDialog}>
-      <div>
-        <section className="flex flex-col mx-8 space-y-2">
-          <ListBookCarousel
-            load={listBookState.loading}
-            books={listBookState.books.data}
-            onClickBook={handleOnClickPreviewBook}
-          >
-            <div className="flex items-center space-x-2 jsutify-center">
-              <Button
-                variant="outline"
-                onClick={handleOnClickAddBook}
-                className="border w-42 border-ghost text-md lg:h-12"
-              >
-                <span className="">добавить сказку</span>
-                <BookPlus />
-              </Button>
-              <SearchBookBox onClickBook={handleOnClickPreviewBook} />
-            </div>
-          </ListBookCarousel>
-          <PaginationBox
-            meta={listBookState.books.meta}
-            onApplyPage={handleOnClickPage}
-          />
-        </section>
-        <Toaster
-          position="top-center"
-          richColors
-          toastOptions={{ className: "toast-admin-page" }}
-        />
-        <DialogContent
-          className={`[&>button]:hidden m-0 p-0 ${
-            bookState.book ? "animate-zoom-in" : "animate-zoom-out"
-          }`}
+    <div>
+      <section className="flex flex-col mx-8 space-y-2">
+        <ListBookCarousel
+          load={listBookState.loading}
+          books={listBookState.books.data}
+          onClickBook={handleOnClickPreviewBook}
         >
+          <div className="flex items-center space-x-2 jsutify-center">
+            <Button
+              variant="outline"
+              onClick={handleOnClickAddBook}
+              className="border w-42 border-ghost text-md lg:h-12"
+            >
+              <span className="">добавить сказку</span>
+              <BookPlus />
+            </Button>
+            <SearchBookBox onClickBook={handleOnClickPreviewBook} />
+          </div>
+        </ListBookCarousel>
+        <PaginationBox
+          meta={listBookState.books.meta}
+          onApplyPage={handleOnClickPage}
+        />
+      </section>
+      <Toaster
+        position="top-center"
+        richColors
+        toastOptions={{ className: "toast-admin-page" }}
+      />
+      {openDialog && (
+        <DialogSheet>
           {openAddBookForm ? (
             <div className="px-4 py-6">
               <Button
@@ -443,70 +439,87 @@ const AdminStoriesPage: React.FC = () => {
                 onUploadCover={handleOnUploadBookCover}
                 onClickAddAudio={() => console.log("onClickAddAudio")}
               >
-                <Popover
-                  open={languageListState.open}
-                  onOpenChange={(open) => {
-                    setLanguageListState((prevState) => ({
-                      ...prevState,
-                      open,
-                    }));
-                  }}
-                >
-                  <TooltipProvider delayDuration={500}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <PopoverTrigger
-                          asChild
-                          onClick={() =>
-                            setLanguageListState((prevState) => ({
-                              ...prevState,
-                              open: true,
-                            }))
-                          }
-                        >
-                          <UploadIcon className="self-center cursor-pointer size-6 hover:text-orange-500" />
-                        </PopoverTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        загрузить озвучку
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <PopoverContent>
-                    <Command>
-                      <p className="self-center font-semibold">
-                        выберите язык для озвучки
-                      </p>
-                      <CommandInput
-                        placeholder="начните поиск..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>
-                          языки для озвучки не найдены
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {languageListState.load ? (
-                            <Skeleton className="w-full h-16" />
-                          ) : (
-                            languageListState.languages.map((language) => (
-                              <CommandItem
-                                key={`lang_${language.id}`}
-                                value={language.name}
-                                onSelect={() =>
-                                  handleOnSelectLanguage(language)
+                <div>
+                  {bookState.audios.length > 0 ? (
+                    <div className="flex items-start space-x-2">
+                      <AudioBook audioBooks={bookState.audios} />
+                      <Popover
+                        open={languageListState.open}
+                        onOpenChange={(open) => {
+                          setLanguageListState((prevState) => ({
+                            ...prevState,
+                            open,
+                          }));
+                        }}
+                      >
+                        <TooltipProvider delayDuration={500}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <PopoverTrigger
+                                onClick={() =>
+                                  setLanguageListState((prevState) => ({
+                                    ...prevState,
+                                    open: true,
+                                  }))
                                 }
                               >
-                                {language.name}
-                              </CommandItem>
-                            ))
-                          )}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                                <TapableButton className="border rounded-md shadow-md text-slate-950 border-slate-950 size-10 [&_svg]:size-8 flex items-center justify-center self-start">
+                                  <BookHeadphones
+                                    className=""
+                                    strokeWidth={1.2}
+                                  />
+                                </TapableButton>
+                              </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              загрузить озвучку
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+
+                        <PopoverContent>
+                          <Command>
+                            <p className="self-center font-semibold">
+                              выберите язык для озвучки
+                            </p>
+                            <CommandInput
+                              placeholder="начните поиск..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>
+                                языки для озвучки не найдены
+                              </CommandEmpty>
+                              <CommandGroup>
+                                {languageListState.load ? (
+                                  <Skeleton className="w-full h-16" />
+                                ) : (
+                                  languageListState.languages.map(
+                                    (language) => (
+                                      <CommandItem
+                                        key={`lang_${language.id}`}
+                                        value={language.name}
+                                        onSelect={() =>
+                                          handleOnSelectLanguage(language)
+                                        }
+                                      >
+                                        {language.name}
+                                      </CommandItem>
+                                    )
+                                  )
+                                )}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  ) : (
+                    <p className="text-lg text-slate-500">
+                      аудиокниги не найдены
+                    </p>
+                  )}
+                </div>
               </BookInfoCardComponent>
             </div>
           ) : null}
@@ -523,9 +536,9 @@ const AdminStoriesPage: React.FC = () => {
               });
             }}
           />
-        </DialogContent>
-      </div>
-    </Dialog>
+        </DialogSheet>
+      )}
+    </div>
   );
 };
 export default AdminStoriesPage;
