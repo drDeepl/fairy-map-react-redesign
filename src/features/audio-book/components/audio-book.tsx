@@ -53,8 +53,9 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   onClickRate,
   children,
 }) => {
-  const [selectedAudio, setSelectedAudio] =
-    useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
+  const [selectedAudio, setSelectedAudio] = useState<
+    Components.Schemas.AudioStoryResponseDto
+  >(audioBooks[0]);
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
@@ -170,8 +171,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
                     <motion.rect
                       x="6"
                       y="4"
-                      width="4"
-                      height="16"
+                      widths={`${4}px`}
+                      height={`${16}px`}
                       fill="currentColor"
                       initial={{ scaleY: 0.4 }}
                       animate={{ scaleY: 1 }}
@@ -179,8 +180,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
                     <motion.rect
                       x="14"
                       y="4"
-                      width="4"
-                      height="16"
+                      widths={`${4}px`}
+                      height={`${16}px`}
                       fill="currentColor"
                       initial={{ scaleY: 0.4 }}
                       animate={{ scaleY: 1 }}

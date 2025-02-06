@@ -5,13 +5,12 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, MotionStyle } from "framer-motion";
 import { debounce } from "lodash";
 interface PopoverProps {
   open: boolean;
   x: number;
   y: number;
-  isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
   className?: string;
@@ -122,7 +121,7 @@ const PopoverMotion: React.FC<PopoverProps> = React.memo(
               animate="visible"
               exit="hidden"
               variants={popoverVariants}
-              style={calculatePopoverPosition()}
+              style={calculatePopoverPosition() as MotionStyle}
               className={`
                 bg-white 
                 shadow-2xl 

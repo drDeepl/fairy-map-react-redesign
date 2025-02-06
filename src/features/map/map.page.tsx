@@ -50,7 +50,6 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import TapableButton from "@/components/tapable-button.component";
-import PopoverMotion from "@/components/popover-motion.component";
 
 interface MapPageProps {
   width: number;

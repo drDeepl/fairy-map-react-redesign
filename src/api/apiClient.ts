@@ -8,6 +8,7 @@ async function initApiClient() {
     definition: `${import.meta.env.VITE_API_URL}api/v1-json`,
   });
 
+  console.log(`${import.meta.env.VITE_API_URL}api/v1-json`);
   await api.init<Client>();
   const apiClient = await api.getClient<Client>();
 
