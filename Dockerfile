@@ -7,10 +7,11 @@ WORKDIR /app
 # Копируйте package.json и package-lock.json в рабочую директорию
 COPY package*.json ./
 
+RUN npm install --platform=linux --arch=x64 @rollup/rollup-linux-x64-musl
+
 # Установите зависимости
 RUN npm install
 
-RUN npm install @rollup/rollup-linux-x64-gnu
 
 # Скопируйте исходный код в контейнер
 COPY . .
