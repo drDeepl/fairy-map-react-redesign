@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 
 import { Separator } from "@/components/ui/separator";
 import SwitchMotion from "@/components/switch-motion";
+import PopoverMotion from "@/components/popover-motion.component";
 
 interface MapProps {
   features: any;
@@ -221,7 +222,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
                   <circle
                     key={`point-${ethnicGroupPoint.idPoint}`}
                     id={`circle-${ethnicGroupPoint.idPoint}`}
-                    className={`cursor-pointer ethnic-group-point-region-${feature.properties.id}`}
+                    className={`cursor-pointer ethnic-group-point-region-${feature.properties.id} z-50`}
                     fill="#82A9FD"
                     stroke="#FFFFFF"
                     strokeWidth="0.5"
@@ -292,18 +293,12 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       >
         <g>{renderedFeatures}</g>
       </svg>
-      <motion.div
-        className={`absolute px-3 py-4 flex flex-col items-center rounded-lg shadow-md border border-ghost z-30 bg-white -translate-x-[50%]`}
-        initial={{ height: 0 }}
-        animate={{
-          height: tooltip.open ? "8rem" : 0,
-          opacity: tooltip.open ? 1 : 0,
-        }}
-        transition={{ duration: 0.2 }}
-        style={{
-          left: tooltip.x,
-          top: tooltip.y,
-        }}
+
+      <PopoverMotion
+        open={tooltip.open}
+        x={tooltip.x}
+        y={tooltip.y}
+        onClose={resetTooltip}
       >
         <p className="mb-2 text-xl font-semibold">{tooltip.title}</p>
 
@@ -389,7 +384,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
             )}
           </motion.div>
         )}
-      </motion.div>
+      </PopoverMotion>
     </div>
   );
 };
