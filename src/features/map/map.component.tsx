@@ -127,26 +127,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     [selectedRegion]
   );
 
-  // function zoomedPath(svg: any, d: any) {
-  //   const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
-  //   const translate = [width / 2, height / 2];
-  //   const scale = Math.min(
-  //     8,
-  //     0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
-  //   );
-
-  //   svg
-  //     .transition()
-  //     .duration(950)
-  //     .call(
-  //       zoom.transform,
-  //       d3.zoomIdentity
-  //         .translate(translate[0], translate[1])
-  //         .scale(scale)
-  //         .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
-  //     );
-  // }
-
   const handleClickPath = useCallback((d: any) => {
     setSelectedRegion(d.properties);
 
@@ -308,18 +288,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       const d = pathGenerator(feature);
 
       return (
-        // <motion.path
-        //   key={feature.properties.id}
-        //   id={`region_${feature.properties.id}`}
-        //   d={d || ""}
-        //   fill={colors.slate[100]}
-        //   stroke={colors.blue[500]}
-        //   strokeWidth={0.5}
-        //   variants={pathVariants}
-        //   initial="initial"
-        //   animate="animate"
-        // />
-        // <g>
         <motion.path
           key={feature.properties.id}
           id={`region_${feature.properties.id}`}
