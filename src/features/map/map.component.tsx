@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import colors from "tailwindcss/colors";
 
 import * as d3 from "d3";
 
@@ -78,6 +85,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
   }, []);
 
   const resetTooltip = () => {
+    setListBook((prevState) => ({ ...prevState, onlyWithAudio: false }));
     setTooltip({
       open: false,
       y: 0,
@@ -114,24 +122,17 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       );
   }
 
-  const handleClickPath = (d: any) => {
+  const handleClickPath = useCallback((d: any) => {
     setSelectedRegion(d.properties);
+
     resetTooltip();
     const svg = d3.select(svgRef.current);
 
-    const defaultRegionClass = "region fill-stone-100";
-    const selectedRegionClass = "region fill-orange-500";
-
-    d3.selectAll("path.region").attr("class", defaultRegionClass);
-
-    const g = svg.select(`#region_${d.properties.id}`);
-
-    g.selectChildren("path").attr("class", selectedRegionClass);
-
-    g.selectChildren();
+    d3.selectAll("path.region").style("fill", colors.slate[100]);
+    d3.select(`#region_${d.properties.id}`).style("fill", colors.orange[500]);
 
     zoomedPath(svg, d);
-  };
+  }, []);
 
   const [tooltip, setTooltip] = useState<TooltipState>({
     open: false,
@@ -194,9 +195,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     hidden: {
       scale: 0,
       opacity: 0,
-      transition: {
-        duration: 0.3,
-      },
+      transition: { duration: 0.3 },
     },
     visible: (index) => ({
       scale: 1,
@@ -214,29 +213,40 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     },
   };
 
+  const calculateRadius = useCallback(
+    (feature: any) => {
+      if (!feature || !feature.geometry) return 0;
+
+      const path = d3.geoPath();
+      const area = path.area(feature);
+
+      return Math.sqrt(area / Math.PI);
+    },
+    [features]
+  );
+
   const renderRegionPoints = useMemo(() => {
     if (!selectedRegion || !features) return null;
 
     return (
       <AnimatePresence>
-        {selectedRegion.ethnicGroupsPoints.map((point: any, index: number) => {
-          console.log(point);
+        {selectedRegion.ethnicGroupsPoints.map((point: any) => {
           const [x, y] = projection([point.longitude, point.latitude]) || [
-            0, 0,
+            0,
+            0,
           ];
-
+          const r = calculateRadius(features[selectedRegion.id - 1]);
           return (
             <motion.circle
               key={point.idPoint}
               id={`circle-${point.idPoint}`}
               cx={x}
               cy={y}
-              r={5}
+              r={r}
               className={`cursor-pointer ethnic-group-point-region-${selectedRegion.id} z-50`}
               fill="#82A9FD"
               stroke="#FFFFFF"
               strokeWidth="0.5"
-              custom={index}
               variants={pointVariants}
               initial="hidden"
               animate="visible"
@@ -250,20 +260,60 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     );
   }, [selectedRegion, features, projection]);
 
+  // Варианты анимации для регионов
+  const regionVariants: Variants = {
+    hidden: (direction) => ({
+      fill: colors.slate[100],
+      opacity: 0,
+      x: direction === "left" ? -100 : direction === "right" ? 100 : 0,
+      y: direction === "top" ? -100 : direction === "bottom" ? 100 : 0,
+      scale: 0.5,
+    }),
+
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      outline: "none",
+      fill: colors.slate[100],
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 120,
+        damping: 20,
+        duration: 0.5,
+      },
+    },
+  };
+
   const renderedRegions = useMemo(() => {
     return features.map((feature: any) => {
       const d = pathGenerator(feature);
+
       return (
-        <g key={feature.properties.id} id={`region_${feature.properties.id}`}>
-          <path
-            className="region fill-stone-100"
-            stroke="#82A9FD"
-            strokeWidth="0.3"
-            onClick={() => handleClickPath(feature)}
-            d={d as any}
-            fill="#FFFFFF"
-          />
-        </g>
+        // <g>
+        <motion.path
+          key={feature.properties.id}
+          id={`region_${feature.properties.id}`}
+          className="region cursor-pointer"
+          stroke={colors.blue[500]}
+          strokeWidth={0.5}
+          onClick={() => handleClickPath(feature)}
+          d={d || ""}
+          fill={colors.slate[100]}
+          initial="hidden"
+          animate="visible"
+          variants={regionVariants}
+          style={{
+            cursor: "pointer",
+            outline: "none",
+            transition: "all 0.3s ease",
+          }}
+          whileTap={{
+            scale: 0.95,
+            transition: { duration: 0.1 },
+          }}
+        />
       );
     });
   }, [features, pathGenerator, projection]);
@@ -313,28 +363,31 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
 
   return (
     <div style={{ position: "relative" }}>
-      <svg
-        className={`w-full h-full`}
+      <motion.svg
+        className="cursor-grab w-screen h-screen"
         ref={svgRef}
-        viewBox={`0 0 ${width} ${height}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <g>
           {renderedRegions}
           {renderRegionPoints}
         </g>
-      </svg>
+      </motion.svg>
 
       <PopoverMotion
         open={tooltip.open}
         x={tooltip.x}
         y={tooltip.y}
         onClose={resetTooltip}
+        className="flex flex-col items-center justify-center"
       >
-        <p className="mb-2 text-xl font-semibold">{tooltip.title}</p>
+        <p className="text-xl font-semibold">{tooltip.title}</p>
 
         {listBook.load ? (
           <div className="flex justify-center w-full">
-            <Skeleton className="w-48 h-6 my-2 bg-baby-blue-800" />
+            <Skeleton className="w-48 h-6 my-2 bg-baby-blue-200" />
           </div>
         ) : (
           <motion.div
