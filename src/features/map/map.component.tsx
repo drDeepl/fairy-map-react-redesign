@@ -94,6 +94,8 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     });
   };
 
+  const [selectedRegion, setSelectedRegion] = useState<any>(null);
+
   const zoom = d3.zoom<SVGSVGElement, unknown>().on("zoom", (event) => {
     if (svgRef.current) {
       resetTooltip();
@@ -102,25 +104,48 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     }
   });
 
-  function zoomedPath(svg: any, d: any) {
-    const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
-    const translate = [width / 2, height / 2];
-    const scale = Math.min(
-      8,
-      0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
-    );
-
-    svg
-      .transition()
-      .duration(950)
-      .call(
-        zoom.transform,
-        d3.zoomIdentity
-          .translate(translate[0], translate[1])
-          .scale(scale)
-          .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+  const zoomedPath = useCallback(
+    (svg: any, d: any) => {
+      const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
+      const translate = [width / 2, height / 2];
+      const scale = Math.min(
+        8,
+        0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
       );
-  }
+
+      svg
+        .transition()
+        .duration(950)
+        .call(
+          zoom.transform,
+          d3.zoomIdentity
+            .translate(translate[0], translate[1])
+            .scale(scale)
+            .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+        );
+    },
+    [selectedRegion]
+  );
+
+  // function zoomedPath(svg: any, d: any) {
+  //   const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d);
+  //   const translate = [width / 2, height / 2];
+  //   const scale = Math.min(
+  //     8,
+  //     0.9 / Math.max((x1 - x0) / width, (y1 - y0) / height)
+  //   );
+
+  //   svg
+  //     .transition()
+  //     .duration(950)
+  //     .call(
+  //       zoom.transform,
+  //       d3.zoomIdentity
+  //         .translate(translate[0], translate[1])
+  //         .scale(scale)
+  //         .translate(-(x0 + x1) / 2, -(y0 + y1) / 2)
+  //     );
+  // }
 
   const handleClickPath = useCallback((d: any) => {
     setSelectedRegion(d.properties);
@@ -154,7 +179,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     ethnicGroupPoint: EthnicGroupPoint
   ) => {
     if (svgRef.current) {
-      console.log("handleClickCircle");
       d3.selectAll("circle").style("fill", "#82A9FD");
       const circle: SVGCircleElement = e.target as SVGCircleElement;
 
@@ -187,8 +211,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       }));
     }
   };
-
-  const [selectedRegion, setSelectedRegion] = useState<any>(null);
 
   // Варианты анимации для точек
   const pointVariants: Variants = {
@@ -262,26 +284,21 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
 
   // Варианты анимации для регионов
   const regionVariants: Variants = {
-    hidden: (direction) => ({
+    hidden: {
       fill: colors.slate[100],
       opacity: 0,
-      x: direction === "left" ? -100 : direction === "right" ? 100 : 0,
-      y: direction === "top" ? -100 : direction === "bottom" ? 100 : 0,
-      scale: 0.5,
-    }),
+      scale: 0,
+    },
 
     visible: {
       opacity: 1,
-      x: 0,
-      y: 0,
       outline: "none",
       fill: colors.slate[100],
       scale: 1,
       transition: {
-        type: "spring",
-        stiffness: 120,
-        damping: 20,
-        duration: 0.5,
+        type: "tween",
+        duration: 3,
+        ease: "easeInOut",
       },
     },
   };
@@ -291,6 +308,17 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       const d = pathGenerator(feature);
 
       return (
+        // <motion.path
+        //   key={feature.properties.id}
+        //   id={`region_${feature.properties.id}`}
+        //   d={d || ""}
+        //   fill={colors.slate[100]}
+        //   stroke={colors.blue[500]}
+        //   strokeWidth={0.5}
+        //   variants={pathVariants}
+        //   initial="initial"
+        //   animate="animate"
+        // />
         // <g>
         <motion.path
           key={feature.properties.id}
@@ -318,6 +346,8 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     });
   }, [features, pathGenerator, projection]);
 
+  const [transform, setTransform] = useState(d3.zoomIdentity);
+
   useEffect(() => {
     if (svgRef.current) {
       const circle = d3.selectAll(`circle`);
@@ -326,9 +356,28 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       const svg = d3
         .select<SVGSVGElement, unknown>(svgRef.current)
         .style("background-color", "#82A9FD");
-      svg.call(zoom);
+      // svg.call(zoom);
+
+      svg
+        .selectAll("path")
+        .data(features)
+        .join("path")
+        .attr("d", pathGenerator as any)
+        .attr("class", "region")
+        .on("click", (event, d) => {
+          const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d as any);
+          const newWidth = x1 - x0;
+          const newHeight = y1 - y0;
+
+          const zoomTransform = d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(Math.min(width / newWidth, height / newHeight) * 0.8)
+            .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
+
+          setTransform(zoomTransform);
+        });
     }
-  }, []);
+  }, [features, pathGenerator, width, height]);
 
   const handleOnSelectBook = async (
     book: Components.Schemas.StoryBookWithAudiosResponseDto
@@ -371,8 +420,10 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
         transition={{ duration: 0.5 }}
       >
         <g>
-          {renderedRegions}
-          {renderRegionPoints}
+          <AnimatePresence>
+            {renderedRegions}
+            {renderRegionPoints}
+          </AnimatePresence>
         </g>
       </motion.svg>
 
