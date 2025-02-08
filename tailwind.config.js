@@ -349,5 +349,9 @@ export default {
       },
     },
   },
+  future: {
+    removeDeprecatedGapUtilities: true,
+    purgeLayersByDefault: true,
+  },
   plugins: [tailwindAnimations],
 };

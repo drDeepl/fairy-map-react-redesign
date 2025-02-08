@@ -1,12 +1,17 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-import { TrackPreviousIcon, TrackNextIcon } from "@radix-ui/react-icons";
+import {
+  TrackPreviousIcon,
+  TrackNextIcon,
+  StarFilledIcon,
+} from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
 import AudioBookPlaylist from "@/features/book/components/audio-book-playlist.component";
-import StarRating from "@/components/star-rating-motion";
+import TooltipStarRating from "@/components/tooltip-star-rating-motion";
 import styled from "styled-components";
 import TapableButton from "@/components/tapable-button.component";
+import Stars from "@/components/stars.component";
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
   onClickRate?: (
@@ -53,9 +58,8 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   onClickRate,
   children,
 }) => {
-  const [selectedAudio, setSelectedAudio] = useState<
-    Components.Schemas.AudioStoryResponseDto
-  >(audioBooks[0]);
+  const [selectedAudio, setSelectedAudio] =
+    useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
 
   const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
@@ -117,20 +121,29 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
 
   return (
     <div className="w-full">
-      <div className="relative flex flex-col items-center space-y-2">
-        <div className="absolute -top-6 left-[45%] bg-slate-950 rounded-full shadow-md">
-          <StarRating
-            currentRating={selectedAudio.commonRating}
-            onClickStar={handleOnClickStar}
-          />
-        </div>
-        <span className="w-12 absolute top-1.5 left-[43.5%] text-orange-500 italic text-md font-bold rounded-full flex justify-center md:text-res-sm">
-          {Math.round((selectedAudio.commonRating + Number.EPSILON) * 10) / 10}
-        </span>
-      </div>
-      <div className="flex flex-col items-center px-2 py-4 space-x-2 space-y-2 border shadow-md rounded-xl bg-slate-200 border-slate-950">
+      <div className="flex flex-col items-center pb-4 space-x-2 space-y-2 border shadow-md rounded-b-xl rounded-tl-xl border-orange-950 bg-gray-50">
         <div className="flex flex-col w-full">
+          <div className="flex items-center justify-center px-4 mb-1 bg-orange-100 border  border-l-orange-500 border-b-orange-500 bg-opacity-95 w-fit place-self-end rounded-bl-2xl">
+            <TooltipStarRating
+              className="[&>*:not(:first-child)]:bg-slate-950"
+              currentRating={selectedAudio.commonRating}
+              onClickStar={handleOnClickStar}
+              size={8}
+            >
+              <div className="flex items-center justify-center">
+                <TapableButton className="flex items-center justify-center">
+                  <StarFilledIcon className="text-orange-500 size-8 self-center" />
+                </TapableButton>
+              </div>
+            </TooltipStarRating>
+
+            <span className="text-orange-500 italic text-md font-bold rounded-full md:text-res-sm">
+              {Math.round((selectedAudio.commonRating + Number.EPSILON) * 10) /
+                10}
+            </span>
+          </div>
           <AudioBookPlaylist
+            className="px-2"
             audios={audioBooks}
             currentAudio={selectedAudio}
             onClickAudioBook={handleOnClickAudioBook}
@@ -138,7 +151,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
           {children}
         </div>
 
-        <div className="flex items-center justify-center w-full justify-items-center">
+        <div className="flex items-center justify-center w-full justify-items-center px-2">
           <audio
             ref={audioRef}
             onTimeUpdate={handleTimeUpdate}

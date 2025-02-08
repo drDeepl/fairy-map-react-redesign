@@ -73,7 +73,7 @@ const Trigger: FC<DropdownProps> = ({ children, className = "" }) => {
   return (
     <button
       onClick={toggleDropdown}
-      className={`w-full text-left bg-gray-100 rounded-md 
+      className={`w-full text-left rounded-md 
         flex items-center justify-between 
         hover:bg-gray-200 transition-colors ${className}`}
     >

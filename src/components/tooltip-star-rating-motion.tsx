@@ -2,18 +2,20 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { StarIcon, StarFilledIcon, Cross1Icon } from "@radix-ui/react-icons";
 
-import TapableButton from "./tapable-button.component";
-
 interface StarRatingProps {
   className?: string;
+  size?: number;
   currentRating: number;
   onClickStar: (rating: number) => Promise<number>;
+  children?: React.ReactNode;
 }
 
-const StarRating: React.FC<StarRatingProps> = ({
+const TooltipStarRating: React.FC<StarRatingProps> = ({
   className,
   currentRating,
   onClickStar,
+  size = 8,
+  children,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [rating, setRating] = useState(currentRating - 1);
@@ -54,9 +56,9 @@ const StarRating: React.FC<StarRatingProps> = ({
           className="cursor-pointer"
         >
           {i <= (hoverRating || rating) ? (
-            <StarFilledIcon className="text-orange-500 size-8" />
+            <StarFilledIcon className={`text-orange-500 size-${size}`} />
           ) : (
-            <StarIcon className="text-gray-300 size-8" />
+            <StarIcon className={`text-gray-300 size-${size}`} />
           )}
         </motion.div>
       );
@@ -108,7 +110,7 @@ const StarRating: React.FC<StarRatingProps> = ({
 
   return (
     <div
-      className={`relative flex items-center space-x-2 ${className} bg-[inherit] rounded-full p-1`}
+      className={`relative flex items-center ${className} p-1`}
       onBlur={() => setIsExpanded(false)}
     >
       <AnimatePresence>
@@ -120,9 +122,7 @@ const StarRating: React.FC<StarRatingProps> = ({
           onClick={handleStarClick}
           className="flex flex-col items-center space-x-1 cursor-pointer"
         >
-          <TapableButton>
-            <StarFilledIcon className="text-orange-500 size-8" />
-          </TapableButton>
+          {children}
         </motion.div>
 
         {isExpanded && (
@@ -146,4 +146,4 @@ const StarRating: React.FC<StarRatingProps> = ({
   );
 };
 
-export default StarRating;
+export default TooltipStarRating;
