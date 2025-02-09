@@ -10,7 +10,7 @@ export default ({ mode }: any) => {
     server: {
       proxy: {
         "/api": {
-          target: "http://82.97.249.207:3000",
+          target: "https://api.vleep-deep.ru",
           changeOrigin: true,
           secure: false,
         },

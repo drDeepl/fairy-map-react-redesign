@@ -221,8 +221,9 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
 
       const path = d3.geoPath();
       const area = path.area(feature);
+      const r = Math.sqrt(area / Math.PI);
 
-      return Math.sqrt(area / Math.PI);
+      return r > 3 ? r : 3;
     },
     [features]
   );
@@ -234,8 +235,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       <AnimatePresence>
         {selectedRegion.ethnicGroupsPoints.map((point: any) => {
           const [x, y] = projection([point.longitude, point.latitude]) || [
-            0,
-            0,
+            0, 0,
           ];
           const r = calculateRadius(features[selectedRegion.id - 1]);
           return (
@@ -291,7 +291,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
         <motion.path
           key={feature.properties.id}
           id={`region_${feature.properties.id}`}
-          className="region cursor-pointer"
+          className="cursor-pointer region"
           stroke={colors.blue[500]}
           strokeWidth={0.5}
           onClick={() => handleClickPath(feature)}
@@ -314,8 +314,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
     });
   }, [features, pathGenerator, projection]);
 
-  const [transform, setTransform] = useState(d3.zoomIdentity);
-
   useEffect(() => {
     if (svgRef.current) {
       const circle = d3.selectAll(`circle`);
@@ -331,19 +329,9 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
         .data(features)
         .join("path")
         .attr("d", pathGenerator as any)
-        .attr("class", "region")
-        .on("click", (event, d) => {
-          const [[x0, y0], [x1, y1]] = pathGenerator.bounds(d as any);
-          const newWidth = x1 - x0;
-          const newHeight = y1 - y0;
+        .attr("class", "region");
 
-          const zoomTransform = d3.zoomIdentity
-            .translate(width / 2, height / 2)
-            .scale(Math.min(width / newWidth, height / newHeight) * 0.8)
-            .translate(-(x0 + x1) / 2, -(y0 + y1) / 2);
-
-          setTransform(zoomTransform);
-        });
+      svg.call(zoom);
     }
   }, [features, pathGenerator, width, height]);
 
@@ -381,7 +369,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
   return (
     <div style={{ position: "relative" }}>
       <motion.svg
-        className="cursor-grab w-screen h-screen"
+        className="w-screen h-screen cursor-grab"
         ref={svgRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
