@@ -1,67 +1,32 @@
-import React, { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
 
-import {
-  TrackPreviousIcon,
-  TrackNextIcon,
-  StarFilledIcon,
-} from "@radix-ui/react-icons";
+import { StarFilledIcon } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
 import AudioBookPlaylist from "@/features/book/components/audio-book-playlist.component";
 import TooltipStarRating from "@/components/tooltip-star-rating-motion";
-import styled from "styled-components";
+
 import TapableButton from "@/components/tapable-button.component";
-import Stars from "@/components/stars.component";
+import AudioPlayer from "@/components/audio-player.component";
+
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
+  onError: (msg: string) => void;
   onClickRate?: (
     rating: number,
     audio: Components.Schemas.AudioStoryResponseDto
   ) => Promise<number>;
+
   children?: React.ReactNode;
 }
-
-// Стилизованный компонент для контейнера иконки
-const IconContainer = styled(motion.div)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  width: 2.5rem;
-  height: 2.5rem;
-`;
-
-// Варианты анимации для иконки
-const iconVariants = {
-  play: {
-    rotate: 0,
-    scale: 1.2,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 15,
-    },
-  },
-  pause: {
-    rotate: 180,
-    scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 300,
-      damping: 15,
-    },
-  },
-};
 
 const AudioBook: React.FC<AudioPlayerProps> = ({
   audioBooks,
   onClickRate,
+  onError,
   children,
 }) => {
   const [selectedAudio, setSelectedAudio] =
     useState<Components.Schemas.AudioStoryResponseDto>(audioBooks[0]);
-
-  const audioRef = useRef(new Audio(selectedAudio.srcAudio));
 
   const handleOnClickStar = async (rating: number) => {
     if (onClickRate) {
@@ -78,52 +43,17 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
     }
   };
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const togglePlayPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleTimeUpdate = () => {
-    const currentProgress =
-      (audioRef.current.currentTime / audioRef.current.duration) * 100;
-    setProgress(currentProgress);
-  };
-
-  const handleRewind = () => {
-    audioRef.current.currentTime = Math.max(
-      0,
-      audioRef.current.currentTime - 10
-    );
-  };
-
-  const handleFastForward = () => {
-    audioRef.current.currentTime = Math.min(
-      audioRef.current.duration,
-      audioRef.current.currentTime + 10
-    );
-  };
-
   const handleOnClickAudioBook = (
     audio: Components.Schemas.AudioStoryResponseDto
   ) => {
-    setIsPlaying(false);
-    setProgress(0);
     setSelectedAudio(audio);
-    audioRef.current.src = audio.srcAudio;
   };
 
   return (
     <div className="w-full">
       <div className="flex flex-col items-center pb-4 space-x-2 space-y-2 border shadow-md rounded-b-xl rounded-tl-xl border-orange-950 bg-gray-50">
         <div className="flex flex-col w-full">
-          <div className="flex items-center justify-center px-4 mb-1 bg-orange-100 border  border-l-orange-500 border-b-orange-500 bg-opacity-95 w-fit place-self-end rounded-bl-2xl">
+          <div className="flex items-center justify-center px-4 mb-1 bg-orange-100 border border-l-orange-500 border-b-orange-500 bg-opacity-95 w-fit place-self-end rounded-bl-2xl">
             <TooltipStarRating
               className="[&>*:not(:first-child)]:bg-slate-950"
               currentRating={selectedAudio.commonRating}
@@ -132,12 +62,12 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
             >
               <div className="flex items-center justify-center">
                 <TapableButton className="flex items-center justify-center">
-                  <StarFilledIcon className="text-orange-500 size-8 self-center" />
+                  <StarFilledIcon className="self-center text-orange-500 size-8" />
                 </TapableButton>
               </div>
             </TooltipStarRating>
 
-            <span className="text-orange-500 italic text-md font-bold rounded-full md:text-res-sm">
+            <span className="italic font-bold text-orange-500 rounded-full text-md md:text-res-sm">
               {Math.round((selectedAudio.commonRating + Number.EPSILON) * 10) /
                 10}
             </span>
@@ -151,7 +81,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
           {children}
         </div>
 
-        <div className="flex items-center justify-center w-full justify-items-center px-2">
+        {/* <div className="flex items-center justify-center w-full px-2 justify-items-center">
           <audio
             ref={audioRef}
             onTimeUpdate={handleTimeUpdate}
@@ -218,7 +148,11 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
               <TrackNextIcon className="size-6" />
             </TapableButton>
           </div>
-        </div>
+        </div> */}
+        <AudioPlayer
+          src={selectedAudio.srcAudio}
+          onError={(e) => onError("ошибка при загрузке озвучки")}
+        />
       </div>
     </div>
   );

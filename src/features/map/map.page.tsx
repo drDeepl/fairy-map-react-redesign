@@ -407,6 +407,12 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                         <AudioBook
                           audioBooks={selectedBook.book.audios}
                           onClickRate={handleOnClickRate}
+                          onError={(msg) => {
+                            addNotification({
+                              type: "error",
+                              message: msg,
+                            });
+                          }}
                         />
                       ) : (
                         <p>аудиокниги не найдены</p>
@@ -602,6 +608,12 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                     <AudioBook
                       audioBooks={selectedBook.book.audios}
                       onClickRate={handleOnClickRate}
+                      onError={(msg) => {
+                        addNotification({
+                          type: "error",
+                          message: msg,
+                        });
+                      }}
                     />
                   ) : (
                     <p>аудиокниги не найдены</p>

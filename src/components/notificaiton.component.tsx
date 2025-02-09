@@ -92,9 +92,9 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         relative
       `}
     >
-      <div className="flex items-center justify-between w-full px-2 pt-4 mx-2 space-x-4">
+      <div className="flex items-center justify-between w-full px-2 py-4 mx-2 space-x-4">
         <span className="font-semibold text-md">{message}</span>
-        <div className="relative">
+        <div className="relative flex items-center justify-center">
           <motion.svg
             viewBox="0 0 200 200"
             className="transform -rotate-90 size-12"
@@ -139,7 +139,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           </Button>
         </div>
       </div>
-      <div onClick={onClose}>{action}</div>
+      {action && (
+        <div onClick={onClose} className="">
+          {action}
+        </div>
+      )}
     </motion.div>
   );
 };
