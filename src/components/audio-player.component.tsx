@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import { motion } from "framer-motion";
-import ProgressInputMotion from "./progress-motion.component";
+import { Slider } from "@/components/ui/slider";
 
 const iconVariants = {
   play: {
@@ -31,13 +31,13 @@ interface AudioPlayerProps {
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState<number[]>([0]);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
   const resetAudioPlayer = () => {
     setIsPlaying(false);
-    setProgress(0);
+    setProgress([0]);
     setDuration(0);
     setCurrentTime(0);
   };
@@ -56,12 +56,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
     setIsPlaying(!isPlaying);
   };
 
-  const handleProgressChange = (e: any) => {
+  const handleProgressChange = (value: number[]) => {
     const audio = audioRef.current;
-    const newProgress = Number(e.target.value);
+    console.log(value);
+    const newProgress = Number(value[0]);
 
     audio.currentTime = (newProgress / 100) * duration;
-    setProgress(newProgress);
+    setProgress(value);
   };
 
   const formatTime = (time: any) => {
@@ -75,7 +76,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
 
     const updateProgress = () => {
       const progressPercent = (audio.currentTime / audio.duration) * 100;
-      setProgress(progressPercent);
+      setProgress([progressPercent]);
       setCurrentTime(audio.currentTime);
     };
 
@@ -89,6 +90,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
       resetAudioPlayer();
     });
     audio.addEventListener("error", onError);
+    audio.addEventListener("ended", () => {
+      resetAudioPlayer();
+    });
 
     return () => {
       audio.removeEventListener("timeupdate", updateProgress);
@@ -98,24 +102,26 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full px-4">
-      <div className="flex flex-col items-center justify-center w-full">
-        <div className="flex justify-between w-full">
-          <span className="text-sm text-gray-600">
-            {formatTime(currentTime)}
-          </span>
+      <div className="flex items-center justify-center w-full gap-2">
+        <div className="flex flex-col justify-between w-full">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-600">
+              {formatTime(currentTime)}
+            </span>
 
-          <span className="text-sm text-gray-600 ">{formatTime(duration)}</span>
+            <span className="text-sm text-gray-600">
+              {formatTime(duration)}
+            </span>
+          </div>
+
+          <Slider
+            className="w-full [&>span:first-child>span]:bg-blue-500 cursor-pointer py-1"
+            min={0}
+            max={100}
+            value={progress}
+            onValueChange={handleProgressChange}
+          />
         </div>
-
-        <motion.input
-          type="range"
-          min="0"
-          max="100"
-          value={progress}
-          onChange={handleProgressChange}
-          className="w-full h-2 transition-colors duration-200 bg-gray-300 rounded-lg appearance-none cursor-pointer hover:bg-gray-400"
-        />
-
         <motion.div
           className="flex p-1 mt-3 border rounded-full cursor-pointer size-10 border-slate-700"
           onClick={togglePlayPause}

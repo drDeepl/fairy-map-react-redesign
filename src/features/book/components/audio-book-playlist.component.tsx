@@ -15,6 +15,7 @@ interface AudioBookPlaylistProps {
   audios: Components.Schemas.AudioStoryResponseDto[];
   onClickAudioBook: (audio: Components.Schemas.AudioStoryResponseDto) => void;
   className?: string;
+  size?: "default" | "compact";
 }
 
 export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
@@ -22,24 +23,33 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
   audios,
   onClickAudioBook,
   className,
+  size = "default",
 }) => {
   return (
     <div className={`flex flex-col w-full  text-slate-950 ${className}`}>
       <Dropdown className="w-full">
         <DropdownTrigger className="hover:bg-slate-200 px-2 [&>*:not(div)]:text-slate-700 p-2">
-          <div className="flex flex-col w-2/3">
-            <div className="flex space-x-1">
-              <small className="text-sm">озвучил:</small>
-              <small className="text-sm">{currentAudio.author.firstName}</small>
-              <small className="text-sm">{currentAudio.author.lastName}</small>
+          {size === "default" && (
+            <div className="flex flex-col w-2/3">
+              <div className="flex space-x-1">
+                <small className="text-sm">озвучил:</small>
+                <small className="text-sm">
+                  {currentAudio.author.firstName}
+                </small>
+                <small className="text-sm">
+                  {currentAudio.author.lastName}
+                </small>
+              </div>
+              <span className="m-0 text-lg font-semibold leading-[18px]">
+                {currentAudio.language.name} язык
+              </span>
             </div>
-            <span className="m-0 text-lg font-semibold leading-[18px]">
-              {currentAudio.language.name} язык
-            </span>
-          </div>
+          )}
           <LanguagesIcon className="-mr-14" />
         </DropdownTrigger>
-        <DropdownMenu>
+        <DropdownMenu
+          className={`${size === "compact" ? "w-64 right-0" : "w-full"}`}
+        >
           <ScrollArea className="h-56">
             {audios.map((audio: Components.Schemas.AudioStoryResponseDto) => (
               <DropdownItem
