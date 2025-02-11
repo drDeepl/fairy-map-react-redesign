@@ -14,6 +14,7 @@ interface DialogProps {
 const DialogSheet: React.FC<DialogProps> = ({
   onClose,
   children,
+
   className = "",
   contentClassName = "",
 }) => {
@@ -42,6 +43,7 @@ const DialogSheet: React.FC<DialogProps> = ({
       scale: 1,
       x: "-50%",
       y: "-50%",
+
       transition: {
         type: "spring",
         stiffness: 300,
@@ -61,14 +63,16 @@ const DialogSheet: React.FC<DialogProps> = ({
 
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 },
+    visible: {
+      opacity: 1,
+    },
     exit: { opacity: 0 },
   };
 
   const dialogNode = (
     <AnimatePresence>
       <motion.div
-        className={`fixed inset-0 bg-black/50 flex justify-center items-center z-[50] ${className}`}
+        className={`fixed inset-0 bg-black/50 flex justify-center items-center ${className}`}
         variants={backdropVariants}
         initial="hidden"
         animate="visible"

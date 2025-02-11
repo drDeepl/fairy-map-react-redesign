@@ -39,7 +39,12 @@ import NotifyContainer, {
 } from "../../components/notificaiton.component";
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
-import { Cross1Icon, PaperPlaneIcon, UpdateIcon } from "@radix-ui/react-icons";
+import {
+  CaretDownIcon,
+  Cross1Icon,
+  PaperPlaneIcon,
+  UpdateIcon,
+} from "@radix-ui/react-icons";
 
 import { ArrowLeftIcon, BookHeadphones } from "lucide-react";
 
@@ -51,12 +56,7 @@ import {
 } from "@/components/ui/tooltip";
 import TapableButton from "@/components/tapable-button.component";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionTrigger,
-} from "@/components/accordition-block.component";
-
+import ModalMotion from "@/components/modal.component";
 interface MapPageProps {
   width: number;
   height: number;
@@ -337,6 +337,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     }
   };
 
+  const [compactDialog, setCompactDialog] = useState<boolean>(false);
+
   interface DrawerState {
     authForm: boolean;
     selectedBook: boolean;
@@ -570,8 +572,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       </div>
     );
   }
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" ref={containerRef}>
       {authFormState.open && (
         <DialogSheet
           onClose={handleOnCloseAuthForm}
@@ -581,7 +584,14 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         </DialogSheet>
       )}
       {selectedBook.book && (
-        <DialogSheet>
+        <ModalMotion
+          isOpen={true}
+          className="relative"
+          modalPosition={compactDialog ? "bottom" : "center"}
+          allowOutsideInteraction={compactDialog}
+          disableOverlay={compactDialog}
+          container={containerRef.current}
+        >
           {notifications.length > 0 ? (
             <NotifyContainer
               className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
@@ -590,25 +600,33 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             />
           ) : null}
 
-          <Tabs
-            defaultValue={currentTab}
-            value={currentTab}
-            className="p-1 size-full"
-          >
+          <Tabs defaultValue={currentTab} value={currentTab} className="p-1">
             <TabsContent value={MapModalTabs.BookInfo.toString()}>
               <BookInfoCardComponent
                 load={selectedBook.load}
                 book={selectedBook.book}
                 onClickAddAudio={handleOnClickAddAudio}
                 headerChildren={
-                  <Button
-                    className="border-gray-500"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleOnCloseBook()}
-                  >
-                    <Cross1Icon className="text-gray-500 size-8" />
-                  </Button>
+                  <div className="flex items-center gap-2 [&_svg]:size-6">
+                    <Button
+                      className="border-gray-500"
+                      variant="outline"
+                      size="icon"
+                      onClick={() =>
+                        setCompactDialog((prevState) => !prevState)
+                      }
+                    >
+                      <CaretDownIcon className="" />
+                    </Button>
+                    <Button
+                      className="border-gray-500"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleOnCloseBook()}
+                    >
+                      <Cross1Icon className="text-gray-500 size-8" />
+                    </Button>
+                  </div>
                 }
               >
                 <div className="flex space-x-2">
@@ -698,7 +716,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               </CreateApplicationAudioForm>
             </TabsContent>
           </Tabs>
-        </DialogSheet>
+        </ModalMotion>
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">

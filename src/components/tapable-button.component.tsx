@@ -29,7 +29,7 @@ const TapableButton: React.FC<TapableButtonProps> = ({
     <motion.button
       type={type}
       disabled={disabled}
-      className={`${className} font-semibold`}
+      className={`${className} font-semibold text-slate-800 bg-slate-100 p-1 rounded-md w-24 h-9`}
       variants={buttonVariants}
       initial="initial"
       whileHover="hover"
