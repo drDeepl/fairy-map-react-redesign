@@ -1,13 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 
-import {
-  motion,
-  useScroll,
-  useMotionValueEvent,
-  useTransform,
-} from "framer-motion";
+import { motion } from "framer-motion";
 import styled from "styled-components";
-import ShinyButton from "./shiny-button.component";
+
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import TapableButton from "./tapable-button.component";
 
@@ -32,19 +27,23 @@ const NavContent = styled.div`
 `;
 
 interface ExpandableModalProps {
+  open?: boolean;
+  compact: boolean;
   className?: string;
   children: React.ReactNode;
+  onClose?: () => void;
 }
 
 const ExpandableModal: React.FC<ExpandableModalProps> = ({
+  compact,
+  onClose,
+  open = true,
   className = "",
   children,
 }) => {
-  const [isVisible, setIsVisible] = useState(true);
-
   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  const [compact, setCompact] = useState(false);
+  // const [compact, setCompact] = useState(false);
 
   // Анимация навигации
   const overlayVariants = {
@@ -53,7 +52,9 @@ const ExpandableModal: React.FC<ExpandableModalProps> = ({
       width: compact ? "32rem" : "100%",
       x: compact ? "-50%" : "0",
       left: compact ? "50%" : "0",
-      y: compact ? "100%" : "0",
+      y: compact
+        ? `${window.innerHeight - overlayRef.current?.clientHeight - 20}px`
+        : "0",
       opacity: 1,
       transition: {
         type: "tween",
@@ -62,8 +63,9 @@ const ExpandableModal: React.FC<ExpandableModalProps> = ({
       },
     },
     hidden: {
-      x: 0,
-      left: 0,
+      x: "0",
+      y: "0",
+      left: "0",
       opacity: 0,
       transition: {
         type: "tween",
@@ -76,21 +78,20 @@ const ExpandableModal: React.FC<ExpandableModalProps> = ({
     <NavContainer
       ref={overlayRef}
       variants={overlayVariants}
-      animate={isVisible ? "visible" : "hidden"}
+      animate={open ? "visible" : "hidden"}
       initial="visible"
       className="rounded-md"
     >
       <NavContent
         className={`w-full max-w-lg bg-slate-100 rounded-md ${className}`}
       >
-        <div className="flex justify-end">
-          <TapableButton
-            className="flex items-center justify-center border bg-slate-100 border-slate-500 size-9"
-            onClick={() => setCompact(!compact)}
-          >
-            <CaretDownIcon className="size-8" />
-          </TapableButton>
-        </div>
+        {onClose && (
+          <div className="flex justify-end">
+            <TapableButton className="flex items-center justify-center border rounded-md bg-slate-100 border-slate-500 size-9">
+              <CaretDownIcon className="size-8" />
+            </TapableButton>
+          </div>
+        )}
         <div className="relative">{children}</div>
       </NavContent>
     </NavContainer>

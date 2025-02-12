@@ -110,7 +110,7 @@ const TooltipStarRating: React.FC<StarRatingProps> = ({
 
   return (
     <div
-      className={`relative flex items-center ${className} p-1`}
+      className={`relative flex items-center ${className}`}
       onBlur={() => setIsExpanded(false)}
     >
       <AnimatePresence>

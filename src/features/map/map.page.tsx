@@ -56,9 +56,6 @@ import {
 } from "@/components/ui/tooltip";
 import TapableButton from "@/components/tapable-button.component";
 
-import ModalMotion from "@/components/modal.component";
-
-import ShinyButton from "@/components/shiny-button.component";
 import ExpandableModal from "@/components/expandable-modal.component";
 
 interface MapPageProps {
@@ -580,7 +577,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       )}
 
       {selectedBook.book && (
-        <ExpandableModal>
+        <ExpandableModal compact={compactDialog}>
           {notifications.length > 0 ? (
             <NotifyContainer
               className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
@@ -588,128 +585,156 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               onRemove={removeNotification}
             />
           ) : null}
-
-          <Tabs defaultValue={currentTab} value={currentTab} className="p-1">
-            <TabsContent value={MapModalTabs.BookInfo.toString()}>
-              <BookInfoCardComponent
-                load={selectedBook.load}
-                book={selectedBook.book}
-                onClickAddAudio={handleOnClickAddAudio}
-                headerChildren={
-                  <div className="flex items-center gap-2 [&_svg]:size-6">
-                    <Button
-                      className="border-gray-500"
-                      variant="outline"
-                      size="icon"
-                      onClick={() =>
-                        setCompactDialog((prevState) => !prevState)
-                      }
-                    >
-                      <CaretDownIcon className="" />
-                    </Button>
-                    <Button
-                      className="border-gray-500"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleOnCloseBook()}
-                    >
-                      <Cross1Icon className="text-gray-500 size-8" />
-                    </Button>
+          {compactDialog ? (
+            <div className="flex flex-col bg-transparent">
+              <TapableButton
+                variant="outline"
+                className="flex items-center justify-center size-8 [&_svg]:size-8 place-self-end"
+                onClick={() => setCompactDialog((prevState) => !prevState)}
+              >
+                <CaretDownIcon
+                  className={`${
+                    compactDialog ? "animate-rotate-180" : "animate-rotate-270"
+                  }`}
+                />
+              </TapableButton>
+              <AudioBook
+                compactMode={compactDialog}
+                audioBooks={selectedBook.book.audios}
+                onClickRate={handleOnClickRate}
+                onError={(msg) => {
+                  addNotification({
+                    type: "error",
+                    message: msg,
+                  });
+                }}
+              />
+            </div>
+          ) : (
+            <Tabs defaultValue={currentTab} value={currentTab} className="p-1">
+              <TabsContent value={MapModalTabs.BookInfo.toString()}>
+                <BookInfoCardComponent
+                  load={selectedBook.load}
+                  book={selectedBook.book}
+                  onClickAddAudio={handleOnClickAddAudio}
+                  headerChildren={
+                    <div className="flex items-center gap-2 [&>button>svg]:size-5">
+                      <TapableButton
+                        variant="outline"
+                        onClick={() =>
+                          setCompactDialog((prevState) => !prevState)
+                        }
+                      >
+                        <CaretDownIcon
+                          className={`${
+                            compactDialog
+                              ? "animate-rotate-180"
+                              : "animate-rotate-270"
+                          }`}
+                        />
+                      </TapableButton>
+                      <TapableButton
+                        variant="outline"
+                        onClick={() => handleOnCloseBook()}
+                      >
+                        <Cross1Icon className="" />
+                      </TapableButton>
+                    </div>
+                  }
+                >
+                  <div className="flex space-x-2">
+                    {selectedBook.book.audios.length > 0 ? (
+                      <AudioBook
+                        compactMode={compactDialog}
+                        audioBooks={selectedBook.book.audios}
+                        onClickRate={handleOnClickRate}
+                        onError={(msg) => {
+                          addNotification({
+                            type: "error",
+                            message: msg,
+                          });
+                        }}
+                      />
+                    ) : (
+                      <p>аудиокниги не найдены</p>
+                    )}
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger className="w-fit h-fit">
+                          <TapableButton
+                            className="border rounded-md shadow-md text-slate-950 border-slate-950 size-10 [&_svg]:size-8 flex items-center justify-center"
+                            onClick={() => {
+                              if (!authState.user) {
+                                addNotification({
+                                  type: "error",
+                                  message:
+                                    "для добавления озвучки необходимо авторизоваться",
+                                  action: (
+                                    <Button
+                                      className="m-2"
+                                      onClick={() => handleOnClickAvatar()}
+                                    >
+                                      войти
+                                    </Button>
+                                  ),
+                                });
+                              } else {
+                                setCurrentTab(
+                                  MapModalTabs.AddApplicationAudio.toString()
+                                );
+                              }
+                            }}
+                          >
+                            <BookHeadphones className="" strokeWidth={1.2} />
+                          </TapableButton>
+                        </TooltipTrigger>
+                        <TooltipContent>предложить свою озвучку</TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
-                }
+                </BookInfoCardComponent>
+              </TabsContent>
+              <TabsContent
+                value={MapModalTabs.AddApplicationAudio.toString()}
+                className="p-0 m-0"
               >
-                <div className="flex space-x-2">
-                  {selectedBook.book.audios.length > 0 ? (
-                    <AudioBook
-                      audioBooks={selectedBook.book.audios}
-                      onClickRate={handleOnClickRate}
-                      onError={(msg) => {
-                        addNotification({
-                          type: "error",
-                          message: msg,
-                        });
-                      }}
-                    />
-                  ) : (
-                    <p>аудиокниги не найдены</p>
-                  )}
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger className="w-fit h-fit">
-                        <TapableButton
-                          className="border rounded-md shadow-md text-slate-950 border-slate-950 size-10 [&_svg]:size-8 flex items-center justify-center"
-                          onClick={() => {
-                            if (!authState.user) {
-                              addNotification({
-                                type: "error",
-                                message:
-                                  "для добавления озвучки необходимо авторизоваться",
-                                action: (
-                                  <Button
-                                    className="m-2"
-                                    onClick={() => handleOnClickAvatar()}
-                                  >
-                                    войти
-                                  </Button>
-                                ),
-                              });
-                            } else {
-                              setCurrentTab(
-                                MapModalTabs.AddApplicationAudio.toString()
-                              );
-                            }
-                          }}
-                        >
-                          <BookHeadphones className="" strokeWidth={1.2} />
-                        </TapableButton>
-                      </TooltipTrigger>
-                      <TooltipContent>предложить свою озвучку</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </BookInfoCardComponent>
-            </TabsContent>
-            <TabsContent
-              value={MapModalTabs.AddApplicationAudio.toString()}
-              className="p-0 m-0"
-            >
-              <CreateApplicationAudioForm
-                storyId={selectedBook.book.id}
-                languages={languageListState.languages}
-                onSubmit={handleOnSubmitCreateApplicationAudio}
-              >
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="border border-ghost"
-                  onClick={() => {
-                    setCurrentTab(MapModalTabs.BookInfo.toString());
-                  }}
+                <CreateApplicationAudioForm
+                  storyId={selectedBook.book.id}
+                  languages={languageListState.languages}
+                  onSubmit={handleOnSubmitCreateApplicationAudio}
                 >
-                  <ArrowLeftIcon />
-                  <span>назад</span>
-                </Button>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="border border-ghost"
+                    onClick={() => {
+                      setCurrentTab(MapModalTabs.BookInfo.toString());
+                    }}
+                  >
+                    <ArrowLeftIcon />
+                    <span>назад</span>
+                  </Button>
 
-                <Button
-                  type="submit"
-                  className="w-32 [&_svg]:size-5"
-                  disabled={applicationAudioState.load}
-                >
-                  <span>отправить</span>
-                  {applicationAudioState.load ? (
-                    <UpdateIcon className="size-6 animate-spin" />
-                  ) : (
-                    <PaperPlaneIcon className="-rotate-45" />
-                  )}
-                </Button>
-              </CreateApplicationAudioForm>
-            </TabsContent>
-          </Tabs>
+                  <Button
+                    type="submit"
+                    className="w-32 [&_svg]:size-5"
+                    disabled={applicationAudioState.load}
+                  >
+                    <span>отправить</span>
+                    {applicationAudioState.load ? (
+                      <UpdateIcon className="size-6 animate-spin" />
+                    ) : (
+                      <PaperPlaneIcon className="-rotate-45" />
+                    )}
+                  </Button>
+                </CreateApplicationAudioForm>
+              </TabsContent>
+            </Tabs>
+          )}
         </ExpandableModal>
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">
-        <ShinyButton>start</ShinyButton>
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
 
         <Button

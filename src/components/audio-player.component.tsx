@@ -27,9 +27,14 @@ const iconVariants = {
 interface AudioPlayerProps {
   src: string;
   onError: (e: Event) => void;
+  className?: string;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  src,
+  onError,
+  className = "",
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState<number[]>([0]);
   const [duration, setDuration] = useState(0);
@@ -101,7 +106,9 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full px-4">
+    <div
+      className={`flex flex-col items-center justify-center w-full ${className}`}
+    >
       <div className="flex items-center justify-center w-full gap-2">
         <div className="flex flex-col justify-between w-full">
           <div className="flex items-center justify-between">
@@ -123,7 +130,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ src, onError }) => {
           />
         </div>
         <motion.div
-          className="flex p-1 mt-3 border rounded-full cursor-pointer size-10 border-slate-700"
+          className="flex p-1 my-2 border rounded-full cursor-pointer size-10 border-slate-700"
           onClick={togglePlayPause}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
