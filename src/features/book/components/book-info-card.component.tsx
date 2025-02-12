@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 
 import NotCoverBook from "@/components/not-cover-book.component";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { CaretUpIcon, EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,6 @@ interface TextAction {
 
 interface InfoBookState {
   loadCover: boolean;
-  book: Components.Schemas.StoryBookResponseDto;
 }
 
 const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
@@ -64,7 +63,6 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
 
   const [infoBookState, setInfoBookState] = useState<InfoBookState>({
     loadCover: true,
-    book: book,
   });
 
   const handleShowText = (showText: boolean) => {
@@ -206,10 +204,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                   htmlFor="picture"
                   className={`${onUploadCover ? "cursor-pointer" : ""}`}
                 >
-                  {infoBookState.book.srcImg ? (
+                  {book.srcImg ? (
                     <img
-                      src={infoBookState.book.srcImg}
-                      alt={infoBookState.book.name}
+                      src={book.srcImg}
+                      alt={book.name}
                       className="object-cover rounded-t-xl w-44 h-60"
                     />
                   ) : (
@@ -235,7 +233,7 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
               <CardTitle className="flex flex-col justify-between pb-2 m-0 mb-6 space-x-2 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="first-letter:uppercase text-res-base md:text-res-sm">
-                    {infoBookState.book.name}
+                    {book.name}
                   </span>
                   {headerChildren}
                 </div>
@@ -287,29 +285,31 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
         <Separator />
       </CardHeader>
 
-      <motion.div
-        className="italic text-justify text-slate-800"
-        initial="closed"
-        animate={textAction.show ? "open" : "closed"}
-        variants={{
-          open: {
-            opacity: 1,
-            height: textAction.fullScreen ? "70svh" : "30svh",
-          },
-          closed: { opacity: 0, height: 0 },
-        }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-      >
-        <ScrollArea
-          className={`${
-            textAction.fullScreen ? "h-[70svh]" : "h-[30svh]"
-          } px-4 pb-6`}
+      {textAction.show && (
+        <motion.div
+          className="italic text-justify text-slate-800"
+          initial="closed"
+          animate={textAction.show ? "open" : "closed"}
+          variants={{
+            open: {
+              opacity: 1,
+              height: textAction.fullScreen ? "70svh" : "30svh",
+            },
+            closed: { opacity: 0, height: 0 },
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
-          {book.text}
-        </ScrollArea>
-      </motion.div>
+          <ScrollArea
+            className={`${
+              textAction.fullScreen ? "h-[70svh]" : "h-[30svh]"
+            } px-4 pb-6`}
+          >
+            {book.text}
+          </ScrollArea>
+        </motion.div>
+      )}
     </Card>
   );
 };
 
-export default BookInfoCardComponent;
+export default React.memo(BookInfoCardComponent);

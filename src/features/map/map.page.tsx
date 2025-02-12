@@ -57,6 +57,10 @@ import {
 import TapableButton from "@/components/tapable-button.component";
 
 import ModalMotion from "@/components/modal.component";
+
+import ShinyButton from "@/components/shiny-button.component";
+import ExpandableModal from "@/components/expandable-modal.component";
+
 interface MapPageProps {
   width: number;
   height: number;
@@ -547,15 +551,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           </Button>
         </div>
 
-        {/* <BottomNavigation initialTab="home">
-          <NavItem
-            id="search"
-            icon={SearchIcon}
-            label="Search"
-            onClick={() => {}}
-          />
-        </BottomNavigation> */}
-
         {mapState.dataMap && (
           <Map
             features={mapState.dataMap.features}
@@ -583,15 +578,9 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           <AuthForm onClose={handleOnCloseAuthForm} />
         </DialogSheet>
       )}
+
       {selectedBook.book && (
-        <ModalMotion
-          isOpen={true}
-          className="relative"
-          modalPosition={compactDialog ? "bottom" : "center"}
-          allowOutsideInteraction={compactDialog}
-          disableOverlay={compactDialog}
-          container={containerRef.current}
-        >
+        <ExpandableModal>
           {notifications.length > 0 ? (
             <NotifyContainer
               className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
@@ -716,10 +705,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               </CreateApplicationAudioForm>
             </TabsContent>
           </Tabs>
-        </ModalMotion>
+        </ExpandableModal>
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">
+        <ShinyButton>start</ShinyButton>
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
 
         <Button

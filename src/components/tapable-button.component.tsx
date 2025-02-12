@@ -16,11 +16,11 @@ const TapableButton: React.FC<TapableButtonProps> = ({
   disabled = false,
 }) => {
   const buttonVariants: Variants = {
-    initial: { scale: 1 },
+    initial: { scale: 0.9 },
 
-    hover: { scale: 1.1 },
+    hover: { scale: 1, backgroundColor: "#0000330F" },
     tap: {
-      scale: 0.95,
+      scale: 1.1,
       transition: { duration: 0.1 },
     },
   };
@@ -29,7 +29,7 @@ const TapableButton: React.FC<TapableButtonProps> = ({
     <motion.button
       type={type}
       disabled={disabled}
-      className={`${className} font-semibold text-slate-800 bg-slate-100 p-1 rounded-md w-24 h-9`}
+      className={`${className} font-semibold text-slate-800 bg-slate-100 p-1 rounded-md`}
       variants={buttonVariants}
       initial="initial"
       whileHover="hover"
