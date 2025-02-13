@@ -55,8 +55,6 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import TapableButton from "@/components/tapable-button.component";
-
-import ExpandableModal from "@/components/expandable-modal.component";
 import ModalMotion from "@/components/modal.component";
 import { Separator } from "@/components/ui/separator";
 
@@ -593,8 +591,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             />
           ) : null}
           {compactDialog ? (
-            <div className="flex flex-col border rounded-md w-96 outline outline-1">
-              <div className="flex justify-between pl-2 bg-slate-100">
+            <div className="flex flex-col w-96">
+              <div className="flex justify-between pl-2 border rounded-t-lg bg-slate-100 border-slate-950 border-b-transparent">
                 <span className="font-semibold text-res-base first-letter:uppercase">
                   {selectedBook.book.name}
                 </span>
@@ -612,9 +610,8 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
                   />
                 </TapableButton>
               </div>
-              <Separator />
               <AudioBook
-                className="border-none rounded-b-none rounded-tl-none"
+                className="rounded-ss-none border-t-slate-200"
                 compactMode={compactDialog}
                 audioBooks={selectedBook.book.audios}
                 onClickRate={handleOnClickRate}
