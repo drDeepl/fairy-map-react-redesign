@@ -17,6 +17,7 @@ interface AudioPlayerProps {
   ) => Promise<number>;
   compactMode?: boolean;
   children?: React.ReactNode;
+  className?: string;
 }
 
 const AudioBook: React.FC<AudioPlayerProps> = ({
@@ -25,6 +26,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   onError,
   compactMode = false,
   children,
+  className = "",
 }) => {
   const [selectedAudio, setSelectedAudio] = useState<
     Components.Schemas.AudioStoryResponseDto
@@ -53,7 +55,9 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
 
   if (compactMode) {
     return (
-      <div className="flex flex-col items-center justify-around w-full space-y-2 border shadow-md rounded-b-xl rounded-tl-xl border-orange-950 bg-gray-50">
+      <div
+        className={`flex flex-col items-center justify-around w-full max-w-xl space-y-2 border shadow-md rounded-b-xl rounded-tl-xl border-orange-950 bg-gray-50 ${className}`}
+      >
         <AudioBookPlaylist
           className="px-2"
           audios={audioBooks}

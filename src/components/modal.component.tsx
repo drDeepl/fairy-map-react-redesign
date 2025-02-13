@@ -109,10 +109,9 @@ const ModalMotion: React.FC<ModalProps> = ({
             <div
               className={`
                 relative 
-                bg-white 
                 rounded-xl 
-                shadow-2xl 
                 max-w-xl                
+                pointer-events-auto
                 ${className}
               `}
               onClick={(e) => e.stopPropagation()}

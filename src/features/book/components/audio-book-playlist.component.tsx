@@ -31,7 +31,10 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
         <DropdownTrigger className="hover:bg-slate-200 px-2 [&>*:not(div)]:text-slate-700 p-2">
           {size === "default" && (
             <div className="flex flex-col w-2/3">
-              <div className="flex space-x-1">
+              <span className="m-0 text-lg font-semibold leading-[18px]">
+                {currentAudio.language.name} язык
+              </span>
+              <div className="flex space-x-1 text-slate-600">
                 <small className="text-sm">озвучил:</small>
                 <small className="text-sm">
                   {currentAudio.author.firstName}
@@ -40,9 +43,6 @@ export const AudioBookPlaylist: React.FC<AudioBookPlaylistProps> = ({
                   {currentAudio.author.lastName}
                 </small>
               </div>
-              <span className="m-0 text-lg font-semibold leading-[18px]">
-                {currentAudio.language.name} язык
-              </span>
             </div>
           )}
           <LanguagesIcon className="-mr-14" />

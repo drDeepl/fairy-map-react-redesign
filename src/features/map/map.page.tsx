@@ -57,6 +57,8 @@ import {
 import TapableButton from "@/components/tapable-button.component";
 
 import ExpandableModal from "@/components/expandable-modal.component";
+import ModalMotion from "@/components/modal.component";
+import { Separator } from "@/components/ui/separator";
 
 interface MapPageProps {
   width: number;
@@ -577,28 +579,42 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       )}
 
       {selectedBook.book && (
-        <ExpandableModal compact={compactDialog}>
+        <ModalMotion
+          isOpen={selectedBook.book ? true : false}
+          allowOutsideInteraction={compactDialog}
+          disableOverlay={compactDialog}
+          modalPosition={compactDialog ? "bottom" : "center"}
+        >
           {notifications.length > 0 ? (
             <NotifyContainer
-              className="absolute max-w-xs right-20 top-[80%] md:top-1 md:right-[20%]"
+              className="absolute w-80 left-1/2 -translate-x-1/2 top-[80%] md:top-1 md:left-1/2"
               notifications={notifications}
               onRemove={removeNotification}
             />
           ) : null}
           {compactDialog ? (
-            <div className="flex flex-col bg-transparent">
-              <TapableButton
-                variant="outline"
-                className="flex items-center justify-center size-8 [&_svg]:size-8 place-self-end"
-                onClick={() => setCompactDialog((prevState) => !prevState)}
-              >
-                <CaretDownIcon
-                  className={`${
-                    compactDialog ? "animate-rotate-180" : "animate-rotate-270"
-                  }`}
-                />
-              </TapableButton>
+            <div className="flex flex-col border rounded-md w-96 outline outline-1">
+              <div className="flex justify-between pl-2 bg-slate-100">
+                <span className="font-semibold text-res-base first-letter:uppercase">
+                  {selectedBook.book.name}
+                </span>
+                <TapableButton
+                  variant="outline"
+                  className="flex items-center justify-center size-8 [&_svg]:size-8 place-self-end bg-slate-100 self-start"
+                  onClick={() => setCompactDialog((prevState) => !prevState)}
+                >
+                  <CaretDownIcon
+                    className={`${
+                      compactDialog
+                        ? "animate-rotate-180"
+                        : "animate-rotate-270"
+                    }`}
+                  />
+                </TapableButton>
+              </div>
+              <Separator />
               <AudioBook
+                className="border-none rounded-b-none rounded-tl-none"
                 compactMode={compactDialog}
                 audioBooks={selectedBook.book.audios}
                 onClickRate={handleOnClickRate}
@@ -612,7 +628,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             </div>
           ) : (
             <Tabs defaultValue={currentTab} value={currentTab} className="p-1">
-              <TabsContent value={MapModalTabs.BookInfo.toString()}>
+              <TabsContent
+                value={MapModalTabs.BookInfo.toString()}
+                className=""
+              >
                 <BookInfoCardComponent
                   load={selectedBook.load}
                   book={selectedBook.book}
@@ -731,7 +750,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               </TabsContent>
             </Tabs>
           )}
-        </ExpandableModal>
+        </ModalMotion>
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">
