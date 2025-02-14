@@ -12,7 +12,7 @@ import { AppDispatch } from "./app/store.ts";
 import { useEffect, useState } from "react";
 import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { setUser } from "./features/auth/auth.slice.ts";
-
+import AudioProvider from "./features/audio-book/components/audio.provider.tsx";
 export interface LocationParams {
   pathname: string;
   state: null;
@@ -64,7 +64,9 @@ function App() {
         <Route
           path={RouteApp.MapPage}
           element={
-            <MapPage width={screenSize.width} height={screenSize.height} />
+            <AudioProvider>
+              <MapPage width={screenSize.width} height={screenSize.height} />
+            </AudioProvider>
           }
         />
         <Route path={RouteApp.AdminPage} element={<AdminPage />} />

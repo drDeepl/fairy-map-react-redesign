@@ -57,6 +57,7 @@ import {
 import TapableButton from "@/components/tapable-button.component";
 import ModalMotion from "@/components/modal.component";
 import { Separator } from "@/components/ui/separator";
+import { GlobalAudioPlayer } from "../audio-book/components/global-audio-player.component";
 
 interface MapPageProps {
   width: number;
@@ -567,6 +568,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   return (
     <div className="flex flex-col" ref={containerRef}>
+      <GlobalAudioPlayer />
       {authFormState.open && (
         <DialogSheet
           onClose={handleOnCloseAuthForm}
@@ -624,7 +626,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
               />
             </div>
           ) : (
-            <Tabs defaultValue={currentTab} value={currentTab} className="p-1">
+            <Tabs
+              defaultValue={currentTab}
+              value={currentTab}
+              className="p-1 w-[36rem]"
+            >
               <TabsContent
                 value={MapModalTabs.BookInfo.toString()}
                 className=""

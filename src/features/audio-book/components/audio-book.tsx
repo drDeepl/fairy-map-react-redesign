@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
@@ -7,6 +7,10 @@ import TooltipStarRating from "@/components/tooltip-star-rating-motion";
 
 import TapableButton from "@/components/tapable-button.component";
 import AudioPlayer from "@/components/audio-player.component";
+import { useDispatch, useSelector } from "react-redux";
+import { loadAudioBook } from "../audio-book-player.slice";
+import { RootState } from "@/app/store";
+import { useAudioContext } from "./audio.provider";
 
 interface AudioPlayerProps {
   audioBooks: Components.Schemas.AudioStoryResponseDto[];
@@ -28,9 +32,25 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   children,
   className = "",
 }) => {
+  const dispatch = useDispatch();
+  const currentAudioBook = useSelector(
+    (state: RootState) => state.audioBookPlayer.currentAudioBook
+  );
+
+  const audioContext = useAudioContext();
+
   const [selectedAudio, setSelectedAudio] = useState<
     Components.Schemas.AudioStoryResponseDto
-  >(audioBooks[0]);
+  >(currentAudioBook || audioBooks[0]);
+
+  useEffect(() => {
+    if (currentAudioBook) {
+      setSelectedAudio(currentAudioBook);
+      audioContext?.playTrack(currentAudioBook.srcAudio);
+    } else {
+      setSelectedAudio(audioBooks[0]);
+    }
+  }, []);
 
   const handleOnClickStar = async (rating: number) => {
     if (onClickRate) {
@@ -50,7 +70,10 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
   const handleOnClickAudioBook = (
     audio: Components.Schemas.AudioStoryResponseDto
   ) => {
-    setSelectedAudio(audio);
+    console.log(audio);
+    dispatch(loadAudioBook(audio));
+    audioContext?.playTrack(audio.srcAudio);
+    // setSelectedAudio(audio);
   };
 
   if (compactMode) {
@@ -124,6 +147,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
 
         <AudioPlayer
           src={selectedAudio.srcAudio}
+          audioContext={audioContext}
           onError={(e) => onError("ошибка при загрузке озвучки")}
         />
       </div>

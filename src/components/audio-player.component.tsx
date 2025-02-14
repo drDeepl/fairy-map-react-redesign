@@ -2,6 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
+import { useDispatch } from "react-redux";
+import {
+  useAudioContext,
+  AudioContextType,
+} from "@/features/audio-book/components/audio.provider";
 
 const iconVariants = {
   play: {
@@ -28,37 +33,70 @@ interface AudioPlayerProps {
   src: string;
   onError: (e: Event) => void;
   className?: string;
+  audioContext?: AudioContextType;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
   src,
+  audioContext,
   onError,
   className = "",
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState<number[]>([0]);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  // const [isPlaying, setIsPlaying] = useState(false);
+  const dispatch = useDispatch();
+  // const [progress, setProgress] = useState<number[]>([0]);
+  // const [duration, setDuration] = useState(0);
+  // const [currentTime, setCurrentTime] = useState(0);
+  // const [isPlaying, setIsPlaying] = useState(false);
+
+  if (!audioContext) return null;
+
+  const {
+    playTrack,
+    pauseTrack,
+    currentActiveAudioPlayers,
+    useAudioPlayer,
+  } = audioContext;
+
+  const { isPlaying, play, pause, duration, currentTime, progress } =
+    currentActiveAudioPlayers().length > 1
+      ? currentActiveAudioPlayers()[0]
+      : useAudioPlayer(src);
+
+  useEffect(() => {
+    const audioPlayers = currentActiveAudioPlayers();
+    if (audioPlayers.length == 0) {
+      playTrack(src);
+    }
+    console.log(audioPlayers);
+  }, []);
 
   const resetAudioPlayer = () => {
-    setIsPlaying(false);
-    setProgress([0]);
-    setDuration(0);
-    setCurrentTime(0);
+    // setIsPlaying(false);
+    pauseTrack();
+    // setProgress([0]);
+    // setDuration(0);
+    // setCurrentTime(0);
   };
 
   const audioRef = useRef(new Audio(src));
 
   const togglePlayPause = () => {
-    const audio = audioRef.current;
+    // const audio = audioRef.current;
 
     if (isPlaying) {
-      audio.pause();
+      pause();
     } else {
-      audio.play();
+      play();
     }
 
-    setIsPlaying(!isPlaying);
+    // if (isPlaying) {
+    //   audio.pause();
+    // } else {
+    //   audio.play();
+    // }
+
+    // setIsPlaying(!isPlaying);
   };
 
   const handleProgressChange = (value: number[]) => {
@@ -67,7 +105,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     const newProgress = Number(value[0]);
 
     audio.currentTime = (newProgress / 100) * duration;
-    setProgress(value);
+    // setProgress(value);
   };
 
   const formatTime = (time: any) => {
@@ -76,34 +114,34 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  useEffect(() => {
-    const audio = audioRef.current;
+  // useEffect(() => {
+  //   const audio = audioRef.current;
 
-    const updateProgress = () => {
-      const progressPercent = (audio.currentTime / audio.duration) * 100;
-      setProgress([progressPercent]);
-      setCurrentTime(audio.currentTime);
-    };
+  //   const updateProgress = () => {
+  //     const progressPercent = (audio.currentTime / audio.duration) * 100;
+  //     setProgress([progressPercent]);
+  //     setCurrentTime(audio.currentTime);
+  //   };
 
-    const setAudioData = () => {
-      setDuration(audio.duration);
-    };
+  //   const setAudioData = () => {
+  //     setDuration(audio.duration);
+  //   };
 
-    audio.addEventListener("timeupdate", updateProgress);
-    audio.addEventListener("loadedmetadata", setAudioData);
-    audio.addEventListener("loadstart", (e) => {
-      resetAudioPlayer();
-    });
-    audio.addEventListener("error", onError);
-    audio.addEventListener("ended", () => {
-      resetAudioPlayer();
-    });
+  //   audio.addEventListener("timeupdate", updateProgress);
+  //   audio.addEventListener("loadedmetadata", setAudioData);
+  //   audio.addEventListener("loadstart", (e) => {
+  //     resetAudioPlayer();
+  //   });
+  //   audio.addEventListener("error", onError);
+  //   audio.addEventListener("ended", () => {
+  //     resetAudioPlayer();
+  //   });
 
-    return () => {
-      audio.removeEventListener("timeupdate", updateProgress);
-      audio.removeEventListener("loadedmetadata", setAudioData);
-    };
-  }, []);
+  //   return () => {
+  //     audio.removeEventListener("timeupdate", updateProgress);
+  //     audio.removeEventListener("loadedmetadata", setAudioData);
+  //   };
+  // }, []);
 
   return (
     <div
