@@ -57,7 +57,6 @@ import {
 import TapableButton from "@/components/tapable-button.component";
 import ModalMotion from "@/components/modal.component";
 import { Separator } from "@/components/ui/separator";
-import { GlobalAudioPlayer } from "../audio-book/components/global-audio-player.component";
 
 interface MapPageProps {
   width: number;
@@ -263,12 +262,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
-      "/api/story/rating/add"
-    ].post(null, {
-      audioId: audio.id,
-      rating: rating,
-    });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
 
     return res.data.ratingAudioStory;
   };
@@ -276,11 +274,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     load: boolean;
   }
 
-  const [applicationAudioState, setApplicationAudioState] = useState<
-    ApplicationAudioState
-  >({
-    load: false,
-  });
+  const [applicationAudioState, setApplicationAudioState] =
+    useState<ApplicationAudioState>({
+      load: false,
+    });
 
   const handleOnSubmitCreateApplicationAudio = async (
     dto: CreateApplicationAudioDto
@@ -568,7 +565,6 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
 
   return (
     <div className="flex flex-col" ref={containerRef}>
-      <GlobalAudioPlayer />
       {authFormState.open && (
         <DialogSheet
           onClose={handleOnCloseAuthForm}

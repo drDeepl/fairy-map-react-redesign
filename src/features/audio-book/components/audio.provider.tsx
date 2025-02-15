@@ -1,198 +1,194 @@
-// audio.provider.tsx
+// AudioContext.tsx
 import React, {
   createContext,
   useContext,
   useState,
   useCallback,
-  useEffect,
+  useRef,
+  ReactNode,
 } from "react";
 
-// Расширенный интерфейс для AudioContextType
-export interface AudioContextType {
-  currentTrack: string | null;
-  isGlobalPlaying: boolean;
-  playTrack: (trackSrc: string) => void;
-  pauseTrack: () => void;
-  useAudioPlayer: (src: string) => AudioPlayerReturn;
-  currentActiveAudioPlayers: () => AudioPlayerReturn[];
+// Типы для трека и состояния плеера
+interface Track {
+  src: string;
 }
 
-const AudioContext = createContext<AudioContextType | null>(null);
-
-// Тип возвращаемого значения useAudioPlayer
-interface AudioPlayerReturn {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  progress: number[];
+interface AudioPlayerState {
   isPlaying: boolean;
+  currentTrack: Track | null;
+  volume: number;
+}
+
+interface AudioPlayerContextType {
+  progress: number[];
   duration: number;
   currentTime: number;
-  currentTrack: string;
-  play: () => void;
+  state: AudioPlayerState;
+  play: (track: Track) => void;
   pause: () => void;
-  seek: (time: number) => void;
+  resume: () => void;
+  setVolume: (volume: number) => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
 }
 
-// Хук для использования контекста
-export const useAudioContext = () => {
-  const context = useContext(AudioContext);
-  if (!context) {
-    throw new Error("useAudioContext must be used within an AudioProvider");
-  }
-  return context;
-};
+// Создание контекста
+const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
+  undefined
+);
 
-const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
-  const [isGlobalPlaying, setIsGlobalPlaying] = useState(false);
-  const [activeAudioPlayers, setActiveAudioPlayers] = useState<
-    Record<string, AudioPlayerReturn>
-  >({});
+interface AudioProviderProps {
+  children: ReactNode;
+}
 
-  const playTrack = useCallback(
-    (trackSrc: string) => {
-      setCurrentTrack(trackSrc);
-      setIsGlobalPlaying(true);
+// Провайдер для аудиоплеера
+const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
+  const [state, setState] = useState<AudioPlayerState>({
+    isPlaying: false,
+    currentTrack: null,
+    volume: 0.5,
+  });
 
-      // Пауза всех других треков
-      // Object.values(activeAudioPlayers).forEach((player) => {
-      //   if (player.currentTrack !== trackSrc) {
-      //     player.pause();
-      //   }
-      // });
-    },
-    [activeAudioPlayers]
-  );
+  const [progress, setProgress] = useState<number[]>([0]);
+  const [duration, setDuration] = useState<number>(0);
+  const [currentTime, setCurrentTime] = useState<number>(0);
 
-  const pauseTrack = useCallback(() => {
-    setIsGlobalPlaying(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playlistRef = useRef<Track[]>([]);
+  const currentIndexRef = useRef<number>(-1);
+
+  // Инициализация аудио элемента
+  const initializeAudio = useCallback(() => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+
+      const updateProgress = () => {
+        const progressPercent =
+          (audioRef.current.currentTime / audioRef.current.duration) * 100;
+        setProgress([progressPercent]);
+        setCurrentTime(audioRef.current.currentTime);
+      };
+
+      const setAudioData = () => {
+        setDuration(audioRef.current.duration);
+      };
+
+      audioRef.current.addEventListener("loadedmetadata", setAudioData);
+
+      audioRef.current.addEventListener("timeupdate", updateProgress);
+      audioRef.current.addEventListener("ended", handleTrackEnd);
+    }
+    return audioRef.current;
   }, []);
 
-  const useAudioPlayer = useCallback(
-    (src: string): AudioPlayerReturn => {
-      const [isPlaying, setIsPlaying] = useState(false);
-      const [duration, setDuration] = useState(0);
-      const [currentTime, setCurrentTime] = useState(0);
-      const [progress, setProgress] = useState<number[]>([0]);
-      const audioRef = React.useRef<HTMLAudioElement>(new Audio(src));
+  // Воспроизведение трека
+  const play = useCallback(
+    (track: Track) => {
+      const audio = initializeAudio();
 
-      // Регистрация плеера в контексте
-      useEffect(() => {
-        const playerInstance: AudioPlayerReturn = {
-          audioRef,
-          progress,
-          isPlaying,
-          duration,
-          currentTime,
-          currentTrack: src,
-          play,
-          pause,
-          seek,
-        };
+      // Остановка текущего трека
+      if (state.isPlaying) {
+        audio.pause();
+      }
 
-        setActiveAudioPlayers({
-          [src]: playerInstance,
-        });
+      audio.src = track.src;
+      audio.volume = state.volume;
+      audio.play();
 
-        // setActiveAudioPlayers((prev) => ({
-        //   ...prev,
-        //   [src]: playerInstance,
-        // }));
-
-        return () => {
-          setActiveAudioPlayers((prev) => {
-            const updated = { ...prev };
-            delete updated[src];
-            return updated;
-          });
-        };
-      }, [src, isPlaying, progress, duration, currentTime]);
-
-      // Синхронизация с глобальным состоянием
-      useEffect(() => {
-        const audioElement = audioRef.current;
-
-        const updateProgress = () => {
-          const progressPercent =
-            (audioElement.currentTime / audioElement.duration) * 100;
-          setProgress([progressPercent]);
-          setCurrentTime(audioElement.currentTime);
-        };
-
-        const setAudioDuration = () => {
-          setDuration(audioElement.duration);
-        };
-
-        audioElement.addEventListener("timeupdate", updateProgress);
-        audioElement.addEventListener("loadedmetadata", setAudioDuration);
-
-        // Управление воспроизведением
-        if (currentTrack === src) {
-          if (isGlobalPlaying) {
-            play();
-          } else {
-            pause();
-          }
-        }
-
-        return () => {
-          audioElement.removeEventListener("timeupdate", updateProgress);
-          audioElement.removeEventListener("loadedmetadata", setAudioDuration);
-          audioElement.pause();
-        };
-      }, [src, currentTrack, isGlobalPlaying]);
-
-      const play = useCallback(() => {
-        audioRef.current.play();
-        setIsPlaying(true);
-        playTrack(src);
-      }, [src, playTrack]);
-
-      const pause = useCallback(() => {
-        audioRef.current.pause();
-        setIsPlaying(false);
-        pauseTrack();
-      }, [pauseTrack]);
-
-      const seek = useCallback((time: number) => {
-        audioRef.current.currentTime = time;
-      }, []);
-
-      return {
-        audioRef,
-        progress,
-        isPlaying,
-        duration,
-        currentTime,
-        currentTrack: src,
-        play,
-        pause,
-        seek,
-      };
+      setState((prev) => ({
+        ...prev,
+        isPlaying: true,
+        currentTrack: track,
+      }));
     },
-    [currentTrack, isGlobalPlaying, playTrack, pauseTrack]
+    [state.volume]
   );
 
-  const currentActiveAudioPlayers = useCallback(
-    () => Object.values(activeAudioPlayers),
-    [activeAudioPlayers]
-  );
+  // Пауза
+  const pause = useCallback(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      setState((prev) => ({ ...prev, isPlaying: false }));
+    }
+  }, []);
+
+  // Возобновление
+  const resume = useCallback(() => {
+    const audio = audioRef.current;
+    if (audio && state.currentTrack) {
+      audio.play();
+      setState((prev) => ({ ...prev, isPlaying: true }));
+    }
+  }, [state.currentTrack]);
+
+  // Установка громкости
+  const setVolume = useCallback((volume: number) => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.volume = volume;
+      setState((prev) => ({ ...prev, volume }));
+    }
+  }, []);
+
+  // Обработка окончания трека
+  const handleTrackEnd = useCallback(() => {
+    nextTrack();
+  }, []);
+
+  // Следующий трек
+  const nextTrack = useCallback(() => {
+    const playlist = playlistRef.current;
+    if (playlist.length === 0) return;
+
+    currentIndexRef.current = (currentIndexRef.current + 1) % playlist.length;
+
+    play(playlist[currentIndexRef.current]);
+  }, [play]);
+
+  // Предыдущий трек
+  const prevTrack = useCallback(() => {
+    const playlist = playlistRef.current;
+    if (playlist.length === 0) return;
+
+    currentIndexRef.current =
+      (currentIndexRef.current - 1 + playlist.length) % playlist.length;
+
+    play(playlist[currentIndexRef.current]);
+  }, [play]);
+
+  // Значения контекста
+  const contextValue = {
+    progress,
+    duration,
+    currentTime,
+    state,
+    play,
+    pause,
+    resume,
+    setVolume,
+    nextTrack,
+    prevTrack,
+  };
 
   return (
-    <AudioContext.Provider
-      value={{
-        currentTrack,
-        isGlobalPlaying,
-        playTrack,
-        pauseTrack,
-        useAudioPlayer,
-        currentActiveAudioPlayers,
-      }}
-    >
+    <AudioPlayerContext.Provider value={contextValue}>
       {children}
-    </AudioContext.Provider>
+    </AudioPlayerContext.Provider>
   );
+};
+
+// Хук для использования аудиоплеера
+export const useAudioPlayer = () => {
+  const context = useContext(AudioPlayerContext);
+
+  if (context === undefined) {
+    throw new Error(
+      "useAudioPlayer must be used within an AudioPlayerProvider"
+    );
+  }
+
+  return context;
 };
 
 export default AudioProvider;

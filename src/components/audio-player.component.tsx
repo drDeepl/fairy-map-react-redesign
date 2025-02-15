@@ -2,11 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 
 import { motion } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
-import { useDispatch } from "react-redux";
-import {
-  useAudioContext,
-  AudioContextType,
-} from "@/features/audio-book/components/audio.provider";
+import { useAudioPlayer } from "@/features/audio-book/components/audio.provider";
 
 const iconVariants = {
   play: {
@@ -33,47 +29,45 @@ interface AudioPlayerProps {
   src: string;
   onError: (e: Event) => void;
   className?: string;
-  audioContext?: AudioContextType;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
   src,
-  audioContext,
   onError,
   className = "",
 }) => {
-  // const [isPlaying, setIsPlaying] = useState(false);
-  const dispatch = useDispatch();
+  const [isPlaying, setIsPlaying] = useState(false);
   // const [progress, setProgress] = useState<number[]>([0]);
   // const [duration, setDuration] = useState(0);
   // const [currentTime, setCurrentTime] = useState(0);
-  // const [isPlaying, setIsPlaying] = useState(false);
-
-  if (!audioContext) return null;
 
   const {
-    playTrack,
-    pauseTrack,
-    currentActiveAudioPlayers,
-    useAudioPlayer,
-  } = audioContext;
+    progress,
+    duration,
+    currentTime,
+    state,
+    play,
+    pause,
+    resume,
+    setVolume,
+    nextTrack,
+    prevTrack,
+  } = useAudioPlayer();
 
-  const { isPlaying, play, pause, duration, currentTime, progress } =
-    currentActiveAudioPlayers().length > 1
-      ? currentActiveAudioPlayers()[0]
-      : useAudioPlayer(src);
+  // const { playTrack, pauseTrack, currentActiveAudioPlayers } = audioContext;
+
+  // const { isPlaying, play, pause, duration, currentTime, progress } =
+  //   currentActiveAudioPlayers().length > 1
+  //     ? currentActiveAudioPlayers()[0]
+  //     : audioContext.playTrack(src);
 
   useEffect(() => {
-    const audioPlayers = currentActiveAudioPlayers();
-    if (audioPlayers.length == 0) {
-      playTrack(src);
-    }
-    console.log(audioPlayers);
+    console.log(state);
   }, []);
 
   const resetAudioPlayer = () => {
     // setIsPlaying(false);
-    pauseTrack();
+    // pauseTrack();
     // setProgress([0]);
     // setDuration(0);
     // setCurrentTime(0);
@@ -84,10 +78,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const togglePlayPause = () => {
     // const audio = audioRef.current;
 
-    if (isPlaying) {
+    if (state.isPlaying) {
       pause();
     } else {
-      play();
+      play({ src });
     }
 
     // if (isPlaying) {
@@ -179,7 +173,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             animate={isPlaying ? "pause" : "play"}
             variants={iconVariants}
           >
-            {isPlaying ? (
+            {state.isPlaying ? (
               <>
                 <motion.rect
                   x="6"
