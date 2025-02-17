@@ -40,9 +40,11 @@ import NotifyContainer, {
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import {
+  AvatarIcon,
   CaretDownIcon,
   Cross1Icon,
   PaperPlaneIcon,
+  PersonIcon,
   UpdateIcon,
 } from "@radix-ui/react-icons";
 
@@ -532,7 +534,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           />
 
           <Button
-            className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
+            className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800 [&_svg>]:size-8"
             variant="outline"
             size="icon"
             onClick={() => {
@@ -541,9 +543,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
             }}
           >
             <span className="text-slate-700 ">
-              {authState.user
-                ? authState.user.email.split("@")[0][0].toUpperCase()
-                : "?"}
+              {authState.user ? (
+                authState.user.email.split("@")[0][0].toUpperCase()
+              ) : (
+                <PersonIcon className="text-slate-500" />
+              )}
             </span>
           </Button>
         </div>
@@ -759,15 +763,17 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
 
         <Button
-          className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800"
+          className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800 [&_svg]:size-8"
           variant="outline"
           size="icon"
           onClick={handleOnClickAvatar}
         >
           <span className="text-slate-700 ">
-            {authState.user
-              ? authState.user.email.split("@")[0][0].toUpperCase()
-              : "?"}
+            {authState.user ? (
+              authState.user.email.split("@")[0][0].toUpperCase()
+            ) : (
+              <PersonIcon className="text-slate-500" />
+            )}
           </span>
         </Button>
       </div>

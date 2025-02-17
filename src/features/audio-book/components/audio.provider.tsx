@@ -104,7 +104,6 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   // Воспроизведение трека
   const play = useCallback(
     (track: Track) => {
-      console.log("callback state");
       const audio = initializeAudio();
 
       // Остановка текущего трека
