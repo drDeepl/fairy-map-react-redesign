@@ -97,7 +97,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </div>
 
           <Slider
-            className="w-full [&>span:first-child>span]:bg-blue-500 cursor-pointer py-1"
+            className="w-full [&>span:first-child>span]:bg-blue-500 [&>span:nth-child(2)>span]:bg-blue-500 [&>span:nth-child(2)>span]:border-none cursor-pointer py-1"
             min={0}
             max={100}
             value={state.progress}
