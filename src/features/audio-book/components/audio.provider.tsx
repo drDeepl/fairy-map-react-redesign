@@ -17,19 +17,23 @@ interface AudioPlayerState {
   isPlaying: boolean;
   currentTrack: Track | null;
   volume: number;
-}
-
-interface AudioPlayerContextType {
   progress: number[];
   duration: number;
   currentTime: number;
+}
+
+interface AudioPlayerContextType {
+  // progress: number[];
+  // duration: number;
+  // currentTime: number;
   state: AudioPlayerState;
+  error: string | null;
   play: (track: Track) => void;
   pause: () => void;
   resume: () => void;
+  onProgressChange: (value: number[]) => void;
   setVolume: (volume: number) => void;
-  nextTrack: () => void;
-  prevTrack: () => void;
+  resetError: () => void;
 }
 
 // Создание контекста
@@ -47,36 +51,52 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     isPlaying: false,
     currentTrack: null,
     volume: 0.5,
+    progress: [0],
+    duration: 0,
+    currentTime: 0,
   });
 
-  const [progress, setProgress] = useState<number[]>([0]);
-  const [duration, setDuration] = useState<number>(0);
-  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+
+  // const [progress, setProgress] = useState<number[]>([0]);
+  // const [duration, setDuration] = useState<number>(0);
+  // const [currentTime, setCurrentTime] = useState<number>(0);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playlistRef = useRef<Track[]>([]);
-  const currentIndexRef = useRef<number>(-1);
+
+  const onError = (e: Event) => {
+    console.log(e);
+    pause();
+    setError("ошибка при загрузки озвучки");
+  };
 
   // Инициализация аудио элемента
   const initializeAudio = useCallback(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+      const audio = audioRef.current;
 
       const updateProgress = () => {
-        const progressPercent =
-          (audioRef.current.currentTime / audioRef.current.duration) * 100;
-        setProgress([progressPercent]);
-        setCurrentTime(audioRef.current.currentTime);
+        const newProgress = (audio.currentTime / audio.duration) * 100;
+        setState((prevState) => ({
+          ...prevState,
+          progress: [newProgress],
+          currentTime: audio.currentTime,
+        }));
+        // setProgress([progressPercent]);
+        // setCurrentTime(audio.currentTime);
       };
 
       const setAudioData = () => {
-        setDuration(audioRef.current.duration);
+        setState((prevState) => ({ ...prevState, duration: audio.duration }));
+        // setDuration(audio.duration);
       };
 
-      audioRef.current.addEventListener("loadedmetadata", setAudioData);
+      audio.addEventListener("loadedmetadata", setAudioData);
+      audio.addEventListener("error", onError);
 
-      audioRef.current.addEventListener("timeupdate", updateProgress);
-      audioRef.current.addEventListener("ended", handleTrackEnd);
+      audio.addEventListener("timeupdate", updateProgress);
+      audio.addEventListener("ended", handleTrackEnd);
     }
     return audioRef.current;
   }, []);
@@ -84,6 +104,7 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
   // Воспроизведение трека
   const play = useCallback(
     (track: Track) => {
+      console.log("callback state");
       const audio = initializeAudio();
 
       // Остановка текущего трека
@@ -93,15 +114,14 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
 
       audio.src = track.src;
       audio.volume = state.volume;
-      audio.play();
 
       setState((prev) => ({
         ...prev,
-        isPlaying: true,
+        isPlaying: false,
         currentTrack: track,
       }));
     },
-    [state.volume]
+    [state.track]
   );
 
   // Пауза
@@ -113,6 +133,10 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const resetError = useCallback(() => {
+    setError(null);
+  }, []);
+
   // Возобновление
   const resume = useCallback(() => {
     const audio = audioRef.current;
@@ -121,6 +145,18 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
       setState((prev) => ({ ...prev, isPlaying: true }));
     }
   }, [state.currentTrack]);
+
+  const onProgressChange = (value: number[]) => {
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    console.log(value);
+    const newProgress = Number(value[0]);
+
+    audio.currentTime = (newProgress / 100) * state.duration;
+    setState((prevState) => ({ ...prevState, progress: [newProgress] }));
+    // setProgress(value);
+  };
 
   // Установка громкости
   const setVolume = useCallback((volume: number) => {
@@ -133,42 +169,22 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
 
   // Обработка окончания трека
   const handleTrackEnd = useCallback(() => {
-    nextTrack();
+    pause();
   }, []);
-
-  // Следующий трек
-  const nextTrack = useCallback(() => {
-    const playlist = playlistRef.current;
-    if (playlist.length === 0) return;
-
-    currentIndexRef.current = (currentIndexRef.current + 1) % playlist.length;
-
-    play(playlist[currentIndexRef.current]);
-  }, [play]);
-
-  // Предыдущий трек
-  const prevTrack = useCallback(() => {
-    const playlist = playlistRef.current;
-    if (playlist.length === 0) return;
-
-    currentIndexRef.current =
-      (currentIndexRef.current - 1 + playlist.length) % playlist.length;
-
-    play(playlist[currentIndexRef.current]);
-  }, [play]);
 
   // Значения контекста
   const contextValue = {
-    progress,
-    duration,
-    currentTime,
+    // progress,
+    // duration,
+    // currentTime,
     state,
+    error,
     play,
     pause,
     resume,
     setVolume,
-    nextTrack,
-    prevTrack,
+    onProgressChange,
+    resetError,
   };
 
   return (

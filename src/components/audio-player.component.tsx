@@ -27,7 +27,7 @@ const iconVariants = {
 
 interface AudioPlayerProps {
   src: string;
-  onError: (e: Event) => void;
+  onError: (msg: string) => void;
   className?: string;
 }
 
@@ -36,22 +36,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   onError,
   className = "",
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  // const [progress, setProgress] = useState<number[]>([0]);
-  // const [duration, setDuration] = useState(0);
-  // const [currentTime, setCurrentTime] = useState(0);
-
   const {
-    progress,
-    duration,
-    currentTime,
     state,
+    error,
     play,
     pause,
     resume,
-    setVolume,
-    nextTrack,
-    prevTrack,
+    onProgressChange,
+    resetError,
   } = useAudioPlayer();
 
   // const { playTrack, pauseTrack, currentActiveAudioPlayers } = audioContext;
@@ -62,44 +54,24 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   //     : audioContext.playTrack(src);
 
   useEffect(() => {
-    console.log(state);
-  }, []);
+    if (error !== null) {
+      onError(error);
+      resetError();
+    }
+  }, [error]);
 
-  const resetAudioPlayer = () => {
-    // setIsPlaying(false);
-    // pauseTrack();
-    // setProgress([0]);
-    // setDuration(0);
-    // setCurrentTime(0);
-  };
-
-  const audioRef = useRef(new Audio(src));
+  useEffect(() => {
+    if (state.currentTrack?.src !== src) {
+      play({ src });
+    }
+  }, [src]);
 
   const togglePlayPause = () => {
-    // const audio = audioRef.current;
-
     if (state.isPlaying) {
       pause();
     } else {
-      play({ src });
+      resume();
     }
-
-    // if (isPlaying) {
-    //   audio.pause();
-    // } else {
-    //   audio.play();
-    // }
-
-    // setIsPlaying(!isPlaying);
-  };
-
-  const handleProgressChange = (value: number[]) => {
-    const audio = audioRef.current;
-    console.log(value);
-    const newProgress = Number(value[0]);
-
-    audio.currentTime = (newProgress / 100) * duration;
-    // setProgress(value);
   };
 
   const formatTime = (time: any) => {
@@ -107,35 +79,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
-
-  // useEffect(() => {
-  //   const audio = audioRef.current;
-
-  //   const updateProgress = () => {
-  //     const progressPercent = (audio.currentTime / audio.duration) * 100;
-  //     setProgress([progressPercent]);
-  //     setCurrentTime(audio.currentTime);
-  //   };
-
-  //   const setAudioData = () => {
-  //     setDuration(audio.duration);
-  //   };
-
-  //   audio.addEventListener("timeupdate", updateProgress);
-  //   audio.addEventListener("loadedmetadata", setAudioData);
-  //   audio.addEventListener("loadstart", (e) => {
-  //     resetAudioPlayer();
-  //   });
-  //   audio.addEventListener("error", onError);
-  //   audio.addEventListener("ended", () => {
-  //     resetAudioPlayer();
-  //   });
-
-  //   return () => {
-  //     audio.removeEventListener("timeupdate", updateProgress);
-  //     audio.removeEventListener("loadedmetadata", setAudioData);
-  //   };
-  // }, []);
 
   return (
     <div
@@ -145,11 +88,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
         <div className="flex flex-col justify-between w-full">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">
-              {formatTime(currentTime)}
+              {formatTime(state.currentTime)}
             </span>
 
             <span className="text-sm text-gray-600">
-              {formatTime(duration)}
+              {formatTime(state.duration)}
             </span>
           </div>
 
@@ -157,8 +100,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             className="w-full [&>span:first-child>span]:bg-blue-500 cursor-pointer py-1"
             min={0}
             max={100}
-            value={progress}
-            onValueChange={handleProgressChange}
+            value={state.progress}
+            onValueChange={onProgressChange}
           />
         </div>
         <motion.div
@@ -170,7 +113,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           <motion.svg
             viewBox="0 0 24 24"
             initial={false}
-            animate={isPlaying ? "pause" : "play"}
+            animate={state.isPlaying ? "pause" : "play"}
             variants={iconVariants}
           >
             {state.isPlaying ? (
@@ -201,8 +144,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           </motion.svg>
         </motion.div>
       </div>
-
-      <audio ref={audioRef} src={src} />
     </div>
   );
 };
