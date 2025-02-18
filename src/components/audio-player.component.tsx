@@ -46,13 +46,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
     resetError,
   } = useAudioPlayer();
 
-  // const { playTrack, pauseTrack, currentActiveAudioPlayers } = audioContext;
-
-  // const { isPlaying, play, pause, duration, currentTime, progress } =
-  //   currentActiveAudioPlayers().length > 1
-  //     ? currentActiveAudioPlayers()[0]
-  //     : audioContext.playTrack(src);
-
   useEffect(() => {
     if (error !== null) {
       onError(error);

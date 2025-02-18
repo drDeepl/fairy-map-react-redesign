@@ -235,7 +235,8 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
       <AnimatePresence>
         {selectedRegion.ethnicGroupsPoints.map((point: any) => {
           const [x, y] = projection([point.longitude, point.latitude]) || [
-            0, 0,
+            0,
+            0,
           ];
           const r = calculateRadius(features[selectedRegion.id - 1]);
           return (
@@ -286,6 +287,9 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
   const renderedRegions = useMemo(() => {
     return features.map((feature: any) => {
       const d = pathGenerator(feature);
+      // .style('transform', 'rotateX(60deg)')
+      // .style('transform-origin', 'center')
+      // .style('box-shadow', '0 10px 20px rgba(0,0,0,0.2)')
 
       return (
         <motion.path
@@ -303,7 +307,6 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
           style={{
             cursor: "pointer",
             outline: "none",
-            transition: "all 0.3s ease",
           }}
           whileTap={{
             scale: 0.95,
@@ -373,7 +376,7 @@ const Map: React.FC<MapProps> = ({ features, width, height, onClickBook }) => {
         ref={svgRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.3 }}
       >
         <g>
           <AnimatePresence>
