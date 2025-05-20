@@ -27,6 +27,28 @@ export default {
         "cloud-uplaod": "url('./assets/img/cloud-upload.svg')",
       },
       keyframes: {
+        "slide-in": {
+          "0%": {
+            transform: "translate3d(0,3vh,0)",
+            height: "0px",
+            opacity: "0",
+          },
+          "30%": {
+            transform: "translate3d(0,2vh,0)",
+            height: "100px",
+            opacity: "0",
+          },
+          "60%": {
+            transform: "translate3d(0,1vh,0)",
+            height: "140px",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "translate3d(0,0,0)",
+            height: "auto",
+            opacity: "1",
+          },
+        },
         rotate180: {
           from: {
             transform: "rotate(0deg)",
@@ -242,6 +264,7 @@ export default {
         },
       },
       animation: {
+        "slide-in": "slide-in 0.5s ease forwards",
         fadeindown: "fade-in-down 1s ease-in 0.25s 1",
         "slide-up-fade": "slide-up-fade 0.6s ease-out",
         "flip-in-y": "flip-in-y 0.6s ease-out",
@@ -271,6 +294,32 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        blue: {
+          50: "#F8FAFF",
+          100: "#F0F4FF",
+          200: "#E0E9FF",
+          300: "#D1DEFF",
+          400: "#BDCFFF",
+          500: "#A8C1FF",
+          600: "#8FAFFF",
+          700: "#7099FF",
+          800: "#4D7FFF",
+          900: "#1457FF",
+          950: "#0042EB",
+        },
+        canvas: {
+          50: "#FCFAFF",
+          100: "#F8F6FB",
+          200: "#F0ECF7",
+          300: "#E9E3F3",
+          400: "#DCD5ED",
+          500: "#CEC6E6",
+          600: "#B9AFCFL",
+          700: "#A298D5",
+          800: "#887EB7",
+          900: "#6E6498",
+          950: "#554C7A",
+        },
         "baby-blue": {
           100: "#e6eeff",
           200: "#cdddfe",

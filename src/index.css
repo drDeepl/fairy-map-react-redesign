@@ -5,6 +5,9 @@
 @tailwind utilities;
 @layer base {
   :root {
+    --border-radius--menu-wrapper: 2rem;
+    --border-radius--menu-link: 1.6rem;
+
     --deep-red: #f87171;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;

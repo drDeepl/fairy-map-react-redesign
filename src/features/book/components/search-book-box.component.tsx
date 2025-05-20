@@ -22,8 +22,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { socket } from "@/api/sockets/sockets";
 import React, { useState, useEffect } from "react";
+import { useSocket } from "../../../api/sockets/socket.context";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import NotCoverBook from "@/components/not-cover-book.component";
@@ -46,6 +47,8 @@ interface ListBookState {
 }
 
 const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
+  const socket = useSocket();
+
   const [open, setOpen] = useState<boolean>(false);
 
   const [valueSearch, setValueSearch] = useState("");
@@ -112,38 +115,20 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
   }, [valueSearch]);
 
   useEffect(() => {
-    const onConnect = () => {
-      console.log("connected");
-      setIsConnected(true);
-    };
-
-    const onDisconnect = () => {
-      console.log("disconnected");
-      setIsConnected(false);
-    };
-
-    if (isConnected) {
-      onConnect();
-    }
     const onBookResults = (books: BookPageResponse) => {
-      console.log("onBookResults");
-      console.log(books);
       setListBookState({
         load: false,
         books: books,
       });
       setIsTyping(false);
     };
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+
     socket.on("searchResultStoryByName", onBookResults);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
       socket.off("searchResultStoryByName", onBookResults);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <div>

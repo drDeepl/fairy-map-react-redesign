@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { setUser } from "./features/auth/auth.slice.ts";
 import AudioProvider from "./features/audio-book/components/audio.provider.tsx";
+import StickyBottomNavigation from "./components/navbar-menu/navbar.component.tsx.tsx";
 export interface LocationParams {
   pathname: string;
   state: null;

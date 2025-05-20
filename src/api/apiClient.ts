@@ -1,57 +1,79 @@
-import OpenAPIClientAxios, { AxiosResponse } from "openapi-client-axios";
-import { Client } from "./schemas/client";
-import { getTokenLocalStorage } from "@/common/helpers/token.helper";
-import { AxiosError, InternalAxiosRequestConfig } from "axios";
+import OpenAPIClientAxios from "openapi-client-axios";
+import type { Client } from "./schemas/client";
+import type {
+  AxiosInstance,
+  AxiosError,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
+import { tokenService } from "../services/token.service";
 
-async function initApiClient() {
+let refreshPromise: Promise<string> | null = null;
+
+function createOpenAPIClient(): Promise<AxiosInstance & Client> {
   const api = new OpenAPIClientAxios({
     definition: `${import.meta.env.VITE_API_URL}api/v1-json`,
+    axiosConfigDefaults: {
+      baseURL: import.meta.env.VITE_API_URL,
+    },
   });
+  return api.init<Client>();
+}
 
-  console.log(`${import.meta.env.VITE_API_URL}api/v1-json`);
-  await api.init<Client>();
-  const apiClient = await api.getClient<Client>();
-
-  apiClient.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      const accessToken: string | null = getTokenLocalStorage();
-      config.headers.Authorization = accessToken ? `Bearer ${accessToken}` : "";
-      return config;
-    },
-    (error: any) => {
-      return Promise.reject(error);
+function addAuthInterceptor(client: AxiosInstance) {
+  client.interceptors.request.use((config: any) => {
+    const token = tokenService.getAccessToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  );
+    return config;
+  });
+}
 
-  apiClient.interceptors.response.use(
-    (response: AxiosResponse) => {
-      return response;
-    },
+function addRefreshInterceptor(client: AxiosInstance & Client) {
+  client.interceptors.response.use(
+    (res: AxiosResponse) => res,
     async (error: AxiosError) => {
-      const originalRequest: InternalAxiosRequestConfig = error.config!;
+      const originalReq = error.config as InternalAxiosRequestConfig;
+      if (error.response?.status === 401 && !originalReq.headers?.["X-Retry"]) {
+        originalReq.headers = originalReq.headers || {};
+        originalReq.headers["X-Retry"] = "true";
 
-      console.error("interceptors error", error);
+        if (!refreshPromise) {
+          refreshPromise = client
+            .AuthController_refresh()
+            .then((res) => {
+              const newToken = res.data.accessToken;
+              tokenService.setAccessToken(newToken);
+              return newToken;
+            })
+            .finally(() => {
+              refreshPromise = null;
+            });
+        }
 
-      if (error.status === 401 && !originalRequest?.headers["X-Retry"]) {
-        originalRequest.headers["X-Retry"] = "true";
-
-        const tokenResponse = await apiClient.AuthController_refresh();
-        localStorage.setItem("accessToken", tokenResponse.data.accessToken);
-
-        originalRequest.headers[
-          "Authorization"
-        ] = `Bearer ${tokenResponse.data.accessToken}`;
-
-        return apiClient(originalRequest);
+        const freshToken = await refreshPromise;
+        originalReq.headers["Authorization"] = `Bearer ${freshToken}`;
+        return client.request(originalReq);
       }
-
       return Promise.reject(error);
     }
   );
+}
 
+let apiClient: (AxiosInstance & Client) | null = null;
+
+export async function initApiClient(): Promise<AxiosInstance & Client> {
+  if (apiClient) {
+    return apiClient;
+  }
+  const client = await createOpenAPIClient();
+  addAuthInterceptor(client);
+  addRefreshInterceptor(client);
+  apiClient = client;
   return apiClient;
 }
 
-const apiClient = await initApiClient();
-
-export default apiClient;
+const client = await initApiClient();
+export default client;
