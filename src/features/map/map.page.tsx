@@ -59,7 +59,7 @@ import {
 import TapableButton from "@/components/tapable-button.component";
 import ModalMotion from "@/components/modal.component";
 import { Separator } from "@/components/ui/separator";
-import Navbar from "../../components/navbar-menu/navbar.component.tsx";
+import NavbarComponent from "@/components/ui/navbar-menu/navbar.component";
 
 interface MapPageProps {
   width: number;
@@ -761,7 +761,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">
-        <Navbar />
+        <NavbarComponent />
         <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
 
         <Button
