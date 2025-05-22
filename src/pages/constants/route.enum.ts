@@ -3,4 +3,5 @@ export enum RouteApp {
   MapPage = "/map",
   UserPage = "/me",
   AdminPage = "/admin",
+  TestPage = "/test",
 }

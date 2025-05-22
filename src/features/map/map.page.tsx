@@ -40,7 +40,6 @@ import NotifyContainer, {
 import { AxiosResponse } from "axios";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import {
-  AvatarIcon,
   CaretDownIcon,
   Cross1Icon,
   PaperPlaneIcon,
@@ -58,7 +57,7 @@ import {
 } from "@/components/ui/tooltip";
 import TapableButton from "@/components/tapable-button.component";
 import ModalMotion from "@/components/modal.component";
-import { Separator } from "@/components/ui/separator";
+
 import NavbarComponent from "@/components/ui/navbar-menu/navbar.component";
 
 interface MapPageProps {
@@ -265,12 +264,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> = await apiClient.paths[
-      "/api/story/rating/add"
-    ].post(null, {
-      audioId: audio.id,
-      rating: rating,
-    });
+    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
+      await apiClient.paths["/api/story/rating/add"].post(null, {
+        audioId: audio.id,
+        rating: rating,
+      });
 
     return res.data.ratingAudioStory;
   };
@@ -278,11 +276,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     load: boolean;
   }
 
-  const [applicationAudioState, setApplicationAudioState] = useState<
-    ApplicationAudioState
-  >({
-    load: false,
-  });
+  const [applicationAudioState, setApplicationAudioState] =
+    useState<ApplicationAudioState>({
+      load: false,
+    });
 
   const handleOnSubmitCreateApplicationAudio = async (
     dto: CreateApplicationAudioDto
@@ -761,23 +758,24 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       )}
 
       <div className="absolute w-full flex justify-between p-4 z-[50]">
-        <NavbarComponent />
-        <SearchBookBox onClickBook={handleOnSelectSearchedBook} />
-
-        <Button
-          className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800 [&_svg]:size-8"
-          variant="outline"
-          size="icon"
-          onClick={handleOnClickAvatar}
+        <NavbarComponent
+          search={<SearchBookBox onClickBook={handleOnSelectSearchedBook} />}
         >
-          <span className="text-slate-700 ">
-            {authState.user ? (
-              authState.user.email.split("@")[0][0].toUpperCase()
-            ) : (
-              <PersonIcon className="text-slate-500" />
-            )}
-          </span>
-        </Button>
+          <Button
+            className="self-center border rounded-full shadow-md bg-slate-50 size-12 border-baby-blue-800 [&_svg]:size-8"
+            variant="outline"
+            size="icon"
+            onClick={handleOnClickAvatar}
+          >
+            <span className="text-slate-700 ">
+              {authState.user ? (
+                authState.user.email.split("@")[0][0].toUpperCase()
+              ) : (
+                <PersonIcon className="text-slate-500" />
+              )}
+            </span>
+          </Button>
+        </NavbarComponent>
       </div>
 
       {mapState.dataMap && (

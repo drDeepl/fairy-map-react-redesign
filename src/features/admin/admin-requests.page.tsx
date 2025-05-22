@@ -36,6 +36,9 @@ import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-st
 import StatusDropdownMenu from "../application/components/status-dropdown.component";
 import PaginationBox from "@/components/pagination.component";
 import { PageMetaDto } from "@/api/interfaces/page-meta.dto";
+import NavbarComponent from "@/components/ui/navbar-menu/navbar.component";
+import StickyBottomNavigation from "@/components/sticky-bottom-navigation";
+import StickyBottomReveal from "@/components/ui/sticky-bottom-reveal";
 
 interface ApplicationTableState {
   load: boolean;
@@ -51,31 +54,35 @@ interface AudioPlayerState {
   applicationAudio: Components.Schemas.AudioApplicationWithUserAudioResponseDto | null;
 }
 
-const AdminRequestsPage = () => {
+interface AdminRequestsPageProps {
+  setBottomPanelOpen: (open: boolean) => void;
+}
+
+const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
+  setBottomPanelOpen,
+}) => {
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] = useState<
-    ApplicationTableState
-  >({
-    load: true,
-    paginationData: {
-      data: [],
-      meta: {
-        page: 0,
-        take: 0,
-        itemCount: 0,
-        pageCount: 0,
-        hasPreviousPage: false,
-        hasNextPage: false,
+  const [applicationTableState, setApplicationTableState] =
+    useState<ApplicationTableState>({
+      load: true,
+      paginationData: {
+        data: [],
+        meta: {
+          page: 0,
+          take: 0,
+          itemCount: 0,
+          pageCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        },
       },
-    },
-  });
+    });
 
-  const [editApplicationState, setEditApplicationState] = useState<
-    ApplicationEditState
-  >({
-    data: undefined,
-  });
+  const [editApplicationState, setEditApplicationState] =
+    useState<ApplicationEditState>({
+      data: undefined,
+    });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -87,6 +94,9 @@ const AdminRequestsPage = () => {
     const audioPlayer: HTMLElement | null = document.getElementById(
       "audio-player__container"
     );
+    console.log(application);
+
+    setBottomPanelOpen(true);
 
     if (audioPlayer) {
       audioPlayer.classList.add("animate-in");
@@ -208,10 +218,11 @@ const AdminRequestsPage = () => {
         }
 
         if (editApplicationState.data.status === "SUCCESSED") {
-          const successedApplicaiton = applicationTableState.paginationData.data.find(
-            (application) =>
-              application.id === editApplicationState.data?.aplicationId
-          );
+          const successedApplicaiton =
+            applicationTableState.paginationData.data.find(
+              (application) =>
+                application.id === editApplicationState.data?.aplicationId
+            );
 
           if (successedApplicaiton) {
             const data = {
@@ -235,14 +246,13 @@ const AdminRequestsPage = () => {
 
         showSuccessToast("статус заявки успешно изменён");
 
-        const updatedApplications = applicationTableState.paginationData.data.map(
-          (application) => {
+        const updatedApplications =
+          applicationTableState.paginationData.data.map((application) => {
             if (application.id === editApplicationState.data?.aplicationId) {
               application.status = editApplicationState.data?.status;
             }
             return application;
-          }
-        );
+          });
 
         setApplicationTableState((prevState) => ({
           ...prevState,
@@ -308,72 +318,7 @@ const AdminRequestsPage = () => {
           )}
         </div>
 
-        {audioPlayerState.applicationAudio ? (
-          <Drawer
-            open={audioPlayerState.applicationAudio != null}
-            dismissible={false}
-            handleOnly={true}
-          >
-            <DrawerContent className="flex items-center w-[50vw] left-[25lvw] right-[25lvw] px-4">
-              <DrawerHeader className="pt-0">
-                <DrawerTitle className="text-xl text-center">
-                  <span>
-                    {audioPlayerState.applicationAudio?.userAudio.originalName}
-                  </span>
-                </DrawerTitle>
-                <DrawerDescription className="text-md">
-                  <div className="flex flex-col items-center ">
-                    <span>{audioPlayerState.applicationAudio?.storyName}</span>
-                    <div className="space-x-1">
-                      <span>озвучил: </span>
-                      <span>
-                        {audioPlayerState.applicationAudio?.user.firstName}
-                      </span>
-                      <span>
-                        {audioPlayerState.applicationAudio?.user.firstName}
-                      </span>
-                    </div>
-                  </div>
-                </DrawerDescription>
-              </DrawerHeader>
-
-              <ReactAudioPlayer
-                className="w-full"
-                controls
-                controlsList="nodownload noplaybackrate foobar"
-                src={audioPlayerState.applicationAudio?.userAudio.srcAudio}
-                onError={handleOnErrorAudio}
-              />
-
-              <DrawerFooter className="flex justify-between text-slate-800">
-                <div className="flex items-center w-full space-x-4 justify-items-center">
-                  {audioPlayerState.applicationAudio.status === "SEND" ? (
-                    <StatusDropdownMenu
-                      onSelectStatus={async (key: string) => {
-                        if (audioPlayerState.applicationAudio) {
-                          handleOnSelectStatus({
-                            status: key,
-                            aplicationId: audioPlayerState.applicationAudio.id,
-                            comment: audioPlayerState.applicationAudio.comment,
-                          });
-                        }
-                      }}
-                      currentStatus={audioPlayerState.applicationAudio.status}
-                    />
-                  ) : null}
-
-                  <Button
-                    variant="outline"
-                    onClick={handleOnClickCloseAudio}
-                    className="bg-slate-100"
-                  >
-                    закрыть
-                  </Button>
-                </div>
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-        ) : null}
+        {/* {audioPlayerState.applicationAudio ? <NavbarComponent /> : null} */}
       </div>
     </div>
   );

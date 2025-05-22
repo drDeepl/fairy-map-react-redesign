@@ -1,15 +1,22 @@
 ﻿// src/components/Navbar.tsx
-import React from "react";
+import React, { Children } from "react";
 import { cn } from "../../../lib/utils";
 import { Menu } from "./menu.component";
 import { MenuItem } from "./menu-item.component";
 import { NavbarProvider } from "./navbar.context";
+import BookPlayer from "@/features/book-player/book-player";
 
 interface NavbarProps {
   className?: string;
+  search?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const NavbarComponent: React.FC<NavbarProps> = ({ className }) => {
+const NavbarComponent: React.FC<NavbarProps> = ({
+  className,
+  children,
+  search,
+}) => {
   return (
     <div
       className={cn(
@@ -17,11 +24,15 @@ const NavbarComponent: React.FC<NavbarProps> = ({ className }) => {
         className
       )}
     >
+      <div className="relative -bottom-[55px] -right-4 z-50">{search}</div>
       <Menu>
-        <MenuItem label="item1">
-          <div>item content1</div>
+        <MenuItem label="">
+          <div className="z-[55]">
+            <BookPlayer />
+          </div>
         </MenuItem>
       </Menu>
+      <div className="absolute bottom-[5px] right-4 z-50">{children}</div>
     </div>
   );
 };

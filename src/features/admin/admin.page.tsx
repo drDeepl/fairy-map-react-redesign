@@ -13,11 +13,15 @@ import AdminRequestsPage from "./admin-requests.page";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { userLogOut } from "../auth/auth.slice";
 import { RouteApp } from "@/pages/constants/route.enum";
+import StickyBottomReveal from "@/components/ui/sticky-bottom-reveal";
+import BookPlayer from "../book-player/book-player";
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const prevTab: string | null = localStorage.getItem("currentTab");
+
+  const [bottomPanelOpen, setBottomPanelOpen] = useState(false);
 
   const navigate = useNavigate();
   const authState = useSelector((state: RootState) => state.auth);
@@ -62,9 +66,16 @@ const AdminPage: React.FC = () => {
           <AdminStoriesPage />
         </TabsContent>
         <TabsContent value={MenuItemAdmin.Request}>
-          <AdminRequestsPage />
+          <AdminRequestsPage setBottomPanelOpen={setBottomPanelOpen} />
         </TabsContent>
       </Tabs>
+
+      <StickyBottomReveal
+        isPanelOpen={bottomPanelOpen}
+        setIsPanelOpen={setBottomPanelOpen}
+      >
+        <BookPlayer />
+      </StickyBottomReveal>
     </AdminSidebarLayout>
   );
 };
