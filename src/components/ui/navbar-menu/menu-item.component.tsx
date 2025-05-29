@@ -3,7 +3,7 @@ import React, { useCallback } from "react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { useNavbar } from "./navbar.context";
 import { cn } from "../../../lib/utils";
-import AnimatedGradientBoxWithSlide from "@/components/animated-gradient";
+
 import { PlayCircleIcon } from "lucide-react";
 
 interface MenuItemProps {
@@ -40,26 +40,6 @@ const buttonVariants: Variants = {
     transition: {
       duration: 0.8,
       ease: "easeInOut",
-    },
-  },
-};
-
-const underlineVariants: Variants = {
-  rest: {
-    scaleX: 0,
-    opacity: 0,
-    originX: 0.5,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
-  hover: {
-    scaleX: 1,
-    opacity: 1,
-    originX: 0.5,
-    backgroundColor: "#FD746E",
-
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.8, 0.25, 1],
     },
   },
 };

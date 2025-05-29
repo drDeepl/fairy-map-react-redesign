@@ -1,5 +1,3 @@
-import { isAxiosError } from "axios";
-
 export interface ApiErrorResponse {
   message: string;
   validationErrors?: Record<string, string[]>;
@@ -14,19 +12,21 @@ export const handleApiErrorResponse = (error: any): ApiErrorResponse => {
     validationErrors: undefined,
   };
 
-  if (isAxiosError(error)) {
-    if (typeof error.status === "number") {
-      errorResponse.message = error.response?.data.message;
+  // if (isAxiosError(error)) {
 
-      if (error.response?.data.statusCode === 400) {
-        errorResponse.validationErrors = error.response?.data.validationErrors;
-      }
+  // }
 
-      return errorResponse;
+  if (typeof error.status === "number") {
+    errorResponse.message = error.response?.data.message;
+
+    if (error.response?.data.statusCode === 400) {
+      errorResponse.validationErrors = error.response?.data.validationErrors;
     }
-    errorResponse.message = "ошибка в интернет соединении";
+
     return errorResponse;
   }
+
+  errorResponse.message = "ошибка в интернет соединении";
 
   return errorResponse;
 };

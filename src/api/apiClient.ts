@@ -1,11 +1,15 @@
-import OpenAPIClientAxios from "openapi-client-axios";
-import type { Client } from "./schemas/client";
-import type {
-  AxiosInstance,
+import OpenAPIClientAxios, {
   AxiosError,
-  InternalAxiosRequestConfig,
+  AxiosInstance,
   AxiosResponse,
-} from "axios";
+} from "openapi-client-axios";
+import type { Client } from "./schemas/client";
+// import type {
+//   AxiosInstance,
+//   AxiosError,
+//   InternalAxiosRequestConfig,
+//   AxiosResponse,
+// } from "axios";
 import { tokenService } from "../services/token.service";
 
 let refreshPromise: Promise<string> | null = null;
@@ -35,7 +39,7 @@ function addRefreshInterceptor(client: AxiosInstance & Client) {
   client.interceptors.response.use(
     (res: AxiosResponse) => res,
     async (error: AxiosError) => {
-      const originalReq = error.config as InternalAxiosRequestConfig;
+      const originalReq = error.config as any;
       if (error.response?.status === 401 && !originalReq.headers?.["X-Retry"]) {
         originalReq.headers = originalReq.headers || {};
         originalReq.headers["X-Retry"] = "true";
@@ -43,7 +47,7 @@ function addRefreshInterceptor(client: AxiosInstance & Client) {
         if (!refreshPromise) {
           refreshPromise = client
             .AuthController_refresh()
-            .then((res) => {
+            .then((res: any) => {
               const newToken = res.data.accessToken;
               tokenService.setAccessToken(newToken);
               return newToken;

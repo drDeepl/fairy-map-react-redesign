@@ -55,7 +55,7 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
 
   const [isTyping, setIsTyping] = useState<boolean>(false);
 
-  const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
+  // const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
 
   const [listBookState, setListBookState] = useState<ListBookState>({
     load: false,

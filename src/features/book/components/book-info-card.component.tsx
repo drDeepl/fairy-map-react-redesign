@@ -113,10 +113,10 @@ const BookInfoCardComponent: React.FC<BookInfoCardProps> = ({
                     htmlFor="picture"
                     className={`${onUploadCover ? "cursor-pointer" : ""}`}
                   >
-                    {infoBookState.book.srcImg ? (
+                    {book.srcImg ? (
                       <img
-                        src={infoBookState.book.srcImg}
-                        alt={infoBookState.book.name}
+                        src={book.srcImg}
+                        alt={book.name}
                         className="object-cover size-44 rounded-t-xl"
                       />
                     ) : (

@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cross1Icon } from "@radix-ui/react-icons";
 
-// Стили можно вынести в CSS-модули или styled-components для лучшей организации
 const styles = {
   pageContainer: {
-    // padding: "20px",
-    // background: "linear-gradient(to bottom, #fdfbfb, #ebedee)",
     fontFamily: "Arial, sans-serif",
   },
   stickyButton: {
@@ -30,54 +27,6 @@ const styles = {
     fontSize: "16px",
     fontWeight: "600",
     letterSpacing: "0.5px",
-    // Важно для центрирования если left: '50%'
-    // Для этого примера сделаем кнопку занимающей некую ширину, но центрированной
-    // minWidth: '200px', // Минимальная ширина, если текст короткий
-    // textAlign: 'center',
-  },
-  contentPanel: {
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    right: 0,
-
-    // backgroundColor: "white",
-    // borderTopLeftRadius: "20px",
-    // borderTopRightRadius: "20px",
-    // boxShadow: "0px -10px 30px rgba(0, 0, 0, 0.1)",
-    padding: "0 1rem",
-    zIndex: 999, // Чуть ниже кнопки, если кнопка должна оставаться "над" панелью
-    // или выше, если панель перекрывает кнопку (тогда нужна кнопка закрытия в панели)
-    overflowY: "auto", // Если контент внутри панели большой
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center", // Центрируем контент внутри панели
-  },
-  closeButtonPanel: {
-    position: "relative",
-    top: "2.2rem",
-    left: "11.2rem",
-    padding: "10px 20px",
-    color: "white",
-
-    borderRadius: "100%",
-    cursor: "pointer",
-    fontSize: "15px",
-  },
-};
-
-// Варианты анимации для кнопки (необязательно, но добавляет "живости")
-const buttonVariants = {
-  initial: { scale: 1, y: 0, opacity: 1 },
-  hover: {
-    scale: 1.05,
-    y: -3,
-    boxShadow: "0px 10px 25px rgba(0, 122, 255, 0.3)", // Тень в цвет кнопки
-    transition: { type: "spring", stiffness: 300, damping: 15 },
-  },
-  tap: {
-    scale: 0.95,
-    transition: { type: "spring", stiffness: 400, damping: 20 },
   },
 };
 
@@ -142,15 +91,37 @@ const StickyBottomReveal: React.FC<StickyBottomRevealProps> = ({
           <motion.div
             id="content-panel-id" // ID для aria-controls
             key="content-panel" // Ключ важен для AnimatePresence
-            style={styles.contentPanel}
+            style={{
+              position: "fixed",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: "0 1rem",
+              zIndex: 999,
+
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
             variants={panelVariants}
-            initial="hidden" // Начальное состояние (из variants)
-            animate="visible" // Конечное состояние при появлении (из variants)
-            exit="hidden" // Состояние при исчезновении (из variants)
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
           >
             <button
               className=""
-              style={styles.closeButtonPanel}
+              style={{
+                position: "relative",
+                top: "2.2rem",
+                left: "11.2rem",
+                padding: "10px 20px",
+                color: "white",
+
+                borderRadius: "100%",
+                cursor: "pointer",
+                fontSize: "15px",
+              }}
               onClick={togglePanel} // Закрываем панель по клику на эту кнопку
             >
               <Cross1Icon className="text-slate-900 size-4" />

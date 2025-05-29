@@ -47,7 +47,7 @@ export const PreviewBookCardComponent: React.FC<PreviewBookCardProps> = ({
         .get(book.srcImg, {
           responseType: "blob",
         })
-        .then((res) => {
+        .then((res: any) => {
           console.log(res);
           const imgUrl = URL.createObjectURL(res.data);
           setSrcImg(imgUrl);

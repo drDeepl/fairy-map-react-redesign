@@ -37,7 +37,7 @@ import AudioBook from "../audio-book/components/audio-book";
 import NotifyContainer, {
   Notification,
 } from "../../components/notificaiton.component";
-import { AxiosResponse } from "axios";
+
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import {
   CaretDownIcon,
@@ -183,7 +183,7 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
           languages: res.data,
         });
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.log(error);
         setLanguageListState({
           load: false,
@@ -264,11 +264,10 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
       return audio.commonRating;
     }
 
-    const res: AxiosResponse<Components.Schemas.AddedRatingAudioStoryDto> =
-      await apiClient.paths["/api/story/rating/add"].post(null, {
-        audioId: audio.id,
-        rating: rating,
-      });
+    const res: any = await apiClient.paths["/api/story/rating/add"].post(null, {
+      audioId: audio.id,
+      rating: rating,
+    });
 
     return res.data.ratingAudioStory;
   };
@@ -276,10 +275,11 @@ const MapPage: React.FC<MapPageProps> = ({ width, height }) => {
     load: boolean;
   }
 
-  const [applicationAudioState, setApplicationAudioState] =
-    useState<ApplicationAudioState>({
-      load: false,
-    });
+  const [applicationAudioState, setApplicationAudioState] = useState<
+    ApplicationAudioState
+  >({
+    load: false,
+  });
 
   const handleOnSubmitCreateApplicationAudio = async (
     dto: CreateApplicationAudioDto

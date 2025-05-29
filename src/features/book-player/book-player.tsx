@@ -2,25 +2,8 @@ import React, { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import {
-  Volume2,
-  VolumeX,
-  SkipBack,
-  SkipForward,
-  Play,
-  Pause,
-  Repeat,
-  Shuffle,
-  Music,
-  BookIcon,
-  CheckCircle,
-} from "lucide-react";
-import {
-  BookPlayerStore,
-  useBookPlayerStore,
-} from "./store/use-book-player-store";
-
-import { cn } from "@/lib/utils";
+import { SkipBack, SkipForward, Play, Pause } from "lucide-react";
+import { useBookPlayerStore } from "./store/use-book-player-store";
 
 import { LyricsDisplay } from "./lyrics-display";
 import { Separator } from "@/components/ui/separator";
@@ -32,12 +15,9 @@ const BookPlayer: React.FC = () => {
     currentTrack,
     isPlaying,
     volume,
-    shuffle,
-    repeat,
     playlist,
     setTrack,
     setIsPlaying,
-    setVolume,
     toggleShuffle,
     toggleRepeat,
     nextTrack,
@@ -46,7 +26,6 @@ const BookPlayer: React.FC = () => {
   const [trackDirection, setTrackDirection] = useState("");
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [showLyrics, setShowLyrics] = useState(false);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -152,26 +131,25 @@ const BookPlayer: React.FC = () => {
           </motion.div>
         </AnimatePresence>
         <div className="flex">
-          {showLyrics ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`lyrics-${currentTrack?.id}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                {currentTrack && (
-                  <LyricsDisplay
-                    lyrics={currentTrack.lyrics}
-                    currentTime={currentTime}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : (
-            <div className="flex items-center">
-              {/* <div className="flex items-center gap-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`lyrics-${currentTrack?.id}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {currentTrack && (
+                <LyricsDisplay
+                  lyrics={currentTrack.lyrics}
+                  currentTime={currentTime}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="flex items-center">
+            {/* <div className="flex items-center gap-4">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -189,95 +167,92 @@ const BookPlayer: React.FC = () => {
                   thumbClassName="size-4"
                 />
               </div> */}
-              <div className="mt-4 w-full">
-                <div className="">
-                  <Slider
-                    value={[progress]}
-                    max={100}
-                    step={0.1}
-                    onValueChange={handleProgressChange}
-                    className="w-full min-w-56"
-                  />
-                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                    <span>
-                      {formatTime(audioRef.current?.currentTime || 0)}
-                    </span>
-                    <span>{formatTime(audioRef.current?.duration || 0)}</span>
-                  </div>
+            <div className="mt-4 w-full">
+              <div className="">
+                <Slider
+                  value={[progress]}
+                  max={100}
+                  step={0.1}
+                  onValueChange={handleProgressChange}
+                  className="w-full min-w-56"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                  <span>{formatTime(audioRef.current?.currentTime || 0)}</span>
+                  <span>{formatTime(audioRef.current?.duration || 0)}</span>
                 </div>
-                <div className="flex items-center justify-center md:justify-start gap-4 mt-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleShuffle}
-                    className="[&_svg]:size-7"
-                  >
-                    {/* <Shuffle
+              </div>
+              <div className="flex items-center justify-center md:justify-start gap-4 mt-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleShuffle}
+                  className="[&_svg]:size-7"
+                >
+                  {/* <Shuffle
                       className={
                         shuffle ? "text-primary" : "text-muted-foreground"
                       }
                     /> */}
-                    <CheckCircledIcon className="text-emerald-500" />
+                  <CheckCircledIcon className="text-emerald-500" />
 
-                    {/* <CheckCircle className="text-emerald-500" /> */}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setTrackDirection("previous");
-                      if (!currentTrack && !isPlaying) {
-                        setIsPlaying(true);
-                        setTrack(playlist[playlist.length - 1]);
-                        return;
-                      }
-                      prevTrack();
-                    }}
-                  >
-                    <SkipBack />
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="icon"
-                    onClick={() => {
-                      if (!currentTrack && !isPlaying) {
-                        setTrackDirection("next");
-                        setIsPlaying(true);
-                        setTrack(playlist[0]);
-                        return;
-                      }
-                      setIsPlaying(!isPlaying);
-                    }}
-                  >
-                    {isPlaying ? <Pause /> : <Play />}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
+                  {/* <CheckCircle className="text-emerald-500" /> */}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setTrackDirection("previous");
+                    if (!currentTrack && !isPlaying) {
+                      setIsPlaying(true);
+                      setTrack(playlist[playlist.length - 1]);
+                      return;
+                    }
+                    prevTrack();
+                  }}
+                >
+                  <SkipBack />
+                </Button>
+                <Button
+                  variant="default"
+                  size="icon"
+                  onClick={() => {
+                    if (!currentTrack && !isPlaying) {
                       setTrackDirection("next");
-                      if (!currentTrack && !isPlaying) {
-                        setIsPlaying(true);
-                        setTrack(playlist[0]);
-                        return;
-                      }
-                      nextTrack();
-                    }}
-                  >
-                    <SkipForward />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleRepeat}
-                    className="[&_svg]:size-7"
-                  >
-                    <CrossCircledIcon className="text-red-500" />
-                  </Button>
-                </div>
+                      setIsPlaying(true);
+                      setTrack(playlist[0]);
+                      return;
+                    }
+                    setIsPlaying(!isPlaying);
+                  }}
+                >
+                  {isPlaying ? <Pause /> : <Play />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    setTrackDirection("next");
+                    if (!currentTrack && !isPlaying) {
+                      setIsPlaying(true);
+                      setTrack(playlist[0]);
+                      return;
+                    }
+                    nextTrack();
+                  }}
+                >
+                  <SkipForward />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleRepeat}
+                  className="[&_svg]:size-7"
+                >
+                  <CrossCircledIcon className="text-red-500" />
+                </Button>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 

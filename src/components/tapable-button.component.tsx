@@ -98,7 +98,7 @@ const TapableButton: React.FC<TapableButtonProps> = ({
     >
       {shinyAnimate && (
         <ShinyOverlay
-          variants={shinyVariants}
+          variants={shinyVariants as any}
           initial="initial"
           animate="animate"
         />

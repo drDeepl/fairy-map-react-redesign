@@ -7,7 +7,7 @@ const AUDIO_EXTENSIONS = [".mp3", ".wav", ".ogg"];
 
 self.addEventListener("install", (event: ExtendableEvent) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(() => {
       console.log(`Opened cache ${CACHE_NAME}`);
     })
   );

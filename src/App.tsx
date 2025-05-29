@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { checkValidAccessTokenInLocalStorage } from "./common/helpers/token.helper.ts";
 import { setUser } from "./features/auth/auth.slice.ts";
 import AudioProvider from "./features/audio-book/components/audio.provider.tsx";
-import TestPage from "./features/test/test.page.tsx";
+
 
 export interface LocationParams {
   pathname: string;
@@ -73,7 +73,7 @@ function App() {
         />
         <Route path={RouteApp.AdminPage} element={<AdminPage />} />
         <Route path={RouteApp.UserPage} element={<UserPage />} />
-        <Route path={RouteApp.TestPage} element={<TestPage />} />
+        
         <Route
           path="*"
           element={<ErrorMessageScreen message="Страница не найдена" />}

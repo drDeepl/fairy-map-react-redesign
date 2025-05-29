@@ -1,5 +1,4 @@
-﻿// src/components/Navbar.tsx
-import React, { Children } from "react";
+﻿import React from "react";
 import { cn } from "../../../lib/utils";
 import { Menu } from "./menu.component";
 import { MenuItem } from "./menu-item.component";

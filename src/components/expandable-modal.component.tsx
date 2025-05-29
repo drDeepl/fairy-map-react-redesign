@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 
 import { motion } from "framer-motion";
 import styled from "styled-components";
@@ -53,7 +53,9 @@ const ExpandableModal: React.FC<ExpandableModalProps> = ({
       x: compact ? "-50%" : "0",
       left: compact ? "50%" : "0",
       y: compact
-        ? `${window.innerHeight - overlayRef.current?.clientHeight - 20}px`
+        ? `${
+            window.innerHeight - ((overlayRef.current?.clientHeight ?? 0) + 20)
+          }px`
         : "0",
       opacity: 1,
       transition: {

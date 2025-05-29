@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/accordion";
 import { Components } from "@/api/schemas/client";
 import apiClient from "@/api/apiClient";
-import { AxiosError, AxiosResponse } from "axios";
 
 import { RouteApp } from "@/pages/constants/route.enum";
 import { CrossCircledIcon, ExitIcon } from "@radix-ui/react-icons";
@@ -244,14 +243,14 @@ const UserPage: React.FC = () => {
       .get({
         storyId: book.id,
       })
-      .then((res) => {
+      .then((res: any) => {
         setBookInfoState((prevState) => ({
           ...prevState,
           audios: res.data,
           load: false,
         }));
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.log(error);
         setBookInfoState((prevState) => ({
           ...prevState,
@@ -266,13 +265,13 @@ const UserPage: React.FC = () => {
     } else {
       apiClient.paths["/api/user/story/audio/request/my"]
         .get({ take: itemsPerPage })
-        .then((result) => {
+        .then((result: any) => {
           setApplicationTableState({
             load: false,
             paginationData: result.data,
           });
         })
-        .catch((error: AxiosError) => {
+        .catch((error: any) => {
           console.log(error);
           showErrorToast("Ошибка при получении заявок...");
         });
@@ -281,15 +280,13 @@ const UserPage: React.FC = () => {
         .get({
           userId: Number(user.sub),
         })
-        .then(
-          (res: AxiosResponse<Components.Schemas.StoryBookResponseDto[]>) => {
-            setListBookState({
-              load: false,
-              books: res.data,
-            });
-            console.log(listBookState);
-          }
-        );
+        .then((res: any) => {
+          setListBookState({
+            load: false,
+            books: res.data,
+          });
+          console.log(listBookState);
+        });
     }
   }, []);
 

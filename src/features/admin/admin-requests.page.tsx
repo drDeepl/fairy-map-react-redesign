@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { AxiosError } from "axios";
+
 import { Components } from "@/api/schemas/client";
 import { createColumns } from "../application/components/data-table/columns";
 
@@ -9,17 +9,6 @@ import { DataTableApplicationAdmin } from "../application/components/data-table/
 
 import { Toaster } from "@/components/ui/toaster";
 
-import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-
-import ReactAudioPlayer from "react-audio-player";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CrossCircledIcon } from "@radix-ui/react-icons";
 
@@ -33,12 +22,9 @@ import { getDescriptionApplicationStatus } from "../application/helpers/get-desc
 
 import DialogForm from "./components/alert-dialog-promt.component";
 import ChangeApplicationStatusForm from "./forms/confirm-change-status/change-status.form";
-import StatusDropdownMenu from "../application/components/status-dropdown.component";
+
 import PaginationBox from "@/components/pagination.component";
 import { PageMetaDto } from "@/api/interfaces/page-meta.dto";
-import NavbarComponent from "@/components/ui/navbar-menu/navbar.component";
-import StickyBottomNavigation from "@/components/sticky-bottom-navigation";
-import StickyBottomReveal from "@/components/ui/sticky-bottom-reveal";
 
 interface ApplicationTableState {
   load: boolean;
@@ -63,26 +49,28 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
 }) => {
   const { toast } = useToast();
 
-  const [applicationTableState, setApplicationTableState] =
-    useState<ApplicationTableState>({
-      load: true,
-      paginationData: {
-        data: [],
-        meta: {
-          page: 0,
-          take: 0,
-          itemCount: 0,
-          pageCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        },
+  const [applicationTableState, setApplicationTableState] = useState<
+    ApplicationTableState
+  >({
+    load: true,
+    paginationData: {
+      data: [],
+      meta: {
+        page: 0,
+        take: 0,
+        itemCount: 0,
+        pageCount: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
       },
-    });
+    },
+  });
 
-  const [editApplicationState, setEditApplicationState] =
-    useState<ApplicationEditState>({
-      data: undefined,
-    });
+  const [editApplicationState, setEditApplicationState] = useState<
+    ApplicationEditState
+  >({
+    data: undefined,
+  });
 
   const [audioPlayerState, setAudioPlayerState] = useState<AudioPlayerState>({
     applicationAudio: null,
@@ -91,6 +79,7 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
   const handleOnClickAudio = (
     application: Components.Schemas.AudioApplicationWithUserAudioResponseDto
   ) => {
+    console.log(audioPlayerState);
     const audioPlayer: HTMLElement | null = document.getElementById(
       "audio-player__container"
     );
@@ -106,19 +95,19 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
     });
   };
 
-  const handleOnClickCloseAudio = () => {
-    const audioPlayer: HTMLElement | null = document.getElementById(
-      "audio-player__container"
-    );
+  // const handleOnClickCloseAudio = () => {
+  //   const audioPlayer: HTMLElement | null = document.getElementById(
+  //     "audio-player__container"
+  //   );
 
-    if (audioPlayer) {
-      audioPlayer.classList.add("animate-zomm-out");
-    }
+  //   if (audioPlayer) {
+  //     audioPlayer.classList.add("animate-zomm-out");
+  //   }
 
-    setAudioPlayerState({
-      applicationAudio: null,
-    });
-  };
+  //   setAudioPlayerState({
+  //     applicationAudio: null,
+  //   });
+  // };
 
   const showErrorToast = (msg: string) => {
     return toast({
@@ -151,13 +140,13 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
   useEffect(() => {
     apiClient.paths["/api/audio-story-request/all"]
       .get({ take: itemsPerPage })
-      .then((result) => {
+      .then((result: any) => {
         setApplicationTableState({
           load: false,
           paginationData: result.data,
         });
       })
-      .catch((error: AxiosError) => {
+      .catch((error: any) => {
         console.log(error);
         showErrorToast("Ошибка при получении заявок...");
       });
@@ -187,10 +176,10 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
     }
   };
 
-  const handleOnErrorAudio = (e: Event) => {
-    console.log(e);
-    showErrorToast("Ошибка при загрузки озвучки...");
-  };
+  // const handleOnErrorAudio = (e: Event) => {
+  //   console.log(e);
+  //   showErrorToast("Ошибка при загрузки озвучки...");
+  // };
 
   const handleOnSelectStatus = (data: ApplicationEditData) => {
     setEditApplicationState({
@@ -218,11 +207,10 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
         }
 
         if (editApplicationState.data.status === "SUCCESSED") {
-          const successedApplicaiton =
-            applicationTableState.paginationData.data.find(
-              (application) =>
-                application.id === editApplicationState.data?.aplicationId
-            );
+          const successedApplicaiton = applicationTableState.paginationData.data.find(
+            (application) =>
+              application.id === editApplicationState.data?.aplicationId
+          );
 
           if (successedApplicaiton) {
             const data = {
@@ -246,13 +234,14 @@ const AdminRequestsPage: React.FC<AdminRequestsPageProps> = ({
 
         showSuccessToast("статус заявки успешно изменён");
 
-        const updatedApplications =
-          applicationTableState.paginationData.data.map((application) => {
+        const updatedApplications = applicationTableState.paginationData.data.map(
+          (application) => {
             if (application.id === editApplicationState.data?.aplicationId) {
               application.status = editApplicationState.data?.status;
             }
             return application;
-          });
+          }
+        );
 
         setApplicationTableState((prevState) => ({
           ...prevState,

@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  ReactNode,
-  useContext,
-  createContext,
-  useEffect,
-} from "react";
+import React, { ReactNode, useContext, createContext, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styled from "styled-components";
 import TapableButton from "./tapable-button.component";

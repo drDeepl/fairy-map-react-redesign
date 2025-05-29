@@ -93,8 +93,10 @@ const AdminStoriesPage: React.FC = () => {
   const [openAddBookForm, setOpenAddBookForm] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
 
-  const [selectedLanguage, setSelectedLanguage] =
-    useState<Components.Schemas.LanguageDto | null>(null);
+  const [
+    selectedLanguage,
+    setSelectedLanguage,
+  ] = useState<Components.Schemas.LanguageDto | null>(null);
 
   const [languageListState, setLanguageListState] = useState<ListLanguageState>(
     {
@@ -216,7 +218,7 @@ const AdminStoriesPage: React.FC = () => {
   };
 
   useEffect(() => {
-    apiClient.EthnicGroupController_getAllLanguage().then((result) => {
+    apiClient.EthnicGroupController_getAllLanguage().then((result: any) => {
       setLanguageListState({
         open: false,
         load: false,
@@ -439,7 +441,10 @@ const AdminStoriesPage: React.FC = () => {
                 <div>
                   {bookState.audios.length > 0 ? (
                     <div className="flex items-start space-x-2">
-                      <AudioBook audioBooks={bookState.audios} />
+                      <AudioBook
+                        audioBooks={bookState.audios}
+                        onError={(msg) => console.log(msg)}
+                      />
                       <Popover
                         open={languageListState.open}
                         onOpenChange={(open) => {

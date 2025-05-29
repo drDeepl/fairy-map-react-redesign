@@ -1,4 +1,4 @@
-﻿import { io, Socket } from "socket.io-client";
+﻿import io, { Socket } from "socket.io-client";
 import { tokenService } from "../../services/token.service";
 
 const SOCKET_URL = import.meta.env.VITE_WEBSOCKET_IO_API_URL as string;
@@ -18,13 +18,13 @@ export function initSocket(): typeof Socket {
       autoConnect: true,
     });
 
-    socketInstance.on("connect", () => {
+    socketInstance?.on("connect", () => {
       console.info("WebSocket connected:", socketInstance?.id);
     });
-    socketInstance.on("connect_error", (err) => {
+    socketInstance?.on("connect_error", (err: any) => {
       console.error("WebSocket connect error:", err);
     });
-    socketInstance.on("disconnect", (reason) => {
+    socketInstance?.on("disconnect", (reason: any) => {
       console.warn("WebSocket disconnected:", reason);
     });
   }

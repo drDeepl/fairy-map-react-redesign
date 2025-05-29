@@ -120,7 +120,7 @@ const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
         currentTrack: track,
       }));
     },
-    [state.track]
+    [state.currentTrack]
   );
 
   // Пауза

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import { Components } from "@/api/schemas/client";
@@ -36,10 +36,9 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
     (state: RootState) => state.audioBookPlayer.currentAudioBook
   );
 
-  const [selectedAudio, setSelectedAudio] =
-    useState<Components.Schemas.AudioStoryResponseDto>(
-      currentAudioBook || audioBooks[0]
-    );
+  const [selectedAudio, setSelectedAudio] = useState<
+    Components.Schemas.AudioStoryResponseDto
+  >(currentAudioBook || audioBooks[0]);
 
   const handleOnClickStar = async (rating: number) => {
     if (onClickRate) {
@@ -77,7 +76,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
         <div className="flex items-center w-full px-2 space-x-1">
           <AudioPlayer
             src={selectedAudio.srcAudio}
-            onError={(e) => onError("ошибка при загрузке озвучки")}
+            onError={(_) => onError("ошибка при загрузке озвучки")}
           />
 
           <div className="flex items-center space-x-1">
@@ -134,7 +133,7 @@ const AudioBook: React.FC<AudioPlayerProps> = ({
 
         <AudioPlayer
           src={selectedAudio.srcAudio}
-          onError={(e) => onError("ошибка при загрузке озвучки")}
+          onError={(_) => onError("ошибка при загрузке озвучки")}
         />
       </div>
     </div>
