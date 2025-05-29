@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/tooltip";
 
 import React, { useState, useEffect } from "react";
-import { useSocket } from "../../../api/sockets/socket.context";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
@@ -47,7 +46,7 @@ interface ListBookState {
 }
 
 const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
-  const socket = useSocket();
+  // const socket = useSocket();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -97,7 +96,8 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
   };
 
   const handleStorySearch = () => {
-    socket.emit("searchStoryByName", { name: valueSearch, take: 10 });
+    // socket.emit("searchStoryByName", { name: valueSearch, take: 10 });
+    console.log("todo search");
   };
 
   useEffect(() => {
@@ -114,21 +114,21 @@ const SearchBookBox: React.FC<SearchBookBoxProps> = ({ onClickBook }) => {
     setIsTyping(false);
   }, [valueSearch]);
 
-  useEffect(() => {
-    const onBookResults = (books: BookPageResponse) => {
-      setListBookState({
-        load: false,
-        books: books,
-      });
-      setIsTyping(false);
-    };
+  // useEffect(() => {
+  //   const onBookResults = (books: BookPageResponse) => {
+  //     setListBookState({
+  //       load: false,
+  //       books: books,
+  //     });
+  //     setIsTyping(false);
+  //   };
 
-    socket.on("searchResultStoryByName", onBookResults);
+  //   socket.on("searchResultStoryByName", onBookResults);
 
-    return () => {
-      socket.off("searchResultStoryByName", onBookResults);
-    };
-  }, [socket]);
+  //   return () => {
+  //     socket.off("searchResultStoryByName", onBookResults);
+  //   };
+  // }, [socket]);
 
   return (
     <div>

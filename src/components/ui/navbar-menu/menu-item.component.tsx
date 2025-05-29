@@ -30,11 +30,13 @@ const menuVariants: Variants = {
 
 const buttonVariants: Variants = {
   rest: {
-    border: "1px solid black",
+    // border: "1px solid black",
+    border: "none",
     borderRadius: "100%",
   },
   hover: {
-    border: "1px solid #FD746E",
+    // border: "1px solid #FD746E",
+    border: "none",
     borderRadius: "100%",
 
     transition: {
@@ -82,7 +84,8 @@ export const MenuItem = React.memo<MenuItemProps>(({ label, children }) => {
         transition={{ duration: 0.5 }}
       >
         <PlayCircleIcon
-          className={isActive ? "text-[#FD746E]" : "text-slate-500"}
+          // className={isActive ? "text-[#FD746E]" : "text-slate-500"}
+          className="text-white"
         />
         <span>{label}</span>
 

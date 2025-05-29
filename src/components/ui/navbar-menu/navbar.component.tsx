@@ -3,7 +3,7 @@ import { cn } from "../../../lib/utils";
 import { Menu } from "./menu.component";
 import { MenuItem } from "./menu-item.component";
 import { NavbarProvider } from "./navbar.context";
-import BookPlayer from "@/features/book-player/book-player";
+// import BookPlayer from "@/features/book-player/book-player";
 
 interface NavbarProps {
   className?: string;
@@ -26,9 +26,7 @@ const NavbarComponent: React.FC<NavbarProps> = ({
       <div className="relative -bottom-[55px] -right-4 z-50">{search}</div>
       <Menu>
         <MenuItem label="">
-          <div className="z-[55]">
-            <BookPlayer />
-          </div>
+          <div className="z-[55]">{/* <BookPlayer /> */}</div>
         </MenuItem>
       </Menu>
       <div className="absolute bottom-[5px] right-4 z-50">{children}</div>
